@@ -1,6 +1,7 @@
-package models
+package models_test
 
 import (
+	"sirine-go/backend/models"
 	"testing"
 	"time"
 )
@@ -37,7 +38,7 @@ func TestUserIsLocked(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			user := &User{
+			user := &models.User{
 				LockedUntil: tt.lockedUntil,
 			}
 			result := user.IsLocked()
@@ -52,19 +53,19 @@ func TestUserIsLocked(t *testing.T) {
 func TestUserIsActive(t *testing.T) {
 	tests := []struct {
 		name        string
-		status      UserStatus
+		status      models.UserStatus
 		lockedUntil *time.Time
 		expected    bool
 	}{
 		{
 			name:        "Active and not locked",
-			status:      StatusActive,
+			status:      models.StatusActive,
 			lockedUntil: nil,
 			expected:    true,
 		},
 		{
 			name:     "Active but locked",
-			status:   StatusActive,
+			status:   models.StatusActive,
 			lockedUntil: func() *time.Time {
 				t := time.Now().Add(10 * time.Minute)
 				return &t
@@ -73,13 +74,13 @@ func TestUserIsActive(t *testing.T) {
 		},
 		{
 			name:        "Inactive",
-			status:      StatusInactive,
+			status:      models.StatusInactive,
 			lockedUntil: nil,
 			expected:    false,
 		},
 		{
 			name:        "Suspended",
-			status:      StatusSuspended,
+			status:      models.StatusSuspended,
 			lockedUntil: nil,
 			expected:    false,
 		},
@@ -87,7 +88,7 @@ func TestUserIsActive(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			user := &User{
+			user := &models.User{
 				Status:      tt.status,
 				LockedUntil: tt.lockedUntil,
 			}
@@ -101,33 +102,33 @@ func TestUserIsActive(t *testing.T) {
 
 // TestUserHasRole memverifikasi role checking
 func TestUserHasRole(t *testing.T) {
-	user := &User{
-		Role: RoleAdmin,
+	user := &models.User{
+		Role: models.RoleAdmin,
 	}
 
 	tests := []struct {
 		name     string
-		roles    []UserRole
+		roles    []models.UserRole
 		expected bool
 	}{
 		{
 			name:     "Has role - single",
-			roles:    []UserRole{RoleAdmin},
+			roles:    []models.UserRole{models.RoleAdmin},
 			expected: true,
 		},
 		{
 			name:     "Has role - multiple",
-			roles:    []UserRole{RoleManager, RoleAdmin, RoleStaffKhazwal},
+			roles:    []models.UserRole{models.RoleManager, models.RoleAdmin, models.RoleStaffKhazwal},
 			expected: true,
 		},
 		{
 			name:     "Does not have role",
-			roles:    []UserRole{RoleOperatorCetak},
+			roles:    []models.UserRole{models.RoleOperatorCetak},
 			expected: false,
 		},
 		{
 			name:     "Empty roles",
-			roles:    []UserRole{},
+			roles:    []models.UserRole{},
 			expected: false,
 		},
 	}
@@ -146,34 +147,34 @@ func TestUserHasRole(t *testing.T) {
 func TestUserIsAdmin(t *testing.T) {
 	tests := []struct {
 		name     string
-		role     UserRole
+		role     models.UserRole
 		expected bool
 	}{
 		{
 			name:     "Admin role",
-			role:     RoleAdmin,
+			role:     models.RoleAdmin,
 			expected: true,
 		},
 		{
 			name:     "Manager role",
-			role:     RoleManager,
+			role:     models.RoleManager,
 			expected: true,
 		},
 		{
 			name:     "Staff role",
-			role:     RoleStaffKhazwal,
+			role:     models.RoleStaffKhazwal,
 			expected: false,
 		},
 		{
 			name:     "Operator role",
-			role:     RoleOperatorCetak,
+			role:     models.RoleOperatorCetak,
 			expected: false,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			user := &User{
+			user := &models.User{
 				Role: tt.role,
 			}
 			result := user.IsAdmin()
@@ -187,18 +188,18 @@ func TestUserIsAdmin(t *testing.T) {
 // TestUserToSafeUser memverifikasi safe user conversion
 func TestUserToSafeUser(t *testing.T) {
 	now := time.Now()
-	user := &User{
+	user := &models.User{
 		ID:              1,
 		NIP:             "99999",
 		FullName:        "Test User",
 		Email:           "test@example.com",
 		Phone:           "081234567890",
 		PasswordHash:    "secret_hash",
-		Role:            RoleAdmin,
-		Department:      DeptKhazwal,
-		Shift:           ShiftPagi,
+		Role:            models.RoleAdmin,
+		Department:      models.DeptKhazwal,
+		Shift:           models.ShiftPagi,
 		ProfilePhotoURL: "https://example.com/photo.jpg",
-		Status:          StatusActive,
+		Status:          models.StatusActive,
 		LastLoginAt:     &now,
 		CreatedAt:       now,
 		UpdatedAt:       now,
@@ -263,7 +264,7 @@ func TestUserSessionIsValid(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			session := &UserSession{
+			session := &models.UserSession{
 				IsRevoked: tt.isRevoked,
 				ExpiresAt: tt.expiresAt,
 			}
@@ -313,7 +314,7 @@ func TestPasswordResetTokenIsValid(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			token := &PasswordResetToken{
+			token := &models.PasswordResetToken{
 				UsedAt:    tt.usedAt,
 				ExpiresAt: tt.expiresAt,
 			}

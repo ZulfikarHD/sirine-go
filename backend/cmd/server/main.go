@@ -8,9 +8,16 @@ import (
 	"sirine-go/backend/routes"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// Load environment variables dari file .env
+	// Path relatif dari backend/ directory (working directory saat go run)
+	if err := godotenv.Load("../.env"); err != nil {
+		log.Println("Warning: .env file tidak ditemukan, menggunakan default values")
+	}
+
 	// Load configuration
 	cfg := config.LoadConfig()
 

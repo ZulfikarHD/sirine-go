@@ -1,12 +1,13 @@
-package services
+package services_test
 
 import (
+	"sirine-go/backend/services"
 	"testing"
 )
 
 // TestHashPassword memverifikasi password hashing dengan bcrypt
 func TestHashPassword(t *testing.T) {
-	service := NewPasswordService()
+	service := services.NewPasswordService()
 	password := "TestPassword123!"
 
 	hash, err := service.HashPassword(password)
@@ -30,7 +31,7 @@ func TestHashPassword(t *testing.T) {
 
 // TestHashPasswordEmpty memverifikasi error handling untuk empty password
 func TestHashPasswordEmpty(t *testing.T) {
-	service := NewPasswordService()
+	service := services.NewPasswordService()
 
 	_, err := service.HashPassword("")
 	if err == nil {
@@ -40,7 +41,7 @@ func TestHashPasswordEmpty(t *testing.T) {
 
 // TestVerifyPassword memverifikasi password verification
 func TestVerifyPassword(t *testing.T) {
-	service := NewPasswordService()
+	service := services.NewPasswordService()
 	password := "CorrectPassword123!"
 
 	hash, _ := service.HashPassword(password)
@@ -68,7 +69,7 @@ func TestVerifyPassword(t *testing.T) {
 
 // TestValidatePasswordPolicy memverifikasi password policy enforcement
 func TestValidatePasswordPolicy(t *testing.T) {
-	service := NewPasswordService()
+	service := services.NewPasswordService()
 
 	tests := []struct {
 		name     string
@@ -129,7 +130,7 @@ func TestValidatePasswordPolicy(t *testing.T) {
 
 // TestGetPasswordStrength memverifikasi password strength calculation
 func TestGetPasswordStrength(t *testing.T) {
-	service := NewPasswordService()
+	service := services.NewPasswordService()
 
 	tests := []struct {
 		name     string
@@ -155,7 +156,7 @@ func TestGetPasswordStrength(t *testing.T) {
 
 // TestValidateAndHash memverifikasi combined validation dan hashing
 func TestValidateAndHash(t *testing.T) {
-	service := NewPasswordService()
+	service := services.NewPasswordService()
 
 	// Valid password
 	validPassword := "ValidPass123!"
@@ -177,7 +178,7 @@ func TestValidateAndHash(t *testing.T) {
 
 // BenchmarkHashPassword mengukur performance password hashing
 func BenchmarkHashPassword(b *testing.B) {
-	service := NewPasswordService()
+	service := services.NewPasswordService()
 	password := "BenchmarkPassword123!"
 
 	b.ResetTimer()
@@ -188,7 +189,7 @@ func BenchmarkHashPassword(b *testing.B) {
 
 // BenchmarkVerifyPassword mengukur performance password verification
 func BenchmarkVerifyPassword(b *testing.B) {
-	service := NewPasswordService()
+	service := services.NewPasswordService()
 	password := "BenchmarkPassword123!"
 	hash, _ := service.HashPassword(password)
 
