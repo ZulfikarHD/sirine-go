@@ -171,12 +171,13 @@ const clearError = (field) => {
 
 /**
  * Handle login form submission dengan validasi flexible untuk NIP atau Email
+ * Memastikan tidak ada full page reload dengan proper error handling
  */
-const handleLogin = async (e) => {
-  // Prevent default form submission untuk avoid full reload
-  if (e) {
-    e.preventDefault()
-  }
+const handleLogin = async (event) => {
+  // CRITICAL: Prevent default form submission behavior untuk avoid full reload
+  // This is a safeguard even though form has @submit.prevent
+  event?.preventDefault()
+  event?.stopPropagation()
 
   // Reset errors
   errors.value = { nip: '', password: '' }
@@ -185,12 +186,12 @@ const handleLogin = async (e) => {
   // Validasi
   if (!form.value.nip || form.value.nip.trim() === '') {
     errors.value.nip = 'NIP atau Email harus diisi'
-    return
+    return false
   }
 
   if (!form.value.password) {
     errors.value.password = 'Password harus diisi'
-    return
+    return false
   }
 
   try {
@@ -208,6 +209,8 @@ const handleLogin = async (e) => {
     triggerHapticFeedback('success')
 
   } catch (err) {
+    // Handle error tanpa page reload
+    console.error('Login error:', err)
     errorMessage.value = err.response?.data?.message || 'NIP/Email atau password salah'
     
     // Shake animation untuk error
@@ -227,5 +230,8 @@ const handleLogin = async (e) => {
     // Trigger error haptic
     triggerHapticFeedback('error')
   }
+  
+  // Ensure we never reload
+  return false
 }
 </script>

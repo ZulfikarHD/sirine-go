@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { useAuthStore } from '../stores/auth'
-import { useRouter } from 'vue-router'
+import router from '../router'
 
 /**
  * API base URL dari environment variable
@@ -42,11 +42,18 @@ apiClient.interceptors.response.use(
     const authStore = useAuthStore()
     const originalRequest = error.config
 
-    // Handle 401 Unauthorized
+    // Handle 401 Unauthorized (hanya untuk authenticated requests)
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
 
-      // Coba refresh token
+      // Skip auto-redirect jika ini adalah login request yang gagal
+      const isLoginRequest = originalRequest.url?.includes('/api/auth/login')
+      if (isLoginRequest) {
+        // Untuk login request, reject error tanpa redirect
+        return Promise.reject(error)
+      }
+
+      // Coba refresh token untuk request lainnya
       if (authStore.refreshToken) {
         try {
           const response = await axios.post(`${API_BASE_URL}/api/auth/refresh`, {
@@ -59,18 +66,19 @@ apiClient.interceptors.response.use(
             return apiClient(originalRequest)
           }
         } catch (refreshError) {
-          // Refresh token gagal, logout user
+          // Refresh token gagal, logout user tanpa full page reload
           authStore.clearAuth()
-          if (typeof window !== 'undefined') {
-            window.location.href = '/login'
+          // Use router untuk avoid full page reload
+          if (window.location.pathname !== '/login') {
+            router.push('/login').catch(() => {})
           }
           return Promise.reject(refreshError)
         }
       } else {
-        // Tidak ada refresh token, logout
+        // Tidak ada refresh token, redirect ke login tanpa full page reload
         authStore.clearAuth()
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login'
+        if (window.location.pathname !== '/login') {
+          router.push('/login').catch(() => {})
         }
       }
     }
