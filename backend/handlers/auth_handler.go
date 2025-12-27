@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"sirine-go/backend/models"
 	"sirine-go/backend/services"
+	"sirine-go/backend/utils"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -22,10 +23,10 @@ func NewAuthHandler(authService *services.AuthService) *AuthHandler {
 }
 
 // Login handles POST /api/auth/login
-// @Summary User login dengan NIP dan password
+// @Summary User login dengan NIP atau Email dan password
 // @Accept json
 // @Produce json
-// @Param request body services.LoginRequest true "Login credentials"
+// @Param request body services.LoginRequest true "Login credentials (NIP atau Email)"
 // @Success 200 {object} services.LoginResponse
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
@@ -34,11 +35,8 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	var req services.LoginRequest
 	
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": "Data yang dikirim tidak valid",
-			"error":   err.Error(),
-		})
+		// Return validation errors dengan pesan dalam Bahasa Indonesia
+		c.JSON(http.StatusBadRequest, utils.NewValidationErrorResponse(err))
 		return
 	}
 
@@ -151,11 +149,8 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": "Refresh token harus disertakan",
-			"error":   err.Error(),
-		})
+		// Return validation errors dengan pesan dalam Bahasa Indonesia
+		c.JSON(http.StatusBadRequest, utils.NewValidationErrorResponse(err))
 		return
 	}
 

@@ -42,7 +42,7 @@ Sprint 1 merupakan implementasi foundational authentication system dengan JWT-ba
 #### 3. Services
 - ✅ **PasswordService**: bcrypt hashing (cost 12), password policy validation
 - ✅ **AuthService**: 
-  - Login dengan NIP/password
+  - Login dengan NIP atau Email (flexible identifier)
   - JWT generation (15 min expiry)
   - Refresh token (30 days expiry)
   - Token validation
@@ -578,6 +578,44 @@ Frontend akan berjalan di `http://localhost:5173`
 3. **Axios Interceptors**: Centralized auth token injection & refresh
 4. **GORM Auto-migration**: Simplified database schema management
 5. **Bcrypt Cost 12**: Balance between security & performance
+
+---
+
+## Recent Updates (Post-Review)
+
+### Update: Flexible Login Identifier (December 27, 2025)
+
+#### Changes Made:
+1. **Frontend (`Login.vue`)**:
+   - ✅ Removed restrictive 5-digit numeric validation
+   - ✅ Changed label dari "NIP (Nomor Induk Pegawai)" ke "NIP atau Email"
+   - ✅ Input field sekarang accept alphanumeric dan email format
+   - ✅ Fixed form submission untuk prevent full page reload
+   - ✅ Updated placeholder: "Masukkan NIP atau Email"
+   - ✅ Updated error messages: "NIP/Email atau password salah"
+
+2. **Backend (`auth_service.go`)**:
+   - ✅ Updated login logic untuk support NIP atau Email
+   - ✅ Query database dengan `WHERE nip = ? OR email = ?`
+   - ✅ Updated error messages untuk consistency
+   - ✅ Added documentation comments
+
+3. **Backend (`auth_handler.go`)**:
+   - ✅ Updated Swagger documentation
+   - ✅ Updated API documentation comments
+
+#### Technical Details:
+- **Login Flow**: User dapat login dengan NIP (text/numeric) atau Email address
+- **Backend Query**: `db.Where("nip = ? OR email = ?", identifier, identifier)`
+- **Form Handling**: Added explicit `e.preventDefault()` untuk avoid full reload
+- **Validation**: Removed strict 5-digit numeric validation, sekarang flexible
+- **Backward Compatibility**: Field name tetap `nip` di API untuk compatibility
+
+#### Benefits:
+- ✅ More flexible user experience
+- ✅ Support multiple identifier types (NIP dengan text, NIP numeric, Email)
+- ✅ Better UX untuk users yang prefer email login
+- ✅ No breaking changes pada API contract
 
 ---
 

@@ -41,8 +41,9 @@ type JWTClaims struct {
 }
 
 // LoginRequest merupakan struktur untuk login request
+// yang mendukung login dengan NIP atau Email
 type LoginRequest struct {
-	NIP        string `json:"nip" binding:"required"`
+	NIP        string `json:"nip" binding:"required"` // Bisa berisi NIP atau Email
 	Password   string `json:"password" binding:"required"`
 	RememberMe bool   `json:"remember_me"`
 }
@@ -55,14 +56,22 @@ type LoginResponse struct {
 	RequirePasswordChange bool           `json:"require_password_change"`
 }
 
-// Login melakukan autentikasi user dengan NIP dan password
+// Login melakukan autentikasi user dengan NIP atau Email dan password
 // serta generate JWT token untuk subsequent requests
 func (s *AuthService) Login(req LoginRequest, ipAddress, userAgent string) (*LoginResponse, error) {
-	// Find user by NIP
+	// Find user by NIP atau Email
+	// Cek apakah input mengandung @ untuk determine email atau NIP
 	var user models.User
-	if err := s.db.Where("nip = ?", req.NIP).First(&user).Error; err != nil {
+	var err error
+	
+	identifier := req.NIP // Field name tetap NIP untuk backward compatibility
+	
+	// Try to find by NIP or Email
+	err = s.db.Where("nip = ? OR email = ?", identifier, identifier).First(&user).Error
+	
+	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, errors.New("NIP atau password salah")
+			return nil, errors.New("NIP/Email atau password salah")
 		}
 		return nil, err
 	}
@@ -94,7 +103,7 @@ func (s *AuthService) Login(req LoginRequest, ipAddress, userAgent string) (*Log
 		}
 		
 		s.db.Save(&user)
-		return nil, errors.New("NIP atau password salah")
+		return nil, errors.New("NIP/Email atau password salah")
 	}
 
 	// Reset failed attempts dan update last login

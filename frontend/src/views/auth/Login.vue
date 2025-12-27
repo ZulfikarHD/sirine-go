@@ -15,7 +15,7 @@
             </svg>
           </div>
           <h1 class="text-3xl font-bold text-gray-900 mb-2">Sirine Go</h1>
-          <p class="text-gray-600">Masuk dengan NIP dan password Anda</p>
+          <p class="text-gray-600">Masuk dengan NIP/Email dan password Anda</p>
         </div>
 
         <!-- Error Message -->
@@ -28,21 +28,19 @@
 
         <!-- Login Form -->
         <form @submit.prevent="handleLogin" class="space-y-5">
-          <!-- NIP Input -->
+          <!-- NIP/Email Input -->
           <div>
             <label for="nip" class="block text-sm font-semibold text-gray-700 mb-2">
-              NIP (Nomor Induk Pegawai)
+              NIP atau Email
             </label>
             <input
               id="nip"
               v-model="form.nip"
               type="text"
-              maxlength="5"
-              placeholder="Masukkan NIP (5 digit)"
+              placeholder="Masukkan NIP atau Email"
               required
               class="input-field"
               :class="{ 'border-red-300': errors.nip }"
-              @input="validateNIP"
               @focus="clearError('nip')"
             />
             <p v-if="errors.nip" class="mt-1 text-xs text-red-600">{{ errors.nip }}</p>
@@ -164,21 +162,6 @@ onMounted(() => {
 })
 
 /**
- * Validate NIP input - hanya angka dan max 5 digit
- */
-const validateNIP = (e) => {
-  const value = e.target.value
-  // Hanya allow angka
-  form.value.nip = value.replace(/\D/g, '').slice(0, 5)
-  
-  if (form.value.nip && form.value.nip.length < 5) {
-    errors.value.nip = 'NIP harus 5 digit'
-  } else {
-    errors.value.nip = ''
-  }
-}
-
-/**
  * Clear error untuk field tertentu
  */
 const clearError = (field) => {
@@ -187,16 +170,21 @@ const clearError = (field) => {
 }
 
 /**
- * Handle login form submission
+ * Handle login form submission dengan validasi flexible untuk NIP atau Email
  */
-const handleLogin = async () => {
+const handleLogin = async (e) => {
+  // Prevent default form submission untuk avoid full reload
+  if (e) {
+    e.preventDefault()
+  }
+
   // Reset errors
   errors.value = { nip: '', password: '' }
   errorMessage.value = ''
 
   // Validasi
-  if (!form.value.nip || form.value.nip.length !== 5) {
-    errors.value.nip = 'NIP harus 5 digit angka'
+  if (!form.value.nip || form.value.nip.trim() === '') {
+    errors.value.nip = 'NIP atau Email harus diisi'
     return
   }
 
@@ -207,20 +195,20 @@ const handleLogin = async () => {
 
   try {
     const response = await login(
-      form.value.nip,
+      form.value.nip.trim(),
       form.value.password,
       form.value.rememberMe
     )
 
     // Login berhasil - redirect
     const redirectPath = route.query.redirect || getDashboardRoute()
-    router.push(redirectPath)
+    await router.push(redirectPath)
 
     // Trigger success haptic
     triggerHapticFeedback('success')
 
   } catch (err) {
-    errorMessage.value = err.response?.data?.message || 'NIP atau password salah'
+    errorMessage.value = err.response?.data?.message || 'NIP/Email atau password salah'
     
     // Shake animation untuk error
     try {

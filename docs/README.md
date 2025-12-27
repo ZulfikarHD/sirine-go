@@ -83,8 +83,14 @@ Build dan test fitur baru:
 8. **[API_DOCUMENTATION.md](./development/API_DOCUMENTATION.md)** 🔌  
    Complete API reference dengan contoh request/response
 
-9. **[TESTING.md](./development/TESTING.md)** 🧪  
-   Testing guide (manual & automated testing)
+9. **[VALIDATION_GUIDE.md](./VALIDATION_GUIDE.md)** ✅  
+   Server-side validation dengan Gin (Laravel-style)
+
+10. **[VALIDATION_EXAMPLES.md](./VALIDATION_EXAMPLES.md)** 📋  
+    Practical validation examples dan test cases
+
+11. **[TESTING.md](./development/TESTING.md)** 🧪  
+    Testing guide (manual & automated testing)
 
 ---
 
