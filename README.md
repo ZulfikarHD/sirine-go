@@ -125,7 +125,6 @@ Dokumentasi lengkap tersedia di folder **`docs/`**:
 - 📗 [**API_DOCUMENTATION.md**](docs/API_DOCUMENTATION.md) - Complete API reference
 - 🏗️ [**ARCHITECTURE_EXPLAINED.md**](docs/ARCHITECTURE_EXPLAINED.md) - Package explanations & why needed
 - 📁 [**FOLDER_STRUCTURE.md**](docs/FOLDER_STRUCTURE.md) - Project structure guide
-- 🎨 [**TAILWIND_V4_MIGRATION.md**](docs/development/TAILWIND_V4_MIGRATION.md) - Tailwind CSS v4 configuration & migration guide
 
 ### **Deployment:**
 - 🚀 [**DEPLOYMENT.md**](docs/DEPLOYMENT.md) - Production deployment guide
