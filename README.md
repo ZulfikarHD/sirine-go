@@ -69,26 +69,30 @@ sirine-go/
 ## ⚡ Quick Start (5 Menit)
 
 ```bash
-# 1. Setup database
-mysql -u root -p -e "CREATE DATABASE sirine_go CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+# 1. Setup database & seed admin user
+mysql -u root -p < backend/database/setup.sql
 
-# 2. Edit .env (sesuaikan DB_PASSWORD)
-nano backend/.env
+# 2. Install backend dependencies
+cd backend && go mod tidy
 
-# 3. Install dependencies
-make install
+# 3. Install frontend dependencies
+cd ../frontend && yarn install
 
 # 4. Jalankan backend (Terminal 1)
-make dev-backend
+cd ../backend && go run cmd/server/main.go
 
 # 5. Jalankan frontend (Terminal 2)
-make dev-frontend
+cd frontend && yarn dev
 
-# 6. Buka browser
-# http://localhost:5173
+# 6. Login ke aplikasi
+# URL: http://localhost:5173
+# NIP: 99999
+# Password: Admin@123
 ```
 
-**🎉 Done! Aplikasi berjalan!**
+**🎉 Done! Authentication system berjalan!**
+
+**Troubleshooting**: Lihat [SPRINT1_IMPLEMENTATION.md](SPRINT1_IMPLEMENTATION.md#troubleshooting)
 
 ---
 
@@ -96,8 +100,12 @@ make dev-frontend
 
 Dokumentasi lengkap tersedia di folder **`docs/`**:
 
+### **Sprint 1 - Authentication:**
+- 🔐 [**AUTHENTICATION.md**](docs/features/AUTHENTICATION.md) - Complete auth system documentation
+- 📖 [**SPRINT1_IMPLEMENTATION.md**](SPRINT1_IMPLEMENTATION.md) - Implementation details & testing guide
+- 📋 [**Sprint Plan**](.cursor/plans/sprint_plan_-_authentication_fa6ccc79.plan.md) - 6-week sprint roadmap
+
 ### **Getting Started:**
-- 📖 [**QUICKSTART.md**](docs/QUICKSTART.md) - Setup dalam 5 menit
 - 📘 [**SETUP_GUIDE.md**](docs/SETUP_GUIDE.md) - Panduan setup lengkap & troubleshooting
 - ✅ [**CHECKLIST.md**](docs/CHECKLIST.md) - Verification checklist
 
@@ -114,8 +122,18 @@ Dokumentasi lengkap tersedia di folder **`docs/`**:
 
 ## 🎯 Key Features
 
+### **Authentication & Security (Sprint 1):**
+- ✅ JWT-based authentication (15 min expiry)
+- ✅ Refresh token mechanism (30 days)
+- ✅ Role-based access control (7 roles)
+- ✅ Rate limiting (5 attempts → 15 min lockout)
+- ✅ Bcrypt password hashing (cost 12)
+- ✅ Session tracking dengan IP & user agent
+- ✅ Activity logging untuk audit trail
+- ✅ Auto token refresh on expiry
+
 ### **Backend Features:**
-- ✅ RESTful API dengan CRUD operations
+- ✅ RESTful API dengan Go + Gin Framework
 - ✅ Service Pattern untuk clean architecture
 - ✅ GORM untuk type-safe database operations
 - ✅ Auto migration
@@ -124,30 +142,36 @@ Dokumentasi lengkap tersedia di folder **`docs/`**:
 - ✅ Error messages dalam Bahasa Indonesia
 
 ### **Frontend Features:**
-- ✅ Modern UI dengan Tailwind CSS (newest version!)
-- ✅ Smooth animations dengan Motion-v
+- ✅ Modern UI dengan Tailwind CSS 4 + iOS design
+- ✅ Glass effect cards dengan backdrop blur
+- ✅ Spring physics animations (Motion-v)
+- ✅ Haptic feedback untuk mobile
 - ✅ Responsive design (mobile-first)
-- ✅ **Offline capabilities dengan PWA**
-- ✅ Online/Offline status indicator
-- ✅ API caching untuk offline access
-- ✅ Composable pattern untuk reusable logic
-- ✅ Form validation
+- ✅ Pinia state management
+- ✅ Vue Router dengan navigation guards
+- ✅ Auto token injection & refresh
+- ✅ Form validation dengan real-time feedback
 - ✅ Loading & error states
+- ✅ Indigo & Fuchsia gradient theme
 
 ---
 
 ## 🌐 API Endpoints
 
+### Authentication (Sprint 1) ✅
 ```
-GET    /health              # Health check
-GET    /api/examples        # Get all examples
-GET    /api/examples/:id    # Get example by ID
-POST   /api/examples        # Create new example
-PUT    /api/examples/:id    # Update example
-DELETE /api/examples/:id    # Delete example
+POST   /api/auth/login      # Login dengan NIP & password
+POST   /api/auth/logout     # Logout dan revoke session
+GET    /api/auth/me         # Get current user info
+POST   /api/auth/refresh    # Refresh JWT token
 ```
 
-**Full API documentation:** [API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md)
+### Health Check
+```
+GET    /health              # Server health status
+```
+
+**Full API documentation:** [docs/features/AUTHENTICATION.md](docs/features/AUTHENTICATION.md)
 
 ---
 
@@ -166,23 +190,33 @@ make clean             # Clean build files
 
 ## 🧪 Testing
 
-### **Test Backend API:**
+### **Test Authentication:**
 ```bash
+# 1. Health check
 curl http://localhost:8080/health
-curl http://localhost:8080/api/examples
+
+# 2. Login
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"nip":"99999","password":"Admin@123"}'
+
+# 3. Get current user (replace TOKEN)
+curl http://localhost:8080/api/auth/me \
+  -H "Authorization: Bearer TOKEN"
 ```
 
 ### **Test Frontend:**
 1. Buka `http://localhost:5173`
-2. Klik "Tambah Data Baru"
-3. Isi form & submit
-4. Test edit & delete
+2. Login: NIP `99999`, Password `Admin@123`
+3. Test dashboard navigation
+4. Test profile page
+5. Test logout flow
 
-### **Test Offline Mode:**
-1. F12 → Network tab
-2. Set "Offline"
-3. Refresh page
-4. ✅ App tetap berfungsi!
+### **Test Security:**
+1. Login dengan wrong password 5x
+2. ✅ Account locked selama 15 menit
+3. Test protected routes tanpa token
+4. ✅ Auto-redirect ke login
 
 ---
 
@@ -317,9 +351,20 @@ This project is private and proprietary.
 
 ## ✅ Status
 
-**Version:** 1.0.0  
-**Status:** ✅ Production Ready  
+**Version:** 1.0.0 - Sprint 1 Complete  
+**Status:** ✅ Authentication System Production Ready  
 **Last Updated:** 27 Desember 2025
+
+### Sprint 1: Foundation & Core Authentication ✅
+- ✅ JWT-based login/logout
+- ✅ Role-based access control (RBAC)
+- ✅ Session management dengan token tracking
+- ✅ Rate limiting & account lockout
+- ✅ iOS-inspired UI dengan glass effect
+- ✅ Haptic feedback & spring animations
+- ✅ Activity logging untuk audit trail
+
+**Next**: Sprint 2 - User Management & Profile
 
 ---
 

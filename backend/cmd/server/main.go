@@ -23,7 +23,12 @@ func main() {
 	}
 
 	// Auto migrate models
-	if err := database.AutoMigrate(&models.Example{}); err != nil {
+	if err := database.AutoMigrate(
+		&models.User{},
+		&models.UserSession{},
+		&models.PasswordResetToken{},
+		&models.ActivityLog{},
+	); err != nil {
 		log.Fatal("Failed to migrate database:", err)
 	}
 
@@ -31,7 +36,7 @@ func main() {
 	r := gin.Default()
 
 	// Setup routes
-	routes.SetupRoutes(r)
+	routes.SetupRoutes(r, cfg)
 
 	// Start server
 	log.Printf("Server berjalan di port %s", cfg.ServerPort)

@@ -1,0 +1,215 @@
+import { ref } from 'vue'
+import { useAuthStore } from '../stores/auth'
+import { useApi } from './useApi'
+import { useRouter } from 'vue-router'
+
+/**
+ * useAuth composable untuk authentication operations
+ * yang mencakup login, logout, dan user management
+ */
+export const useAuth = () => {
+  const authStore = useAuthStore()
+  const api = useApi()
+  const router = useRouter()
+
+  const isLoading = ref(false)
+  const error = ref(null)
+
+  /**
+   * Login dengan NIP dan password
+   * @param {string} nip - Nomor Induk Pegawai
+   * @param {string} password - Password user
+   * @param {boolean} rememberMe - Remember me option
+   * @returns {Promise} Login response
+   */
+  const login = async (nip, password, rememberMe = false) => {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const response = await api.post('/api/auth/login', {
+        nip,
+        password,
+        remember_me: rememberMe,
+      })
+
+      if (response.success) {
+        authStore.setAuth(response.data)
+
+        // Trigger haptic feedback untuk success (jika available)
+        triggerHapticFeedback('success')
+
+        return response.data
+      } else {
+        throw new Error(response.message || 'Login gagal')
+      }
+    } catch (err) {
+      error.value = err.response?.data?.message || err.message || 'Login gagal'
+      
+      // Trigger haptic feedback untuk error
+      triggerHapticFeedback('error')
+      
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  /**
+   * Logout dan clear session
+   */
+  const logout = async () => {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      await api.post('/api/auth/logout')
+      authStore.clearAuth()
+      router.push('/login')
+      
+      // Trigger haptic feedback
+      triggerHapticFeedback('success')
+    } catch (err) {
+      // Tetap clear auth meski API call gagal
+      authStore.clearAuth()
+      router.push('/login')
+      console.error('Logout error:', err)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  /**
+   * Fetch current user data untuk refresh user info
+   */
+  const fetchCurrentUser = async () => {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const response = await api.get('/api/auth/me')
+
+      if (response.success) {
+        authStore.setUser(response.data)
+        return response.data
+      } else {
+        throw new Error(response.message || 'Gagal mengambil data user')
+      }
+    } catch (err) {
+      error.value = err.response?.data?.message || err.message
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  /**
+   * Check authentication status dan validate token
+   */
+  const checkAuth = async () => {
+    if (!authStore.token) {
+      return false
+    }
+
+    try {
+      await fetchCurrentUser()
+      return true
+    } catch (err) {
+      authStore.clearAuth()
+      return false
+    }
+  }
+
+  /**
+   * Refresh authentication token
+   */
+  const refreshAuth = async () => {
+    if (!authStore.refreshToken) {
+      throw new Error('No refresh token available')
+    }
+
+    try {
+      const response = await api.post('/api/auth/refresh', {
+        refresh_token: authStore.refreshToken,
+      })
+
+      if (response.success) {
+        authStore.setAuth(response.data)
+        return response.data
+      } else {
+        throw new Error(response.message || 'Token refresh gagal')
+      }
+    } catch (err) {
+      authStore.clearAuth()
+      throw err
+    }
+  }
+
+  /**
+   * Get role-based dashboard route
+   */
+  const getDashboardRoute = () => {
+    if (!authStore.user) return '/login'
+
+    const role = authStore.user.role
+
+    // Route mapping berdasarkan role
+    const dashboardMap = {
+      ADMIN: '/dashboard/admin',
+      MANAGER: '/dashboard/admin',
+      STAFF_KHAZWAL: '/dashboard/staff',
+      OPERATOR_CETAK: '/dashboard/staff',
+      QC_INSPECTOR: '/dashboard/staff',
+      VERIFIKATOR: '/dashboard/staff',
+      STAFF_KHAZKHIR: '/dashboard/staff',
+    }
+
+    return dashboardMap[role] || '/dashboard/staff'
+  }
+
+  /**
+   * Trigger haptic feedback (vibration) jika available
+   * @param {string} type - Type of feedback: 'success', 'error', 'warning'
+   */
+  const triggerHapticFeedback = (type = 'success') => {
+    if ('vibrate' in navigator) {
+      switch (type) {
+        case 'success':
+          navigator.vibrate(200) // Single pulse untuk success
+          break
+        case 'error':
+          navigator.vibrate([100, 50, 100]) // Double pulse untuk error
+          break
+        case 'warning':
+          navigator.vibrate([50, 50, 50]) // Triple short pulse
+          break
+        case 'achievement':
+          navigator.vibrate([100, 50, 100, 50, 100]) // Multiple pulses
+          break
+        default:
+          navigator.vibrate(100)
+      }
+    }
+  }
+
+  return {
+    // State
+    isLoading,
+    error,
+
+    // Methods
+    login,
+    logout,
+    fetchCurrentUser,
+    checkAuth,
+    refreshAuth,
+    getDashboardRoute,
+    triggerHapticFeedback,
+
+    // Store access
+    isAuthenticated: authStore.isAuthenticated,
+    user: authStore.user,
+    hasRole: authStore.hasRole,
+    isAdmin: authStore.isAdmin,
+  }
+}
