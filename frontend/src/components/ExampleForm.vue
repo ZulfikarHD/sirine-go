@@ -71,7 +71,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import { Motion } from '@motionone/vue'
+import { Motion } from 'motion-v'
 
 const props = defineProps({
   initialData: {

@@ -105,7 +105,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { Motion } from '@motionone/vue'
+import { Motion } from 'motion-v'
 import { useOnline } from '@vueuse/core'
 import { useExamples } from '../composables/useExamples'
 import ExampleCard from '../components/ExampleCard.vue'

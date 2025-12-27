@@ -15,9 +15,9 @@
     "clean": "rm -rf dist node_modules"
   },
   "dependencies": {
-    "@motionone/vue": "^10.16.4",
     "@vueuse/core": "^14.1.0",
     "axios": "^1.13.2",
+    "motion-v": "^1.7.4",
     "pinia": "^2.2.0",
     "vue": "^3.5.24",
     "vue-router": "^4.4.0"

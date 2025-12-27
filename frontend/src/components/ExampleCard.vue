@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-import { Motion } from '@motionone/vue'
+import { Motion } from 'motion-v'
 
 defineProps({
   example: {
