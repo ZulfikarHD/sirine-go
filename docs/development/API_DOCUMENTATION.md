@@ -1,6 +1,12 @@
 # 📚 API Documentation - Sirine Go App
 
-Base URL: `http://localhost:8080`
+Complete API reference untuk Sirine Go App.
+
+**Base URL:** `http://localhost:8080` (development)
+
+> **📖 Belajar customize API?** Lihat [CUSTOMIZATION_GUIDE.md](./CUSTOMIZATION_GUIDE.md)
+
+---
 
 ## 🔍 Overview
 
@@ -358,13 +364,27 @@ curl -w "\nTime: %{time_total}s\n" http://localhost:8080/api/examples
 
 ---
 
+## 📚 Related Documentation
+
+**Using the API:**
+- **[CUSTOMIZATION_GUIDE.md](./CUSTOMIZATION_GUIDE.md)** - Add new endpoints
+- **[TESTING.md](./TESTING.md)** - Test API endpoints
+- **[FAQ.md](./FAQ.md)** - API troubleshooting
+
+**Backend Architecture:**
+- **[ARCHITECTURE_EXPLAINED.md](./ARCHITECTURE_EXPLAINED.md)** - Understand tech stack
+- **[FOLDER_STRUCTURE.md](./FOLDER_STRUCTURE.md)** - Project structure
+
+---
+
 ## 📞 Support
 
 Jika ada pertanyaan tentang API:
 - Developer: Zulfikar Hidayatullah
 - Phone: +62 857-1583-8733
+- Also check: [FAQ.md](./FAQ.md)
 
 ---
 
-**Last Updated:** 27 Desember 2025
+**Last Updated:** 27 Desember 2025  
 **Version:** 1.0.0

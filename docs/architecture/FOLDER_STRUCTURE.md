@@ -368,10 +368,17 @@ find frontend/src -name "*.js"
 
 ## 📚 Related Documentation
 
-- **Architecture:** See `ARCHITECTURE_EXPLAINED.md`
-- **Setup:** See `SETUP_GUIDE.md`
-- **API:** See `API_DOCUMENTATION.md`
-- **Quick Start:** See `QUICKSTART.md`
+**Understanding the project:**
+- **[ARCHITECTURE_EXPLAINED.md](./ARCHITECTURE_EXPLAINED.md)** - Why each package exists
+- **[PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md)** - Complete overview
+
+**Working with the structure:**
+- **[CUSTOMIZATION_GUIDE.md](./CUSTOMIZATION_GUIDE.md)** - Add new files/features
+- **[API_DOCUMENTATION.md](./API_DOCUMENTATION.md)** - API endpoints
+
+**Setup:**
+- **[QUICKSTART.md](./QUICKSTART.md)** - Quick setup
+- **[SETUP_GUIDE.md](./SETUP_GUIDE.md)** - Detailed setup
 
 ---
 

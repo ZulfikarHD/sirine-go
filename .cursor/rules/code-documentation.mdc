@@ -1,0 +1,130 @@
+---
+alwaysApply: true
+---
+# Cursor Rules - Indonesian Documentation
+
+## Language & Tone
+- Formal Bahasa Indonesia (EYD)
+- Professional, descriptive, informative
+- Mix: English tech terms + Indonesian explanation
+- Example: "WebSocket connection", "message queue management"
+
+## Key Connectors
+- "yaitu:" = definition/elaboration
+- "antara lain:" = list/examples
+- "dengan demikian," = conclusion
+- "yang mencakup" = component details
+- "dimana" = condition/state
+- "serta" = additional info
+- "untuk" = purpose
+
+## Code Comments
+
+### Function/Method
+```javascript
+/**
+ * [Function purpose & behavior] dengan [implementation detail]
+ * @param {Type} name - Explanation
+ * @returns {Type} Return detail
+ */
+```
+
+### Inline
+```javascript
+// Validasi input dengan checking type dan format
+// untuk memastikan data sesuai requirement
+```
+
+### Complex Logic
+```javascript
+/**
+ * Mapping priority ke weight value untuk queue processing
+ * dimana critical = 1, high = 2, medium = 3, low = 4
+ */
+```
+
+## Documentation Structure
+```markdown
+# [Module Name]
+
+## Overview
+[Module] merupakan [definition] yang bertujuan untuk [purpose], yaitu: [detail]
+
+## Prerequisites
+Komponen yang diperlukan, antara lain:
+- [Item] untuk [purpose]
+
+## Quick Start
+### Installation
+### Configuration
+
+## Architecture
+Sistem mencakup komponen:
+- **Component** - [function/role]
+
+## Core Logic
+Flow processing melalui tahapan:
+1. **Step** - [explanation]
+
+## Features
+### [Feature]
+[Explanation with benefit & approach]
+
+## API Reference
+## Testing
+## Troubleshooting
+### [Problem]
+[Solution with verification]
+```
+
+## Writing Patterns
+
+**Opening:**
+`[Subject] merupakan [definition] yang bertujuan untuk [purpose], yaitu: [detail]`
+
+**Bullets:**
+- `[Item] untuk [purpose]`
+- `[Item] yang [detail]`
+- `[Item] dengan [implementation]`
+
+**Flow:**
+```
+Proses [X] dilakukan melalui tahapan:
+1. **[Step]** - [explanation]
+```
+
+**Metrics:**
+`[metric] sebesar [number]% berdasarkan [source]`
+
+## Examples
+
+**Good Comment:**
+```javascript
+/**
+ * Validasi dan normalize user input dengan sanitization
+ * untuk mencegah XSS serta memastikan data integrity
+ * @param {Object} input - Raw input dari form
+ * @returns {Object} Normalized data siap disimpan
+ */
+```
+
+**Good Inline:**
+```javascript
+// Batch processing untuk optimasi performance dimana
+// setiap batch maksimal 100 records
+const batchSize = 100;
+```
+
+## Avoid
+- Overly brief comments (1-2 words)
+- Missing context
+- Mixed lang in one word (wrong: "me-migrate", right: "melakukan migration")
+- Skipping formal connectors
+- Non-descriptive
+
+## Checklist
+- [ ] Descriptive & complete comments
+- [ ] Use connectors (yaitu, antara lain, dll)
+- [ ] Include purpose/benefit
+- [ ] Consistent terminology
+- [ ] Formal but clear

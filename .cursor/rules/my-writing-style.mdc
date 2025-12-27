@@ -1,0 +1,171 @@
+---
+description: My Writing Style
+alwaysApply: false
+---
+# Cursor Rules - Indonesian Documentation Style
+
+## Overview
+Aturan penulisan untuk konsistensi dokumentasi Bahasa Indonesia dengan pendekatan formal-profesional yang mencakup struktur sistematis, terminologi teknis-bisnis, dan format yang mudah dipahami developer maupun stakeholder.
+
+## Core Principles
+
+### Language & Tone
+- Bahasa Indonesia formal (EYD)
+- Professional, descriptive, informative
+- Mix: English tech terms + Indonesian explanation
+- Example: "WebSocket connection", "message queue management"
+
+### Sentence Structure
+- Kalimat kompleks dengan banyak klausa
+- Gabung detail dengan koma
+- Connectors: "yaitu:", "antara lain:", "dengan demikian,", "serta", "dimana", "yang mencakup"
+
+### Documentation Structure
+- Overview (definisi-tujuan-detail)
+- Prerequisites
+- Quick Start (install & config)
+- Architecture (layer & komponen)
+- Core Logic (flow & business logic)
+- Features
+- API Reference (if applicable)
+- Testing
+- Troubleshooting
+- Performance Considerations
+- Future Improvements
+
+## Writing Rules
+
+### Rule 1: Opening Statements
+Pattern: `Subject + merupakan + definisi + yang bertujuan untuk + tujuan + yaitu: + detail`
+
+**Example:** "Modul Notification Service merupakan implementasi sistem notifikasi real-time yang bertujuan untuk menyediakan layanan push notification kepada user, yaitu: supervisor dan operator produksi yang memerlukan informasi update status produksi secara instan."
+
+### Rule 2: Bullet Points
+Format: `item + sebagai/untuk/yang + fungsi/detail`
+Setiap item lengkap dan deskriptif (bukan 1-2 kata)
+
+### Rule 3: Technical Explanation
+Numbered steps dengan detail per step, sertakan "yang mencakup" atau "dengan" untuk info implementasi.
+
+### Rule 4: Code Comments
+Deskriptif dengan penjelasan tujuan, behavior, dan approach implementasi dalam Bahasa Indonesia formal.
+
+### Rule 5: Connectors
+- "yaitu:" = definisi/elaborasi
+- "antara lain:" = list/contoh
+- "dengan demikian," = kesimpulan
+- "yang mencakup" = detail komponen
+- "dimana" = kondisi/state
+- "serta" = info setara
+- "berdasarkan" = referensi data/hasil
+
+### Rule 6: Quantifiable Info
+Format: `angka + unit + konteks + berdasarkan/sebesar/dengan`
+Example: "mengurangi delay 40% berdasarkan testing" atau "handling hingga 10,000 concurrent connections"
+
+### Rule 7: Feature Description
+Sub-heading + penjelasan lengkap fungsi, benefit, dan implementasi approach dalam 2-3 kalimat.
+
+### Rule 8: Prerequisites
+List dengan detail versi dan fungsi, gunakan "untuk" jelaskan purpose setiap dependency.
+
+### Rule 9: Troubleshooting
+Problem statement (H3) → solusi yang mencakup verification steps dan expected result.
+
+### Rule 10: Future Improvements
+List improvement plans dengan expected benefit/impact dari setiap enhancement.
+
+## Examples
+
+### Module Overview
+```markdown
+# Authentication Service
+
+## Overview
+Modul Authentication Service merupakan komponen sistem keamanan yang bertujuan untuk mengelola proses autentikasi dan autorisasi user, yaitu: validasi credentials, generation JWT tokens, dan management user sessions yang terintegrasi dengan PostgreSQL dan Redis cache untuk optimasi performa dan security robust.
+```
+
+### Feature Description
+```markdown
+### Token Refresh Mechanism
+Sistem refresh token dirancang untuk meningkatkan security dengan cara membatasi lifetime access token menjadi 15 menit, serta menyediakan refresh token dengan validity 7 hari yang dapat digunakan untuk generate access token baru tanpa re-authentication, dimana proses ini dilakukan otomatis oleh client SDK sebelum access token expired.
+```
+
+### Code Comment
+```javascript
+/**
+ * Validasi JWT token dan extract payload user information
+ * dengan verifikasi signature menggunakan secret key
+ * untuk memastikan token valid dan belum di-revoke
+ *
+ * @param {string} token - JWT token dari authorization header
+ * @returns {Object} User payload: userId, role, permissions
+ * @throws {TokenExpiredError} Jika token expired
+ * @throws {InvalidTokenError} Jika signature invalid
+ */
+async function validateToken(token) {
+  // Implementation
+}
+```
+
+### Architecture
+```markdown
+## Architecture
+Sistem dibangun dengan arsitektur microservices yang mencakup komponen utama, antara lain:
+
+- **API Gateway** - Routing request ke service dengan load balancing
+- **Auth Service** - Handling authentication logic dan token management
+- **User Service** - Managing user data dan profile information
+- **Session Store** - Redis-based session management untuk fast access
+
+Dengan demikian, setiap service dapat di-scale secara independent sesuai load untuk mencapai high availability dan fault tolerance.
+```
+
+### Setup Instructions
+```markdown
+## Quick Start
+
+### Installation
+Install dependencies yang diperlukan, antara lain:
+
+\`\`\`bash
+npm install
+cp .env.example .env
+npm run migrate:up
+npm run dev
+\`\`\`
+
+### Environment Configuration
+Konfigurasi environment variables pada `.env` dengan parameter sebagai berikut:
+
+\`\`\`env
+NODE_ENV=development
+DATABASE_URL=postgresql://user:pass@localhost:5432/db
+REDIS_URL=redis://localhost:6379
+JWT_SECRET=your_secret_key_here
+JWT_EXPIRY=15m
+REFRESH_TOKEN_EXPIRY=7d
+\`\`\`
+```
+
+## Avoid
+
+1. Kalimat terlalu pendek atau bullet points 1-2 kata
+2. "kita"/"kami" - gunakan passive voice atau "sistem", "modul", "service"
+3. Skip context/explanation - selalu beri detail cukup
+4. Redundansi kata tapi jangan terlalu singkat sampai hilang informasi
+5. Mix English-Indonesian dalam satu kata (salah: "me-migrate", benar: "melakukan migration")
+
+## Checklist
+
+- [ ] Setiap section dimulai dengan opening statement jelas
+- [ ] Gunakan connector tepat (yaitu, antara lain, dengan demikian)
+- [ ] Bullet points deskriptif dan lengkap
+- [ ] Code comments Bahasa Indonesia formal
+- [ ] Terminologi konsisten
+- [ ] Kalimat kompleks tapi mudah dipahami
+- [ ] Include quantifiable data jika ada
+- [ ] Structure mengikuti template
+
+## Notes
+Dokumentasi fleksibel dan dapat disesuaikan kebutuhan project, namun core principles dan writing rules harus dipertahankan untuk konsistensi style across all documentation.

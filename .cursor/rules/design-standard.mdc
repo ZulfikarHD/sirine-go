@@ -1,0 +1,16 @@
+---
+alwaysApply: true
+---
+
+- App Design is like Apple app
+- Use Indigo and Fuchsia as main theme to be more techy and modern
+- Always think hirarchy for mobile user prespective in user experience when designing the pages
+- use motion-v
+
+### Use iOS Design Principles like
+- **Spring Physics**: Natural, bouncy animations yang terasa like native iOS
+- **Press Feedback**: Scale-down effect saat element di-tap (0.97 scale)
+- **Glass Effect**: Frosted glass navbar dan footer dengan backdrop blur
+- **Haptic Feedback**: Vibration API untuk tactile response
+- **Staggered Animations**: Sequential entrance animations untuk lists
+- **Gesture Recognition**: Swipe-to-delete, pull-to-refresh, drag-to-dismiss

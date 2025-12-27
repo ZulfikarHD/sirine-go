@@ -1,281 +1,306 @@
-# Sirine Go App
+# 📚 Dokumentasi Sirine Go App
 
-Web application offline-capable menggunakan Gin (Go), Vue 3, Vite, dan MySQL dengan Tailwind CSS dan Motion-v untuk animasi.
+> Modern full-stack web application dengan 100% offline capability menggunakan Go (Gin) dan Vue 3.
 
-## 🚀 Tech Stack
+## 🎯 Tentang Sirine Go App
 
-### Backend
-- **Go** dengan **Gin Framework**
-- **GORM** untuk ORM
-- **MySQL** sebagai database
-- **CORS** middleware
-- Service pattern architecture
+**Sirine Go App** adalah aplikasi web modern yang dapat berfungsi sepenuhnya offline, dibangun dengan teknologi terkini untuk memberikan performa optimal dan user experience terbaik.
 
-### Frontend
-- **Vue 3** dengan Composition API
-- **Vite** sebagai build tool
-- **Tailwind CSS** untuk styling
-- **Motion-v** (@motionone/vue) untuk animasi
-- **Axios** untuk HTTP requests
-- **VueUse** untuk composables utilities
-- **PWA** dengan Vite Plugin PWA untuk offline capabilities
+**Tech Stack:**
+- **Backend:** Go (Gin) + MySQL + GORM
+- **Frontend:** Vue 3 + Vite + Tailwind CSS 4.1.18 + Motion-v
+- **Architecture:** RESTful API dengan Service Pattern
+- **Special Features:** Progressive Web App (PWA) untuk offline capabilities
+
+---
+
+## 🚀 Quick Start
+
+Untuk setup cepat (5 menit), gunakan command berikut:
+
+```bash
+# 1. Setup database
+mysql -u root -p -e "CREATE DATABASE sirine_go CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+
+# 2. Edit .env
+nano backend/.env  # Set DB_PASSWORD
+
+# 3. Install dependencies
+make install
+
+# 4. Run (buka 2 terminal)
+make dev-backend   # Terminal 1
+make dev-frontend  # Terminal 2
+
+# 5. Buka browser: http://localhost:5173
+```
+
+**📖 Detail lengkap:** Lihat [getting-started/QUICKSTART.md](./getting-started/QUICKSTART.md)
+
+---
+
+## 📖 Dokumentasi
+
+Dokumentasi terorganisir dalam folders berdasarkan kategori:
+
+### 📘 **Getting Started** → `getting-started/`
+
+Mulai di sini jika baru pertama kali:
+
+1. **[QUICKSTART.md](./getting-started/QUICKSTART.md)** ⚡  
+   Setup dalam 5 menit - Step-by-step paling simple
+
+2. **[SETUP_GUIDE.md](./getting-started/SETUP_GUIDE.md)** 📋  
+   Setup lengkap dengan penjelasan detail setiap step
+
+3. **[CHECKLIST.md](./getting-started/CHECKLIST.md)** ✅  
+   Checklist untuk verifikasi setup sudah benar
+
+---
+
+### 🏗️ **Architecture** → `architecture/`
+
+Pahami struktur dan design decisions:
+
+4. **[ARCHITECTURE_EXPLAINED.md](./architecture/ARCHITECTURE_EXPLAINED.md)** 🏛️  
+   Penjelasan semua package dan kenapa dibutuhkan
+
+5. **[FOLDER_STRUCTURE.md](./architecture/FOLDER_STRUCTURE.md)** 📁  
+   Struktur folder dan file organization
+
+6. **[PROJECT_SUMMARY.md](./architecture/PROJECT_SUMMARY.md)** 📊  
+   Overview lengkap project (features, decisions, metrics)
+
+---
+
+### 🛠️ **Development** → `development/`
+
+Build dan test fitur baru:
+
+7. **[CUSTOMIZATION_GUIDE.md](./development/CUSTOMIZATION_GUIDE.md)** 🎨  
+   Cara menambah model, endpoint, dan component baru
+
+8. **[API_DOCUMENTATION.md](./development/API_DOCUMENTATION.md)** 🔌  
+   Complete API reference dengan contoh request/response
+
+9. **[TESTING.md](./development/TESTING.md)** 🧪  
+   Testing guide (manual & automated testing)
+
+---
+
+### 🚀 **Deployment** → `deployment/`
+
+Ready untuk production:
+
+10. **[DEPLOYMENT.md](./deployment/DEPLOYMENT.md)** 🌐  
+    Deployment ke production server dengan Nginx + SSL
+
+---
+
+### ❓ **Troubleshooting** → `troubleshooting/`
+
+Mengalami masalah:
+
+11. **[FAQ.md](./troubleshooting/FAQ.md)** 💡  
+    Common questions dan solusi masalah umum
+
+---
 
 ## 📋 Prerequisites
 
-- Go 1.24+ terinstall
-- Node.js 18+ dan Yarn terinstall
-- MySQL 8.0+ terinstall dan berjalan
-- Git
+Pastikan terinstall:
+- ✅ **Go 1.24+** - Backend language
+- ✅ **Node.js 18+ & Yarn** - Frontend tooling  
+- ✅ **MySQL 8.0+** - Database
+- ✅ **Git** - Version control
 
-## 🛠️ Setup & Installation
+**Verify:**
+```bash
+go version && node --version && yarn --version && mysql --version
+```
 
-### 1. Clone Repository
+---
+
+## 🎨 Key Features
+
+### **🌐 100% Offline Capable**
+- Service Worker untuk caching
+- PWA installable (Desktop & Mobile)
+- NetworkFirst caching strategy untuk API
+- Online/Offline status indicator real-time
+
+### **🎨 Modern UI/UX**
+- Smooth animations dengan Motion-v
+- Tailwind CSS (newest version 4.1.18)
+- Responsive design (mobile-first)
+- Loading & error states
+- Professional personality (INFJ)
+
+### **🚀 Performance**
+- Vite build tool (10-100x faster)
+- GORM ORM (type-safe & optimized)
+- Gin framework (40,000+ req/s)
+- Asset caching & optimization
+
+---
+
+## 🛠️ Development Commands
 
 ```bash
-cd /home/sirinedev/WebApp/Developement/sirine-go
+make help              # Show all available commands
+make install           # Install all dependencies
+make dev-backend       # Run backend development server
+make dev-frontend      # Run frontend development server
+make build             # Build for production
+make clean             # Clean build files
 ```
 
-### 2. Setup Database
+---
 
-Buat database MySQL:
-
-```sql
-CREATE DATABASE sirine_go CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
-
-### 3. Konfigurasi Environment
-
-File `.env` sudah dibuat. Sesuaikan dengan konfigurasi MySQL Anda:
-
-```env
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=your_password
-DB_NAME=sirine_go
-
-SERVER_PORT=8080
-GIN_MODE=debug
-
-TZ=Asia/Jakarta
-```
-
-### 4. Install Dependencies Backend
-
-```bash
-go mod download
-```
-
-### 5. Install Dependencies Frontend
-
-```bash
-cd frontend
-yarn install
-```
-
-## 🏃 Running the Application
-
-### Development Mode
-
-#### 1. Jalankan Backend (Terminal 1)
-
-```bash
-go run cmd/server/main.go
-```
-
-Backend akan berjalan di `http://localhost:8080`
-
-#### 2. Jalankan Frontend (Terminal 2)
-
-```bash
-cd frontend
-yarn dev
-```
-
-Frontend akan berjalan di `http://localhost:5173`
-
-### Production Mode
-
-#### 1. Build Frontend
-
-```bash
-cd frontend
-yarn build
-```
-
-#### 2. Build & Run Backend
-
-```bash
-go build -o sirine-go cmd/server/main.go
-./sirine-go
-```
-
-Aplikasi akan berjalan di `http://localhost:8080` dengan frontend yang sudah di-build.
-
-## 📁 Struktur Project
+## 📂 Project Structure
 
 ```
 sirine-go/
-├── cmd/
-│   └── server/
-│       └── main.go           # Entry point aplikasi
-├── config/
-│   └── config.go             # Konfigurasi aplikasi
-├── database/
-│   └── database.go           # Database connection & migration
-├── models/
-│   └── example.go            # Database models
-├── services/
-│   └── example_service.go    # Business logic layer
-├── handlers/
-│   └── example_handler.go    # HTTP handlers
-├── middleware/
-│   └── cors.go               # CORS middleware
-├── routes/
-│   └── routes.go             # Route definitions
-├── frontend/
+├── backend/           # Go + Gin backend
+│   ├── cmd/          # Entry point
+│   ├── config/       # Configuration
+│   ├── database/     # Database setup
+│   ├── handlers/     # HTTP handlers
+│   ├── middleware/   # Middleware
+│   ├── models/       # Database models
+│   ├── routes/       # API routes
+│   └── services/     # Business logic
+│
+├── frontend/         # Vue 3 + Vite frontend
 │   ├── src/
-│   │   ├── components/       # Vue components
-│   │   ├── composables/      # Composable functions
-│   │   ├── views/            # Page views
-│   │   ├── App.vue           # Root component
-│   │   ├── main.js           # Entry point
-│   │   └── style.css         # Global styles (Tailwind)
-│   ├── public/               # Static assets
-│   ├── index.html
-│   ├── vite.config.js        # Vite configuration
-│   ├── tailwind.config.js    # Tailwind configuration
-│   └── package.json
-├── .env                      # Environment variables
-├── .gitignore
-├── go.mod
-├── go.sum
-└── README.md
+│   │   ├── components/  # Vue components
+│   │   ├── composables/ # Reusable logic
+│   │   └── views/       # Page views
+│   └── public/       # Static assets
+│
+└── docs/             # Documentation (you are here!)
 ```
 
-## 🎨 Features
+**📖 Detail lengkap:** Lihat [FOLDER_STRUCTURE.md](./FOLDER_STRUCTURE.md)
 
-### Backend Features
-- ✅ RESTful API dengan Gin
-- ✅ CRUD operations dengan GORM
-- ✅ Service pattern untuk business logic
-- ✅ CORS middleware
-- ✅ Environment-based configuration
-- ✅ Auto migration database
-- ✅ Timezone Asia/Jakarta (WIB)
-- ✅ Pesan error dalam Bahasa Indonesia
+---
 
-### Frontend Features
-- ✅ Modern UI dengan Tailwind CSS
-- ✅ Smooth animations dengan Motion-v
-- ✅ Responsive design (mobile-first)
-- ✅ Offline capabilities dengan PWA
-- ✅ Online/Offline status indicator
-- ✅ API caching untuk offline access
-- ✅ Composable pattern untuk reusable logic
-- ✅ Form validation
-- ✅ Loading & error states
+## 🔌 API Quick Reference
 
-## 🔌 API Endpoints
-
-### Health Check
-```
+```http
+# Health check
 GET /health
+
+# Examples CRUD
+GET    /api/examples      # Get all
+GET    /api/examples/:id  # Get by ID
+POST   /api/examples      # Create
+PUT    /api/examples/:id  # Update
+DELETE /api/examples/:id  # Delete
 ```
 
-### Examples
-```
-GET    /api/examples      # Get all examples
-GET    /api/examples/:id  # Get example by ID
-POST   /api/examples      # Create new example
-PUT    /api/examples/:id  # Update example
-DELETE /api/examples/:id  # Delete example
-```
+**📖 Detail lengkap:** Lihat [API_DOCUMENTATION.md](./API_DOCUMENTATION.md)
 
-### Example Request Body (POST/PUT)
-```json
-{
-  "title": "Judul Example",
-  "content": "Konten example",
-  "is_active": true
-}
+---
+
+## 🐛 Troubleshooting Quick Fix
+
+### Database Error?
+```bash
+sudo systemctl start mysql
+mysql -u root -p -e "USE sirine_go;"
 ```
 
-## 🌐 Offline Capabilities
+### Port Already in Use?
+```bash
+sudo lsof -i :8080 && sudo kill -9 <PID>  # Backend
+sudo lsof -i :5173 && sudo kill -9 <PID>  # Frontend
+```
 
-Aplikasi ini dapat berfungsi 100% offline dengan fitur:
+### Dependencies Error?
+```bash
+make clean && make install
+```
 
-1. **Service Worker**: Mengcache semua assets (JS, CSS, HTML, images)
-2. **API Caching**: Request API di-cache dengan strategi NetworkFirst
-3. **PWA Manifest**: Aplikasi dapat diinstall sebagai Progressive Web App
-4. **Online/Offline Indicator**: Menampilkan status koneksi real-time
+**📖 Solusi lengkap:** Lihat [troubleshooting/FAQ.md](./troubleshooting/FAQ.md)
 
-### Cara Kerja Offline:
-- Saat online: Data di-fetch dari server dan di-cache
-- Saat offline: Data diambil dari cache
-- Saat kembali online: Data otomatis sync dengan server
+---
+
+## 📚 Documentation Flow
+
+**Rekomendasi urutan baca dokumentasi:**
+
+```
+START HERE
+    ↓
+README.md (Overview) ← You are here
+    ↓
+📘 getting-started/
+    ├─ QUICKSTART.md (5 menit setup)
+    ├─ SETUP_GUIDE.md (Detail setup)
+    └─ CHECKLIST.md (Verify setup)
+    ↓
+🏗️ architecture/
+    ├─ ARCHITECTURE_EXPLAINED.md (Understand tech)
+    ├─ FOLDER_STRUCTURE.md (Understand structure)
+    └─ PROJECT_SUMMARY.md (Overview)
+    ↓
+🛠️ development/
+    ├─ CUSTOMIZATION_GUIDE.md (Build features)
+    ├─ API_DOCUMENTATION.md (API reference)
+    └─ TESTING.md (Test your code)
+    ↓
+🚀 deployment/
+    └─ DEPLOYMENT.md (Deploy to production)
+    ↓
+❓ troubleshooting/
+    └─ FAQ.md (When stuck)
+```
+
+---
 
 ## 🎯 Best Practices
 
 ### Backend
-- Service pattern untuk separation of concerns
-- Error handling dengan pesan Bahasa Indonesia
-- Consistent API response format
-- Environment-based configuration
+- ✅ Service Pattern untuk separation of concerns
+- ✅ Error handling dalam Bahasa Indonesia
+- ✅ Consistent API response format
+- ✅ Environment-based configuration
 
 ### Frontend
-- Composition API untuk better code organization
-- Composables untuk reusable logic
-- Component-based architecture
-- Mobile-first responsive design
-- Smooth animations untuk better UX
-- Loading & error states untuk user feedback
+- ✅ Composition API untuk better organization
+- ✅ Composables untuk reusable logic
+- ✅ Component-based architecture
+- ✅ Mobile-first responsive design
+- ✅ Smooth animations untuk better UX
 
-## 📱 Mobile Optimization
+---
 
-Aplikasi ini dioptimasi untuk pengalaman mobile:
-- Responsive grid layout
-- Touch-friendly buttons
-- Smooth scroll behavior
-- Mobile-first CSS
-- PWA installable di mobile devices
-
-## 🔧 Customization
-
-### Menambah Model Baru
-1. Buat model di `models/`
-2. Buat service di `services/`
-3. Buat handler di `handlers/`
-4. Tambahkan routes di `routes/routes.go`
-5. Tambahkan migration di `cmd/server/main.go`
-
-### Menambah Component Vue
-1. Buat component di `frontend/src/components/`
-2. Buat composable jika perlu di `frontend/src/composables/`
-3. Import dan gunakan di views
-
-## 🐛 Troubleshooting
-
-### Database Connection Error
-- Pastikan MySQL berjalan
-- Check credentials di `.env`
-- Pastikan database sudah dibuat
-
-### Frontend Build Error
-- Hapus `node_modules` dan `yarn.lock`
-- Run `yarn install` lagi
-- Check Node.js version (minimal 18+)
-
-### Port Already in Use
-- Backend: Ubah `SERVER_PORT` di `.env`
-- Frontend: Ubah `server.port` di `vite.config.js`
-
-## 👨‍💻 Developer
+## 👨‍💻 Developer Info
 
 **Zulfikar Hidayatullah**
-- Phone: +62 857-1583-8733
-- Timezone: Asia/Jakarta (WIB)
+- 📞 Phone: +62 857-1583-8733
+- 🌍 Timezone: Asia/Jakarta (WIB)
+- 🧠 Personality: INFJ (Professional)
 
-## 📄 License
+---
 
-This project is private and proprietary.
+## 📄 Version & License
+
+- **Version:** 1.0.0
+- **Last Updated:** 27 Desember 2025
+- **License:** Private & Proprietary
+
+---
+
+## 🎉 Ready to Start?
+
+Pilih path Anda:
+
+- 🚀 **Quick Setup:** [getting-started/QUICKSTART.md](./getting-started/QUICKSTART.md)
+- 📖 **Detail Setup:** [getting-started/SETUP_GUIDE.md](./getting-started/SETUP_GUIDE.md)
+- 🏗️ **Understand Architecture:** [architecture/](./architecture/)
+- 🎨 **Build Features:** [development/CUSTOMIZATION_GUIDE.md](./development/CUSTOMIZATION_GUIDE.md)
+- 🌐 **Deploy:** [deployment/DEPLOYMENT.md](./deployment/DEPLOYMENT.md)
+
+**Happy Coding! 🎯**

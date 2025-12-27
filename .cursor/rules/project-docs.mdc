@@ -1,0 +1,7 @@
+---
+alwaysApply: true
+---
+# Overview
+
+this project is custom fullstack web application built with go and vue 3.
+for full documentation see [docs/README.md](../../docs/README.md)
