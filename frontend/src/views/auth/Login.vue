@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-fuchsia-50 to-indigo-100 p-4">
+  <div class="min-h-screen flex items-center justify-center bg-linear-to-br from-indigo-50 via-fuchsia-50 to-indigo-100 p-4">
     <!-- Login Card dengan glass effect -->
     <div 
       class="w-full max-w-md"
@@ -9,7 +9,7 @@
       <div class="glass-card rounded-3xl p-8 shadow-2xl backdrop-blur-xl bg-white/80 border border-white/20">
         <!-- Logo & Title -->
         <div class="text-center mb-8">
-          <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-fuchsia-600 mb-4 shadow-lg">
+          <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-linear-to-br from-indigo-500 to-fuchsia-600 mb-4 shadow-lg">
             <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
@@ -124,7 +124,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuth } from '../../composables/useAuth'
-import { animate, spring } from 'motion'
+import { animate, spring } from 'motion-v'
 
 const router = useRouter()
 const route = useRoute()
@@ -149,11 +149,18 @@ const cardAnimation = ref({})
 
 onMounted(() => {
   // Spring entrance animation untuk card
-  animate(
-    '.glass-card',
-    { opacity: [0, 1], transform: ['scale(0.95)', 'scale(1)'] },
-    { duration: 0.6, easing: spring({ stiffness: 300, damping: 20 }) }
-  )
+  try {
+    const card = document.querySelector('.glass-card')
+    if (card) {
+      animate(
+        card,
+        { opacity: [0, 1], transform: ['scale(0.95)', 'scale(1)'] },
+        { duration: 0.6, easing: spring({ stiffness: 300, damping: 20 }) }
+      )
+    }
+  } catch (error) {
+    console.log('Animation not available:', error)
+  }
 })
 
 /**
@@ -216,60 +223,21 @@ const handleLogin = async () => {
     errorMessage.value = err.response?.data?.message || 'NIP atau password salah'
     
     // Shake animation untuk error
-    animate(
-      '.glass-card',
-      { transform: ['translateX(0)', 'translateX(-10px)', 'translateX(10px)', 'translateX(-10px)', 'translateX(0)'] },
-      { duration: 0.4 }
-    )
+    try {
+      const card = document.querySelector('.glass-card')
+      if (card) {
+        animate(
+          card,
+          { transform: ['translateX(0)', 'translateX(-10px)', 'translateX(10px)', 'translateX(-10px)', 'translateX(0)'] },
+          { duration: 0.4 }
+        )
+      }
+    } catch (animError) {
+      console.log('Animation error:', animError)
+    }
 
     // Trigger error haptic
     triggerHapticFeedback('error')
   }
 }
 </script>
-
-<style scoped>
-/* Glass effect card */
-.glass-card {
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  background-color: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(209, 213, 219, 0.3);
-}
-
-/* Input field dengan iOS-style */
-.input-field {
-  @apply w-full px-4 py-3 rounded-xl border-2 border-gray-200 
-         focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 
-         transition-all duration-200 outline-none
-         text-gray-900 placeholder-gray-400;
-}
-
-/* Primary button dengan iOS-style spring animation */
-.btn-primary {
-  @apply w-full py-3 px-6 rounded-xl font-semibold text-white
-         bg-gradient-to-r from-indigo-600 to-fuchsia-600
-         hover:from-indigo-700 hover:to-fuchsia-700
-         focus:outline-none focus:ring-4 focus:ring-indigo-200
-         disabled:opacity-50 disabled:cursor-not-allowed
-         transform transition-all duration-200
-         active:scale-[0.97] shadow-lg;
-}
-
-/* Active scale effect untuk interactive elements */
-.active-scale {
-  @apply transform transition-transform duration-150 active:scale-95;
-}
-
-/* Shake animation untuk error */
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-10px); }
-  50% { transform: translateX(10px); }
-  75% { transform: translateX(-10px); }
-}
-
-.animate-shake {
-  animation: shake 0.4s ease-in-out;
-}
-</style>

@@ -22,6 +22,24 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 		})
 	})
 
+	// Root endpoint untuk development mode info
+	r.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "Sirine Go API Server",
+			"version": "1.0.0",
+			"endpoints": gin.H{
+				"health": "/health",
+				"api":    "/api/*",
+				"docs":   "Lihat dokumentasi untuk endpoint lengkap",
+			},
+			"development": gin.H{
+				"frontend_dev_server": "http://localhost:5173",
+				"backend_api":         "http://localhost:8080/api",
+				"note":                "Dalam development mode, akses frontend melalui Vite dev server (port 5173)",
+			},
+		})
+	})
+
 	// Get database instance
 	db := database.GetDB()
 
@@ -61,10 +79,10 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 		// }
 	}
 
-	// Serve static files for frontend (untuk production)
-	r.Static("/assets", "./frontend/dist/assets")
-	r.StaticFile("/", "./frontend/dist/index.html")
-	r.NoRoute(func(c *gin.Context) {
-		c.File("./frontend/dist/index.html")
-	})
+	// Serve static files for frontend (hanya untuk production)
+	// Dalam development mode, frontend diakses melalui Vite dev server (port 5173)
+	// r.Static("/assets", "./frontend/dist/assets")
+	// r.NoRoute(func(c *gin.Context) {
+	// 	c.File("./frontend/dist/index.html")
+	// })
 }

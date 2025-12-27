@@ -92,7 +92,18 @@ cd frontend && yarn dev
 
 **🎉 Done! Authentication system berjalan!**
 
-**Troubleshooting**: Lihat [SPRINT1_IMPLEMENTATION.md](SPRINT1_IMPLEMENTATION.md#troubleshooting)
+### 🌐 Akses Aplikasi (Development Mode)
+
+Setelah kedua server berjalan:
+
+| Service | URL | Keterangan |
+|---------|-----|------------|
+| **Frontend UI** | `http://localhost:5173` atau `http://10.30.11.65:5173` | Aplikasi Vue dengan hot-reload |
+| **Backend API** | `http://localhost:8080/api/*` | REST API endpoints |
+
+⚠️ **PENTING**: Dalam development mode, akses frontend melalui port **5173** (Vite), bukan port 8080!
+
+**Troubleshooting**: Lihat [DEVELOPMENT_GUIDE.md](docs/DEVELOPMENT_GUIDE.md) atau [SPRINT1_IMPLEMENTATION.md](SPRINT1_IMPLEMENTATION.md#troubleshooting)
 
 ---
 
@@ -110,9 +121,11 @@ Dokumentasi lengkap tersedia di folder **`docs/`**:
 - ✅ [**CHECKLIST.md**](docs/CHECKLIST.md) - Verification checklist
 
 ### **Development:**
+- 🛠️ [**DEVELOPMENT_GUIDE.md**](docs/DEVELOPMENT_GUIDE.md) - Development mode setup & troubleshooting
 - 📗 [**API_DOCUMENTATION.md**](docs/API_DOCUMENTATION.md) - Complete API reference
 - 🏗️ [**ARCHITECTURE_EXPLAINED.md**](docs/ARCHITECTURE_EXPLAINED.md) - Package explanations & why needed
 - 📁 [**FOLDER_STRUCTURE.md**](docs/FOLDER_STRUCTURE.md) - Project structure guide
+- 🎨 [**TAILWIND_V4_MIGRATION.md**](docs/development/TAILWIND_V4_MIGRATION.md) - Tailwind CSS v4 configuration & migration guide
 
 ### **Deployment:**
 - 🚀 [**DEPLOYMENT.md**](docs/DEPLOYMENT.md) - Production deployment guide
@@ -351,9 +364,10 @@ This project is private and proprietary.
 
 ## ✅ Status
 
-**Version:** 1.0.0 - Sprint 1 Complete  
+**Version:** 1.0.1 - Sprint 1 Complete  
 **Status:** ✅ Authentication System Production Ready  
-**Last Updated:** 27 Desember 2025
+**Last Updated:** 27 Desember 2025  
+**Latest:** 🎨 Tailwind CSS v4 configuration fixed
 
 ### Sprint 1: Foundation & Core Authentication ✅
 - ✅ JWT-based login/logout

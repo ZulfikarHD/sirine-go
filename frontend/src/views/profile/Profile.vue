@@ -146,6 +146,8 @@ const formatDate = (dateString) => {
 </script>
 
 <style scoped>
+@import "tailwindcss" reference;
+
 .glass-card {
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);

@@ -26,6 +26,8 @@
 </script>
 
 <style scoped>
+@import "tailwindcss" reference;
+
 .active-scale {
   @apply transform transition-transform duration-150 active:scale-95;
 }

@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
   /* Base styles dengan iOS-inspired font smoothing */
@@ -27,7 +25,7 @@
   /* Primary button dengan Indigo & Fuchsia gradient theme */
   .btn-primary {
     @apply px-6 py-3 rounded-xl font-semibold text-white
-           bg-gradient-to-r from-indigo-600 to-fuchsia-600
+           bg-linear-to-r from-indigo-600 to-fuchsia-600
            hover:from-indigo-700 hover:to-fuchsia-700
            focus:outline-none focus:ring-4 focus:ring-indigo-200
            disabled:opacity-50 disabled:cursor-not-allowed
@@ -53,7 +51,8 @@
   }
   
   /* Input field dengan iOS-style */
-  .input {
+  .input,
+  .input-field {
     @apply w-full px-4 py-3 rounded-xl border-2 border-gray-200 
            focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 
            transition-all duration-200 outline-none
@@ -187,15 +186,15 @@
 
   /* Gradient text utilities untuk theme */
   .text-gradient-indigo-fuchsia {
-    @apply text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-fuchsia-600;
+    @apply text-transparent bg-clip-text bg-linear-to-r from-indigo-600 to-fuchsia-600;
   }
 
   .bg-gradient-primary {
-    @apply bg-gradient-to-r from-indigo-600 to-fuchsia-600;
+    @apply bg-linear-to-r from-indigo-600 to-fuchsia-600;
   }
 
   .bg-gradient-primary-hover {
-    @apply bg-gradient-to-r from-indigo-700 to-fuchsia-700;
+    @apply bg-linear-to-r from-indigo-700 to-fuchsia-700;
   }
 
   /* Scrollbar styling untuk iOS-like appearance */

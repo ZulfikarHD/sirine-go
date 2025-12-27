@@ -83,7 +83,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '../../stores/auth'
 import Navbar from '../../components/layout/Navbar.vue'
-import { animate, stagger } from 'motion'
+import { animate, stagger } from 'motion-dom'
 
 const authStore = useAuthStore()
 const user = computed(() => authStore.user)
@@ -180,6 +180,8 @@ onMounted(() => {
 </script>
 
 <style scoped>
+@import "tailwindcss" reference;
+
 .glass-card {
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
