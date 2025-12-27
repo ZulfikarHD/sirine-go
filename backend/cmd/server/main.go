@@ -4,7 +4,6 @@ import (
 	"log"
 	"sirine-go/backend/config"
 	"sirine-go/backend/database"
-	"sirine-go/backend/models"
 	"sirine-go/backend/routes"
 
 	"github.com/gin-gonic/gin"
@@ -29,15 +28,12 @@ func main() {
 		log.Fatal("Failed to connect to database:", err)
 	}
 
-	// Auto migrate models
-	if err := database.AutoMigrate(
-		&models.User{},
-		&models.UserSession{},
-		&models.PasswordResetToken{},
-		&models.ActivityLog{},
-	); err != nil {
+	// Auto migrate models menggunakan registry
+	registry := database.NewModelsRegistry()
+	if err := database.AutoMigrate(registry.GetModels()...); err != nil {
 		log.Fatal("Failed to migrate database:", err)
 	}
+	log.Printf("Database tables synchronized (%d models)", registry.GetTableCount())
 
 	// Initialize Gin router
 	r := gin.Default()

@@ -1,4 +1,4 @@
-.PHONY: help dev-backend dev-frontend build-frontend build run clean install test
+.PHONY: help dev-backend dev-frontend build-frontend build run clean install test db-create db-drop db-migrate db-rollback db-fresh db-seed db-reset hash-make hash-check
 
 help: ## Tampilkan bantuan
 	@echo "Available commands:"
@@ -46,11 +46,43 @@ test: ## Jalankan tests
 	cd frontend && yarn test
 
 db-create: ## Buat database
-	@echo "Creating database..."
-	mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS sirine_go CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-	@echo "✅ Database created!"
+	cd backend && go run cmd/migrate/main.go create
 
-db-migrate: ## Jalankan migrations
-	@echo "Running migrations..."
-	cd backend && go run cmd/server/main.go
-	@echo "✅ Migrations complete!"
+db-drop: ## Hapus database
+	cd backend && go run cmd/migrate/main.go drop
+
+db-migrate: ## Jalankan migrations (up)
+	cd backend && go run cmd/migrate/main.go up
+
+db-rollback: ## Rollback migrations (down)
+	cd backend && go run cmd/migrate/main.go down
+
+db-fresh: ## Drop database, create ulang, dan migrate
+	cd backend && go run cmd/migrate/main.go fresh
+
+db-seed: ## Jalankan database seeder
+	cd backend && go run cmd/seed/main.go
+
+db-reset: ## Fresh migration + seed (untuk development)
+	@echo "🔄 Resetting database..."
+	@$(MAKE) db-fresh
+	@$(MAKE) db-seed
+	@echo "✅ Database reset complete!"
+
+hash-make: ## Generate bcrypt hash untuk password (Usage: make hash-make PASSWORD="YourPassword")
+	@if [ -z "$(PASSWORD)" ]; then \
+		echo "❌ Error: PASSWORD tidak diberikan"; \
+		echo ""; \
+		echo "Usage: make hash-make PASSWORD=\"YourPassword\""; \
+		echo "Example: make hash-make PASSWORD=\"Admin@123\""; \
+		exit 1; \
+	fi
+	@cd backend && go run cmd/hash/main.go make "$(PASSWORD)"
+
+hash-check: ## Verify password dengan hash (direct go run recommended)
+	@echo "⚠️  Note: Karena $ escaping di Makefile, gunakan command berikut:"
+	@echo ""
+	@echo "cd backend && go run cmd/hash/main.go check \"YourPassword\" '\$$2a\$$12\$$...'"
+	@echo ""
+	@echo "Example:"
+	@echo "cd backend && go run cmd/hash/main.go check \"Admin@123\" '\$$2a\$$12\$$nNag4FTJB0fiX/f22aINOuYcuP8cUOWOyCZub6tBCom0Evxv4ahTK'"

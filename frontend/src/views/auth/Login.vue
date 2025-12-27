@@ -122,7 +122,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuth } from '../../composables/useAuth'
-import { animate, spring } from 'motion-v'
+import { animate } from 'motion-v'
 
 const router = useRouter()
 const route = useRoute()
@@ -148,14 +148,11 @@ const cardAnimation = ref({})
 onMounted(() => {
   // Spring entrance animation untuk card
   try {
-    const card = document.querySelector('.glass-card')
-    if (card) {
-      animate(
-        card,
-        { opacity: [0, 1], transform: ['scale(0.95)', 'scale(1)'] },
-        { duration: 0.6, easing: spring({ stiffness: 300, damping: 20 }) }
-      )
-    }
+    animate(
+      '.glass-card',
+      { opacity: [0, 1], transform: ['scale(0.95)', 'scale(1)'] },
+      { duration: 0.6, easing: [0.34, 1.56, 0.64, 1] }
+    )
   } catch (error) {
     console.log('Animation not available:', error)
   }
@@ -215,14 +212,11 @@ const handleLogin = async (event) => {
     
     // Shake animation untuk error
     try {
-      const card = document.querySelector('.glass-card')
-      if (card) {
-        animate(
-          card,
-          { transform: ['translateX(0)', 'translateX(-10px)', 'translateX(10px)', 'translateX(-10px)', 'translateX(0)'] },
-          { duration: 0.4 }
-        )
-      }
+      animate(
+        '.glass-card',
+        { transform: ['translateX(0)', 'translateX(-10px)', 'translateX(10px)', 'translateX(-10px)', 'translateX(0)'] },
+        { duration: 0.4 }
+      )
     } catch (animError) {
       console.log('Animation error:', animError)
     }

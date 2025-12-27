@@ -83,7 +83,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '../../stores/auth'
 import Navbar from '../../components/layout/Navbar.vue'
-import { animate, stagger } from 'motion-dom'
+import { animate, stagger } from 'motion-v'
 
 const authStore = useAuthStore()
 const user = computed(() => authStore.user)

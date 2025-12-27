@@ -51,7 +51,7 @@ const (
 // yang mencakup authentication, authorization, dan profile information
 type User struct {
 	ID                  uint64         `gorm:"primaryKey;autoIncrement" json:"id"`
-	NIP                 string         `gorm:"type:varchar(5);uniqueIndex;not null" json:"nip" binding:"required,max=5,numeric"`
+	NIP                 string         `gorm:"column:nip;type:varchar(5);uniqueIndex;not null" json:"nip" binding:"required,max=5,numeric"`
 	FullName            string         `gorm:"type:varchar(255);not null" json:"full_name" binding:"required"`
 	Email               string         `gorm:"type:varchar(255);uniqueIndex;not null" json:"email" binding:"required,email"`
 	Phone               string         `gorm:"type:varchar(20)" json:"phone"`
