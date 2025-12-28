@@ -1,10 +1,13 @@
 package services
 
 import (
+	"bytes"
 	"crypto/rand"
+	"encoding/csv"
 	"errors"
 	"fmt"
 	"sirine-go/backend/models"
+	"strconv"
 	"strings"
 
 	"gorm.io/gorm"
@@ -443,4 +446,213 @@ func (s *UserService) BulkUpdateStatus(userIDs []uint64, status string, currentU
 	}
 
 	return int(result.RowsAffected), nil
+}
+
+// UserImportError merupakan struktur untuk tracking import errors per row
+type UserImportError struct {
+	Row    int    `json:"row"`
+	NIP    string `json:"nip"`
+	Reason string `json:"reason"`
+}
+
+// BulkImportResult merupakan result dari bulk import operation
+type BulkImportResult struct {
+	Imported int               `json:"imported"`
+	Failed   int               `json:"failed"`
+	Errors   []UserImportError `json:"errors"`
+}
+
+// BulkImportUsersFromCSV melakukan import users dari CSV file
+// dengan validation dan error tracking untuk setiap row
+func (s *UserService) BulkImportUsersFromCSV(csvData []byte) (*BulkImportResult, error) {
+	reader := csv.NewReader(bytes.NewReader(csvData))
+	
+	// Read all records
+	records, err := reader.ReadAll()
+	if err != nil {
+		return nil, fmt.Errorf("gagal membaca CSV file: %w", err)
+	}
+
+	if len(records) < 2 {
+		return nil, errors.New("CSV file kosong atau tidak memiliki data")
+	}
+
+	// Validate header (expected: NIP, Full Name, Email, Phone, Role, Department)
+	header := records[0]
+	expectedHeaders := []string{"NIP", "Full Name", "Email", "Phone", "Role", "Department"}
+	if len(header) != len(expectedHeaders) {
+		return nil, fmt.Errorf("format CSV tidak sesuai, expected headers: %v", expectedHeaders)
+	}
+
+	result := &BulkImportResult{
+		Imported: 0,
+		Failed:   0,
+		Errors:   []UserImportError{},
+	}
+
+	// Process each row (skip header)
+	for i, record := range records[1:] {
+		rowNumber := i + 2 // +2 karena header adalah row 1, dan index mulai dari 0
+
+		if len(record) != 6 {
+			result.Failed++
+			result.Errors = append(result.Errors, UserImportError{
+				Row:    rowNumber,
+				NIP:    record[0],
+				Reason: "Format row tidak lengkap",
+			})
+			continue
+		}
+
+		nip := strings.TrimSpace(record[0])
+		fullName := strings.TrimSpace(record[1])
+		email := strings.TrimSpace(record[2])
+		phone := strings.TrimSpace(record[3])
+		role := strings.TrimSpace(record[4])
+		department := strings.TrimSpace(record[5])
+
+		// Validate required fields
+		if nip == "" || fullName == "" || email == "" || role == "" || department == "" {
+			result.Failed++
+			result.Errors = append(result.Errors, UserImportError{
+				Row:    rowNumber,
+				NIP:    nip,
+				Reason: "Field required kosong (NIP, Full Name, Email, Role, atau Department)",
+			})
+			continue
+		}
+
+		// Validate NIP length
+		if len(nip) > 5 {
+			result.Failed++
+			result.Errors = append(result.Errors, UserImportError{
+				Row:    rowNumber,
+				NIP:    nip,
+				Reason: "NIP maksimal 5 digit",
+			})
+			continue
+		}
+
+		// Validate NIP uniqueness
+		var existingUser models.User
+		if err := s.db.Where("nip = ?", nip).First(&existingUser).Error; err == nil {
+			result.Failed++
+			result.Errors = append(result.Errors, UserImportError{
+				Row:    rowNumber,
+				NIP:    nip,
+				Reason: "NIP sudah terdaftar",
+			})
+			continue
+		}
+
+		// Validate email uniqueness
+		if err := s.db.Where("email = ?", email).First(&existingUser).Error; err == nil {
+			result.Failed++
+			result.Errors = append(result.Errors, UserImportError{
+				Row:    rowNumber,
+				NIP:    nip,
+				Reason: "Email sudah terdaftar",
+			})
+			continue
+		}
+
+		// Create user via CreateUser method
+		createReq := CreateUserRequest{
+			NIP:        nip,
+			FullName:   fullName,
+			Email:      email,
+			Phone:      phone,
+			Role:       role,
+			Department: department,
+			Shift:      "PAGI", // Default shift
+		}
+
+		_, err := s.CreateUser(createReq)
+		if err != nil {
+			result.Failed++
+			result.Errors = append(result.Errors, UserImportError{
+				Row:    rowNumber,
+				NIP:    nip,
+				Reason: err.Error(),
+			})
+			continue
+		}
+
+		result.Imported++
+	}
+
+	return result, nil
+}
+
+// ExportUsersToCSV mengekspor semua users ke CSV format
+// untuk backup atau migration purposes
+func (s *UserService) ExportUsersToCSV(filters UserFilters) ([]byte, error) {
+	// Get all users dengan filters (tanpa pagination)
+	var users []models.User
+	
+	query := s.db.Model(&models.User{})
+
+	// Apply filters (sama seperti GetAllUsers)
+	if filters.Role != "" {
+		query = query.Where("role = ?", filters.Role)
+	}
+	if filters.Department != "" {
+		query = query.Where("department = ?", filters.Department)
+	}
+	if filters.Status != "" {
+		query = query.Where("status = ?", filters.Status)
+	}
+	if filters.Search != "" {
+		searchTerm := "%" + strings.ToLower(filters.Search) + "%"
+		query = query.Where("LOWER(nip) LIKE ? OR LOWER(full_name) LIKE ?", searchTerm, searchTerm)
+	}
+
+	// Order by NIP
+	query = query.Order("nip ASC")
+
+	if err := query.Find(&users).Error; err != nil {
+		return nil, fmt.Errorf("gagal mengambil data users: %w", err)
+	}
+
+	// Create CSV buffer
+	var buf bytes.Buffer
+	writer := csv.NewWriter(&buf)
+
+	// Write header
+	header := []string{
+		"ID", "NIP", "Full Name", "Email", "Phone", 
+		"Role", "Department", "Shift", "Status", 
+		"Total Points", "Level", "Created At",
+	}
+	if err := writer.Write(header); err != nil {
+		return nil, fmt.Errorf("gagal menulis CSV header: %w", err)
+	}
+
+	// Write data rows
+	for _, user := range users {
+		record := []string{
+			strconv.FormatUint(user.ID, 10),
+			user.NIP,
+			user.FullName,
+			user.Email,
+			user.Phone,
+			string(user.Role),
+			string(user.Department),
+			string(user.Shift),
+			string(user.Status),
+			strconv.Itoa(user.TotalPoints),
+			user.Level,
+			user.CreatedAt.Format("2006-01-02 15:04:05"),
+		}
+		if err := writer.Write(record); err != nil {
+			return nil, fmt.Errorf("gagal menulis CSV row: %w", err)
+		}
+	}
+
+	writer.Flush()
+	if err := writer.Error(); err != nil {
+		return nil, fmt.Errorf("gagal finalize CSV: %w", err)
+	}
+
+	return buf.Bytes(), nil
 }

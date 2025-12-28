@@ -6,15 +6,13 @@
       class="glass-card p-8 rounded-2xl mb-6"
     >
       <div class="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-6">
-        <!-- Avatar -->
-        <div class="relative">
-          <div class="w-24 h-24 rounded-full bg-linear-to-br from-indigo-500 to-fuchsia-600 flex items-center justify-center text-white text-3xl font-bold shadow-xl">
-            {{ userInitial }}
-          </div>
-          <button class="absolute bottom-0 right-0 w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white shadow-lg hover:bg-indigo-700">
-            <Camera class="w-4 h-4" />
-          </button>
-        </div>
+        <!-- Photo Upload Component -->
+        <PhotoUpload
+          :current-photo="user?.profile_photo_url"
+          :alt-text="`${user?.full_name} Profile Photo`"
+          @upload-success="handlePhotoUploadSuccess"
+          @delete-success="handlePhotoDeleteSuccess"
+        />
 
         <!-- User Info -->
         <div class="flex-1 text-center md:text-left">
@@ -48,12 +46,52 @@
       </div>
     </Motion>
 
+    <!-- Points Display -->
+    <PointsDisplay
+      v-if="stats"
+      :points="stats.total_points"
+      :level="stats.level"
+      :next-level="stats.next_level"
+      :points-to-next="stats.points_to_next"
+      :achievements-unlocked="stats.achievements_unlocked"
+      :total-achievements="stats.total_achievements"
+      class="mb-6"
+    />
+
+    <!-- Recent Achievements Preview -->
+    <Motion
+      v-if="recentAchievements && recentAchievements.length > 0"
+      :initial="{ opacity: 0, y: 15 }"
+      :animate="{ opacity: 1, y: 0 }"
+      :transition="{ duration: 0.25, delay: 0.15, ease: 'easeOut' }"
+      class="glass-card p-6 rounded-2xl mb-6"
+    >
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold text-gray-900">Achievement Terbaru</h2>
+        <button 
+          @click="router.push('/profile/achievements')" 
+          class="text-sm font-medium text-indigo-600 hover:text-indigo-700"
+        >
+          Lihat Semua →
+        </button>
+      </div>
+      
+      <div class="grid grid-cols-1 gap-3">
+        <AchievementBadge
+          v-for="(achievement, index) in recentAchievements.slice(0, 3)"
+          :key="achievement.id"
+          :achievement="achievement"
+          :index="index"
+        />
+      </div>
+    </Motion>
+
     <!-- Actions -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       <Motion
         :initial="{ opacity: 0, y: 15 }"
         :animate="{ opacity: 1, y: 0 }"
-        :transition="{ duration: 0.25, delay: 0.1, ease: 'easeOut' }"
+        :transition="{ duration: 0.25, delay: 0.2, ease: 'easeOut' }"
       >
         <button 
           @click="router.push('/profile/edit')"
@@ -74,11 +112,12 @@
       <Motion
         :initial="{ opacity: 0, y: 15 }"
         :animate="{ opacity: 1, y: 0 }"
-        :transition="{ duration: 0.25, delay: 0.15, ease: 'easeOut' }"
+        :transition="{ duration: 0.25, delay: 0.25, ease: 'easeOut' }"
       >
         <button 
-        @click="router.push('/profile/change-password')" 
-        class="glass-card p-6 rounded-2xl hover:shadow-lg text-left active-scale w-full">
+          @click="router.push('/profile/change-password')" 
+          class="glass-card p-6 rounded-2xl hover:shadow-lg text-left active-scale w-full"
+        >
           <div class="flex items-center space-x-4">
             <div class="w-12 h-12 rounded-xl bg-fuchsia-500 flex items-center justify-center">
               <Lock class="w-6 h-6 text-white" />
@@ -90,13 +129,34 @@
           </div>
         </button>
       </Motion>
+
+      <Motion
+        :initial="{ opacity: 0, y: 15 }"
+        :animate="{ opacity: 1, y: 0 }"
+        :transition="{ duration: 0.25, delay: 0.3, ease: 'easeOut' }"
+      >
+        <button 
+          @click="router.push('/profile/achievements')" 
+          class="glass-card p-6 rounded-2xl hover:shadow-lg text-left active-scale w-full"
+        >
+          <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500 flex items-center justify-center">
+              <Trophy class="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 class="font-semibold text-gray-900">Achievements</h3>
+              <p class="text-sm text-gray-600">Lihat semua pencapaian</p>
+            </div>
+          </div>
+        </button>
+      </Motion>
     </div>
 
     <!-- Account Info -->
     <Motion
       :initial="{ opacity: 0, y: 15 }"
       :animate="{ opacity: 1, y: 0 }"
-      :transition="{ duration: 0.25, delay: 0.2, ease: 'easeOut' }"
+      :transition="{ duration: 0.25, delay: 0.35, ease: 'easeOut' }"
       class="glass-card p-6 rounded-2xl"
     >
       <h2 class="text-xl font-semibold text-gray-900 mb-4">Informasi Akun</h2>
@@ -123,28 +183,80 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { Motion } from 'motion-v'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
+import { useApi } from '../../composables/useApi'
 import AppLayout from '../../components/layout/AppLayout.vue'
+import PhotoUpload from '../../components/profile/PhotoUpload.vue'
+import PointsDisplay from '../../components/profile/PointsDisplay.vue'
+import AchievementBadge from '../../components/profile/AchievementBadge.vue'
 import { entranceAnimations } from '../../composables/useMotion'
-import { Camera, Mail, IdCard, Phone, UserCog, Lock } from 'lucide-vue-next'
+import { Mail, IdCard, Phone, UserCog, Lock, Trophy } from 'lucide-vue-next'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { get } = useApi()
+
 const user = computed(() => authStore.user)
+const stats = ref(null)
+const recentAchievements = ref([])
 
-const userInitial = computed(() => {
-  if (!user.value?.full_name) return '?'
-  return user.value.full_name
-    .split(' ')
-    .map(n => n[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase()
-})
+/**
+ * Fetch user stats untuk points dan level display
+ */
+const fetchUserStats = async () => {
+  try {
+    const response = await get('/profile/stats')
+    if (response.success) {
+      stats.value = response.data
+    }
+  } catch (error) {
+    console.error('Failed to fetch user stats:', error)
+  }
+}
 
+/**
+ * Fetch recent achievements untuk preview
+ */
+const fetchRecentAchievements = async () => {
+  try {
+    const response = await get('/profile/achievements')
+    if (response.success) {
+      // Filter hanya unlocked achievements dan sort by unlock date
+      const unlocked = response.data.filter(a => a.is_unlocked)
+      unlocked.sort((a, b) => new Date(b.unlocked_at) - new Date(a.unlocked_at))
+      recentAchievements.value = unlocked
+    }
+  } catch (error) {
+    console.error('Failed to fetch achievements:', error)
+  }
+}
+
+/**
+ * Handle photo upload success
+ */
+const handlePhotoUploadSuccess = async (photoUrl) => {
+  // Update user profile photo di auth store
+  authStore.updateUserField('profile_photo_url', photoUrl)
+  
+  // Refresh stats (mungkin ada achievement unlock)
+  await fetchUserStats()
+  await fetchRecentAchievements()
+}
+
+/**
+ * Handle photo delete success
+ */
+const handlePhotoDeleteSuccess = () => {
+  // Update user profile photo di auth store
+  authStore.updateUserField('profile_photo_url', '')
+}
+
+/**
+ * Format date untuk display
+ */
 const formatDate = (dateString) => {
   if (!dateString) return '-'
   const date = new Date(dateString)
@@ -156,4 +268,14 @@ const formatDate = (dateString) => {
     minute: '2-digit',
   })
 }
+
+/**
+ * Initialize data on mount
+ */
+onMounted(async () => {
+  await Promise.all([
+    fetchUserStats(),
+    fetchRecentAchievements(),
+  ])
+})
 </script>

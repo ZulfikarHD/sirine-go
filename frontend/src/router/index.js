@@ -85,6 +85,12 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: '/profile/achievements',
+    name: 'Achievements',
+    component: () => import('../views/profile/Achievements.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/admin/users',
     name: 'UserManagement',
     component: () => import('../views/admin/users/UserList.vue'),

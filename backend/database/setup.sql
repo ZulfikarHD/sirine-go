@@ -25,6 +25,8 @@ CREATE TABLE IF NOT EXISTS users (
     department ENUM('KHAZWAL', 'CETAK', 'VERIFIKASI', 'KHAZKHIR') NOT NULL,
     shift ENUM('PAGI', 'SIANG', 'MALAM') DEFAULT 'PAGI',
     profile_photo_url VARCHAR(500),
+    total_points INT DEFAULT 0 COMMENT 'Total gamification points',
+    level VARCHAR(20) DEFAULT 'Bronze' COMMENT 'User level based on points',
     status ENUM('ACTIVE', 'INACTIVE', 'SUSPENDED') DEFAULT 'ACTIVE',
     must_change_password BOOLEAN DEFAULT TRUE COMMENT 'Force password change on first login',
     last_login_at TIMESTAMP NULL,
@@ -107,6 +109,38 @@ CREATE TABLE IF NOT EXISTS notifications (
     INDEX idx_user_read (user_id, is_read)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Tabel Achievements untuk gamification system
+CREATE TABLE IF NOT EXISTS achievements (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(50) NOT NULL UNIQUE COMMENT 'Unique code untuk achievement',
+    name VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    icon VARCHAR(100) COMMENT 'Icon identifier atau emoji',
+    points INT NOT NULL DEFAULT 0 COMMENT 'Points yang didapat saat unlock',
+    category ENUM('LOGIN', 'PRODUCTIVITY', 'QUALITY', 'MILESTONE') DEFAULT 'MILESTONE',
+    criteria JSON COMMENT 'Criteria untuk unlock achievement',
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_code (code),
+    INDEX idx_category (category),
+    INDEX idx_is_active (is_active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Tabel User Achievements untuk tracking unlocked achievements
+CREATE TABLE IF NOT EXISTS user_achievements (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+    achievement_id BIGINT UNSIGNED NOT NULL,
+    unlocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (achievement_id) REFERENCES achievements(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_user_achievement (user_id, achievement_id),
+    INDEX idx_user_id (user_id),
+    INDEX idx_achievement_id (achievement_id),
+    INDEX idx_unlocked_at (unlocked_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Seed initial admin user
 -- Password: Admin@123 (akan di-hash oleh aplikasi)
 -- NIP: 99999
@@ -123,6 +157,16 @@ VALUES (
     FALSE,
     'ACTIVE'
 ) ON DUPLICATE KEY UPDATE nip=nip;
+
+-- Seed initial achievements
+INSERT INTO achievements (code, name, description, icon, points, category, criteria) VALUES
+('FIRST_LOGIN', 'Login Pertama', 'Berhasil login untuk pertama kalinya ke sistem', '🎉', 10, 'LOGIN', '{"type": "login_count", "value": 1}'),
+('WEEK_STREAK', 'Semangat Seminggu', 'Login selama 7 hari berturut-turut', '🔥', 50, 'LOGIN', '{"type": "login_streak", "value": 7}'),
+('MONTH_STREAK', 'Dedikasi Sebulan', 'Login selama 30 hari berturut-turut', '⭐', 100, 'LOGIN', '{"type": "login_streak", "value": 30}'),
+('PROFILE_COMPLETE', 'Profil Lengkap', 'Melengkapi informasi profil dan foto', '✨', 20, 'MILESTONE', '{"type": "profile_complete"}'),
+('EARLY_BIRD', 'Si Pagi Hari', 'Login sebelum jam 07:00 WIB sebanyak 10 kali', '🌅', 30, 'LOGIN', '{"type": "early_login", "value": 10}'),
+('NIGHT_OWL', 'Burung Hantu', 'Login setelah jam 20:00 WIB sebanyak 10 kali', '🦉', 30, 'LOGIN', '{"type": "late_login", "value": 10}')
+ON DUPLICATE KEY UPDATE code=code;
 
 -- Catatan:
 -- GORM Auto Migration akan handle kolom tambahan jika ada perubahan model

@@ -86,10 +86,20 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 			users.POST("/bulk-delete", middleware.RequireRole("ADMIN"), userHandler.BulkDeleteUsers)
 			users.POST("/bulk-update-status", middleware.RequireRole("ADMIN"), userHandler.BulkUpdateStatus)
 			users.POST("/:id/reset-password", middleware.RequireRole("ADMIN"), passwordHandler.ForceResetPassword)
+			users.POST("/import", middleware.RequireRole("ADMIN"), userHandler.ImportUsersFromCSV)
+			users.GET("/export", userHandler.ExportUsersToCSV)
 		}
 
+		// File service untuk photo uploads
+		fileService := services.NewFileService(db)
+
+		// Achievement service untuk gamification
+		notificationService := services.NewNotificationService(db)
+		achievementService := services.NewAchievementService(db, notificationService)
+		achievementHandler := handlers.NewAchievementHandler(achievementService)
+
 		// Profile routes (Self-service untuk semua authenticated users)
-		profileHandler := handlers.NewProfileHandler(userService)
+		profileHandler := handlers.NewProfileHandler(userService, fileService, achievementService)
 
 		profile := api.Group("/profile")
 		profile.Use(middleware.AuthMiddleware(db, cfg))
@@ -98,10 +108,36 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 			profile.GET("", profileHandler.GetProfile)
 			profile.PUT("", profileHandler.UpdateProfile)
 			profile.PUT("/password", passwordHandler.ChangePassword)
+			profile.POST("/photo", profileHandler.UploadProfilePhoto)
+			profile.DELETE("/photo", profileHandler.DeleteProfilePhoto)
+			profile.GET("/achievements", achievementHandler.GetUserAchievements)
+			profile.GET("/stats", achievementHandler.GetUserStats)
+		}
+
+		// Achievement routes (Protected - All authenticated users)
+		achievements := api.Group("/achievements")
+		achievements.Use(middleware.AuthMiddleware(db, cfg))
+		{
+			achievements.GET("", achievementHandler.GetAllAchievements)
+		}
+
+		// Admin Achievement routes
+		adminAchievements := api.Group("/admin/achievements")
+		adminAchievements.Use(middleware.AuthMiddleware(db, cfg))
+		adminAchievements.Use(middleware.RequireRole("ADMIN"))
+		{
+			adminAchievements.POST("/award", achievementHandler.AwardAchievement)
+		}
+
+		// Admin User Achievement routes
+		adminUsers := api.Group("/admin/users")
+		adminUsers.Use(middleware.AuthMiddleware(db, cfg))
+		adminUsers.Use(middleware.RequireRole("ADMIN", "MANAGER"))
+		{
+			adminUsers.GET("/:id/achievements", achievementHandler.GetAchievementsByUserID)
 		}
 
 		// Notification routes (Protected - All authenticated users)
-		notificationService := services.NewNotificationService(db)
 		notificationHandler := handlers.NewNotificationHandler(notificationService)
 
 		notifications := api.Group("/notifications")
@@ -150,6 +186,9 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 		// 	examples.DELETE("/:id", exampleHandler.Delete)
 		// }
 	}
+
+	// Serve static files untuk uploads
+	r.Static("/uploads", "./public/uploads")
 
 	// Serve static files for frontend (hanya untuk production)
 	// Dalam development mode, frontend diakses melalui Vite dev server (port 5173)

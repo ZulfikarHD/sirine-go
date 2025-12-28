@@ -60,6 +60,8 @@ type User struct {
 	Department          Department     `gorm:"type:enum('KHAZWAL','CETAK','VERIFIKASI','KHAZKHIR');not null" json:"department" binding:"required"`
 	Shift               Shift          `gorm:"type:enum('PAGI','SIANG','MALAM');default:'PAGI'" json:"shift"`
 	ProfilePhotoURL     string         `gorm:"type:varchar(500)" json:"profile_photo_url"`
+	TotalPoints         int            `gorm:"default:0" json:"total_points"`
+	Level               string         `gorm:"type:varchar(20);default:'Bronze'" json:"level"`
 	Status              UserStatus     `gorm:"type:enum('ACTIVE','INACTIVE','SUSPENDED');default:'ACTIVE'" json:"status"`
 	MustChangePassword  bool           `gorm:"default:true" json:"must_change_password"`
 	LastLoginAt         *time.Time     `gorm:"type:timestamp null" json:"last_login_at"`
@@ -115,6 +117,8 @@ type SafeUser struct {
 	Department      Department `json:"department"`
 	Shift           Shift      `json:"shift"`
 	ProfilePhotoURL string     `json:"profile_photo_url"`
+	TotalPoints     int        `json:"total_points"`
+	Level           string     `json:"level"`
 	Status          UserStatus `json:"status"`
 	LastLoginAt     *time.Time `json:"last_login_at"`
 	LockedUntil     *time.Time `json:"locked_until,omitempty"`
@@ -134,10 +138,27 @@ func (u *User) ToSafeUser() SafeUser {
 		Department:      u.Department,
 		Shift:           u.Shift,
 		ProfilePhotoURL: u.ProfilePhotoURL,
+		TotalPoints:     u.TotalPoints,
+		Level:           u.Level,
 		Status:          u.Status,
 		LastLoginAt:     u.LastLoginAt,
 		LockedUntil:     u.LockedUntil,
 		CreatedAt:       u.CreatedAt,
 		UpdatedAt:       u.UpdatedAt,
+	}
+}
+
+// GetLevelFromPoints menghitung level berdasarkan total points
+// dengan threshold: Bronze (0-99), Silver (100-499), Gold (500-999), Platinum (1000+)
+func GetLevelFromPoints(points int) string {
+	switch {
+	case points >= 1000:
+		return "Platinum"
+	case points >= 500:
+		return "Gold"
+	case points >= 100:
+		return "Silver"
+	default:
+		return "Bronze"
 	}
 }

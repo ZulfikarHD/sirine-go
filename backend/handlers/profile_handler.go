@@ -10,13 +10,17 @@ import (
 
 // ProfileHandler merupakan handler untuk profile management (self-service)
 type ProfileHandler struct {
-	userService *services.UserService
+	userService         *services.UserService
+	fileService         *services.FileService
+	achievementService  *services.AchievementService
 }
 
 // NewProfileHandler membuat instance baru dari ProfileHandler
-func NewProfileHandler(userService *services.UserService) *ProfileHandler {
+func NewProfileHandler(userService *services.UserService, fileService *services.FileService, achievementService *services.AchievementService) *ProfileHandler {
 	return &ProfileHandler{
-		userService: userService,
+		userService:        userService,
+		fileService:        fileService,
+		achievementService: achievementService,
 	}
 }
 
@@ -101,5 +105,87 @@ func (h *ProfileHandler) UpdateProfile(c *gin.Context) {
 		"success": true,
 		"message": "Profile berhasil diupdate",
 		"data":    updatedUser,
+	})
+}
+
+// UploadProfilePhoto meng-upload profile photo user
+// @route POST /api/profile/photo
+// @access Protected (All authenticated users)
+func (h *ProfileHandler) UploadProfilePhoto(c *gin.Context) {
+	// Get current user dari context
+	currentUser, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"message": "User tidak terautentikasi",
+		})
+		return
+	}
+
+	user := currentUser.(*models.User)
+
+	// Get uploaded file
+	fileHeader, err := c.FormFile("photo")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "File photo tidak ditemukan",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// Upload dan process photo
+	photoURL, err := h.fileService.UploadProfilePhoto(user.ID, fileHeader)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "Gagal upload photo",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// Check dan award achievement untuk profile complete
+	go h.achievementService.CheckAndAwardProfileComplete(user.ID)
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Photo profile berhasil diupload",
+		"data": gin.H{
+			"photo_url": photoURL,
+		},
+	})
+}
+
+// DeleteProfilePhoto menghapus profile photo user
+// @route DELETE /api/profile/photo
+// @access Protected (All authenticated users)
+func (h *ProfileHandler) DeleteProfilePhoto(c *gin.Context) {
+	// Get current user dari context
+	currentUser, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"message": "User tidak terautentikasi",
+		})
+		return
+	}
+
+	user := currentUser.(*models.User)
+
+	// Delete photo
+	if err := h.fileService.DeleteProfilePhoto(user.ID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "Gagal menghapus photo",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Photo profile berhasil dihapus",
 	})
 }

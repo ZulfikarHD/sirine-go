@@ -10,13 +10,35 @@
           <h1 class="text-2xl font-bold text-gray-900">Manajemen User</h1>
           <p class="text-sm text-gray-600 mt-1">Kelola data user sistem</p>
         </div>
-        <button 
-          @click="openCreateModal"
-          class="btn-primary flex items-center space-x-2 active-scale"
-        >
-          <UserPlus class="w-5 h-5" />
-          <span>Tambah User Baru</span>
-        </button>
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- Import CSV Button -->
+          <button 
+            @click="showImportModal = true"
+            class="btn-secondary flex items-center space-x-2 active-scale"
+          >
+            <Upload class="w-5 h-5" />
+            <span>Import CSV</span>
+          </button>
+          
+          <!-- Export CSV Button -->
+          <button 
+            @click="handleExport"
+            :disabled="userStore.loading"
+            class="btn-secondary flex items-center space-x-2 active-scale"
+          >
+            <Download class="w-5 h-5" />
+            <span>Export CSV</span>
+          </button>
+          
+          <!-- Add User Button -->
+          <button 
+            @click="openCreateModal"
+            class="btn-primary flex items-center space-x-2 active-scale"
+          >
+            <UserPlus class="w-5 h-5" />
+            <span>Tambah User</span>
+          </button>
+        </div>
       </div>
 
       <!-- Search dan Filters -->
@@ -249,6 +271,12 @@
       :detail="alertDialog.config.value.detail"
       @close="alertDialog.handleClose"
     />
+
+    <!-- CSV Import Modal -->
+    <CsvImport
+      v-model="showImportModal"
+      @import-success="handleImportSuccess"
+    />
   </AppLayout>
 </template>
 
@@ -257,16 +285,21 @@ import { ref, computed, onMounted } from 'vue'
 import { Motion } from 'motion-v'
 import { useUserStore } from '../../../stores/user'
 import { useRouter } from 'vue-router'
+import { useApi } from '../../../composables/useApi'
+import { useHaptic } from '../../../composables/useHaptic'
 import AppLayout from '../../../components/layout/AppLayout.vue'
 import RoleBadge from '../../../components/admin/RoleBadge.vue'
 import UserFormModal from '../../../components/admin/UserFormModal.vue'
+import CsvImport from '../../../components/admin/CsvImport.vue'
 import { ConfirmDialog, AlertDialog } from '../../../components/common'
 import { useConfirmDialog, useAlertDialog } from '../../../composables/useModal'
 import { entranceAnimations } from '../../../composables/useMotion'
-import { UserPlus, Search, Users, Edit, Trash2, X } from 'lucide-vue-next'
+import { UserPlus, Search, Users, Edit, Trash2, X, Upload, Download } from 'lucide-vue-next'
 
 const userStore = useUserStore()
 const router = useRouter()
+const { get } = useApi()
+const haptic = useHaptic()
 
 // Modal composables
 const confirmDialog = useConfirmDialog()
@@ -278,6 +311,7 @@ const selectedRole = ref('')
 const selectedDepartment = ref('')
 const showFormModal = ref(false)
 const selectedUser = ref(null)
+const showImportModal = ref(false)
 
 // Debounced search
 let searchTimeout = null
@@ -384,6 +418,76 @@ const confirmDelete = async (user) => {
       })
     }
   }
+}
+
+// CSV Import/Export
+const handleExport = async () => {
+  try {
+    haptic.medium()
+    
+    // Build query params untuk filter export
+    const params = new URLSearchParams({
+      search: searchQuery.value || '',
+      role: selectedRole.value || '',
+      department: selectedDepartment.value || '',
+    }).toString()
+    
+    // Direct download menggunakan window.open
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'
+    const token = localStorage.getItem('auth_token')
+    
+    // Create download link dengan fetch
+    const response = await fetch(`${baseURL}/users/export?${params}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    
+    if (!response.ok) {
+      throw new Error('Failed to export users')
+    }
+    
+    // Get filename dari header atau use default
+    const contentDisposition = response.headers.get('Content-Disposition')
+    const filenameMatch = contentDisposition?.match(/filename="?([^"]+)"?/)
+    const filename = filenameMatch ? filenameMatch[1] : `users_export_${Date.now()}.csv`
+    
+    // Create blob dan download
+    const blob = await response.blob()
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    document.body.appendChild(a)
+    a.click()
+    window.URL.revokeObjectURL(url)
+    document.body.removeChild(a)
+    
+    haptic.success()
+    await alertDialog.success('Export berhasil!', {
+      detail: 'File CSV telah didownload.',
+      autoDismiss: true,
+      autoDismissDelay: 2000
+    })
+  } catch (error) {
+    haptic.error()
+    await alertDialog.error('Gagal export users', {
+      detail: error.message || 'Terjadi kesalahan saat export data.'
+    })
+  }
+}
+
+const handleImportSuccess = async (result) => {
+  haptic.success()
+  
+  await alertDialog.success('Import selesai!', {
+    detail: `${result.imported} users berhasil diimport${result.failed > 0 ? `, ${result.failed} gagal` : ''}.`,
+    autoDismiss: true,
+    autoDismissDelay: 3000
+  })
+  
+  // Refresh user list
+  await userStore.fetchUsers(userStore.currentPage)
 }
 
 // Helper

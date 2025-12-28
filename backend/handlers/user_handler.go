@@ -1,10 +1,13 @@
 package handlers
 
 import (
+	"fmt"
+	"io"
 	"net/http"
 	"sirine-go/backend/models"
 	"sirine-go/backend/services"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -334,4 +337,111 @@ func (h *UserHandler) BulkUpdateStatus(c *gin.Context) {
 			"affected_count": affected,
 		},
 	})
+}
+
+// ImportUsersFromCSV melakukan bulk import users dari CSV file
+// @route POST /api/users/import
+// @access Admin only
+func (h *UserHandler) ImportUsersFromCSV(c *gin.Context) {
+	// Get uploaded file
+	fileHeader, err := c.FormFile("csv_file")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "File CSV tidak ditemukan",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// Validate file extension
+	if fileHeader.Header.Get("Content-Type") != "text/csv" && 
+	   fileHeader.Header.Get("Content-Type") != "application/vnd.ms-excel" {
+		// Try to validate by filename extension
+		if len(fileHeader.Filename) < 4 || fileHeader.Filename[len(fileHeader.Filename)-4:] != ".csv" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"message": "File harus berformat CSV",
+			})
+			return
+		}
+	}
+
+	// Open file
+	file, err := fileHeader.Open()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "Gagal membaca file",
+			"error":   err.Error(),
+		})
+		return
+	}
+	defer file.Close()
+
+	// Read file content
+	csvData, err := io.ReadAll(file)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "Gagal membaca file content",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// Import users
+	result, err := h.userService.BulkImportUsersFromCSV(csvData)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "Gagal import users",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": fmt.Sprintf("Import selesai: %d berhasil, %d gagal", result.Imported, result.Failed),
+		"data":    result,
+	})
+}
+
+// ExportUsersToCSV mengekspor users ke CSV file
+// @route GET /api/users/export
+// @access Admin only
+func (h *UserHandler) ExportUsersToCSV(c *gin.Context) {
+	var filters services.UserFilters
+
+	// Bind query parameters untuk filter
+	if err := c.ShouldBindQuery(&filters); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "Parameter filter tidak valid",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// Export users
+	csvData, err := h.userService.ExportUsersToCSV(filters)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "Gagal export users",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// Set headers untuk file download
+	filename := fmt.Sprintf("users_export_%s.csv", time.Now().Format("20060102_150405"))
+	c.Header("Content-Description", "File Transfer")
+	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
+	c.Header("Content-Type", "text/csv")
+	c.Header("Content-Length", strconv.Itoa(len(csvData)))
+
+	// Write CSV data
+	c.Data(http.StatusOK, "text/csv", csvData)
 }

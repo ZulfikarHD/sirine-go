@@ -127,6 +127,21 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  /**
+   * Update specific user field tanpa full replace
+   * untuk partial updates seperti photo upload
+   */
+  const updateUserField = (field, value) => {
+    if (!user.value) return
+    
+    user.value = {
+      ...user.value,
+      [field]: value
+    }
+    
+    localStorage.setItem('user_data', JSON.stringify(user.value))
+  }
+
   return {
     // State
     user,
@@ -148,5 +163,6 @@ export const useAuthStore = defineStore('auth', () => {
     isAdmin,
     hasDepartment,
     fetchCurrentUser,
+    updateUserField,
   }
 })
