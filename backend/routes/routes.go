@@ -64,6 +64,37 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 			authProtected.GET("/me", authHandler.GetCurrentUser)
 		}
 
+		// User Management routes (Admin/Manager only)
+		passwordService := services.NewPasswordService()
+		userService := services.NewUserService(db, passwordService)
+		userHandler := handlers.NewUserHandler(userService)
+
+		users := api.Group("/users")
+		users.Use(middleware.AuthMiddleware(db, cfg))
+		users.Use(middleware.RequireRole("ADMIN", "MANAGER"))
+		users.Use(middleware.ActivityLogger(db))
+		{
+			users.GET("", userHandler.GetAllUsers)
+			users.GET("/search", userHandler.SearchUsers)
+			users.GET("/:id", userHandler.GetUserByID)
+			users.POST("", middleware.RequireRole("ADMIN"), userHandler.CreateUser)
+			users.PUT("/:id", middleware.RequireRole("ADMIN"), userHandler.UpdateUser)
+			users.DELETE("/:id", middleware.RequireRole("ADMIN"), userHandler.DeleteUser)
+			users.POST("/bulk-delete", middleware.RequireRole("ADMIN"), userHandler.BulkDeleteUsers)
+			users.POST("/bulk-update-status", middleware.RequireRole("ADMIN"), userHandler.BulkUpdateStatus)
+		}
+
+		// Profile routes (Self-service untuk semua authenticated users)
+		profileHandler := handlers.NewProfileHandler(userService)
+
+		profile := api.Group("/profile")
+		profile.Use(middleware.AuthMiddleware(db, cfg))
+		profile.Use(middleware.ActivityLogger(db))
+		{
+			profile.GET("", profileHandler.GetProfile)
+			profile.PUT("", profileHandler.UpdateProfile)
+		}
+
 		// Example routes (protected) - Commented out for Sprint 1
 		// Will be re-enabled when needed
 		// exampleService := services.NewExampleService()

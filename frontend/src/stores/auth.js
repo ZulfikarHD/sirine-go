@@ -101,6 +101,32 @@ export const useAuthStore = defineStore('auth', () => {
     return departments.includes(user.value.department)
   }
 
+  /**
+   * Fetch current user data dari server
+   * untuk sync latest user information
+   */
+  const fetchCurrentUser = async () => {
+    if (!token.value) return
+
+    try {
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'
+      const response = await fetch(`${API_BASE}/auth/me`, {
+        headers: {
+          'Authorization': `Bearer ${token.value}`
+        }
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success) {
+          setUser(data.data)
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching current user:', error)
+    }
+  }
+
   return {
     // State
     user,
@@ -121,5 +147,6 @@ export const useAuthStore = defineStore('auth', () => {
     hasRole,
     isAdmin,
     hasDepartment,
+    fetchCurrentUser,
   }
 })

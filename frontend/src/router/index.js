@@ -55,6 +55,21 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: '/profile/edit',
+    name: 'EditProfile',
+    component: () => import('../views/profile/EditProfile.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/admin/users',
+    name: 'UserManagement',
+    component: () => import('../views/admin/users/UserList.vue'),
+    meta: { 
+      requiresAuth: true,
+      roles: ['ADMIN', 'MANAGER'],
+    },
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('../views/NotFound.vue'),

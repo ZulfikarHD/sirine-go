@@ -27,7 +27,7 @@ export const useAuth = () => {
     error.value = null
 
     try {
-      const response = await api.post('/api/auth/login', {
+      const response = await api.post('/auth/login', {
         nip,
         password,
         remember_me: rememberMe,
@@ -63,7 +63,7 @@ export const useAuth = () => {
     error.value = null
 
     try {
-      await api.post('/api/auth/logout')
+      await api.post('/auth/logout')
       authStore.clearAuth()
       router.push('/login')
       
@@ -87,7 +87,7 @@ export const useAuth = () => {
     error.value = null
 
     try {
-      const response = await api.get('/api/auth/me')
+      const response = await api.get('/auth/me')
 
       if (response.success) {
         authStore.setUser(response.data)
@@ -129,7 +129,7 @@ export const useAuth = () => {
     }
 
     try {
-      const response = await api.post('/api/auth/refresh', {
+      const response = await api.post('/auth/refresh', {
         refresh_token: authStore.refreshToken,
       })
 

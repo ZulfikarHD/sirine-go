@@ -84,7 +84,8 @@ import {
   BarChart3,
   Settings,
   FileText,
-  Siren
+  Siren,
+  UserCircle
 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -114,33 +115,47 @@ const isActive = (path) => {
   return route.path === path || route.path.startsWith(path + '/')
 }
 
-const navigationGroups = [
-  {
-    title: '',
+// Navigation groups dengan role-based visibility
+const navigationGroups = computed(() => {
+  const isAdmin = user.value?.role === 'ADMIN' || user.value?.role === 'MANAGER'
+  
+  const groups = [
+    {
+      title: '',
+      items: [
+        { name: 'Dashboard', href: '/dashboard', icon: Home },
+      ]
+    },
+    {
+      title: 'Produksi',
+      items: [
+        { name: 'Pesanan (PO)', href: '/dashboard/orders', icon: ClipboardList },
+        { name: 'Produksi', href: '/dashboard/production', icon: Box },
+        { name: 'Laporan', href: '/dashboard/reports', icon: FileText },
+      ]
+    }
+  ]
+
+  // Admin/Manager only menu
+  if (isAdmin) {
+    groups.push({
+      title: 'Manajemen',
+      items: [
+        { name: 'Manajemen User', href: '/admin/users', icon: Users },
+        { name: 'Statistik', href: '/dashboard/stats', icon: BarChart3 },
+      ]
+    })
+  }
+
+  // Profile menu (untuk semua user)
+  groups.push({
+    title: 'Akun',
     items: [
-      { name: 'Dashboard', href: '/dashboard', icon: Home },
-    ]
-  },
-  {
-    title: 'Produksi',
-    items: [
-      { name: 'Pesanan (PO)', href: '/dashboard/orders', icon: ClipboardList },
-      { name: 'Produksi', href: '/dashboard/production', icon: Box },
-      { name: 'Laporan', href: '/dashboard/reports', icon: FileText },
-    ]
-  },
-  {
-    title: 'Manajemen',
-    items: [
-      { name: 'Pengguna', href: '/dashboard/users', icon: Users },
-      { name: 'Statistik', href: '/dashboard/stats', icon: BarChart3 },
-    ]
-  },
-  {
-    title: 'Sistem',
-    items: [
+      { name: 'Profile', href: '/profile', icon: UserCircle },
       { name: 'Pengaturan', href: '/dashboard/settings', icon: Settings },
     ]
-  }
-]
+  })
+
+  return groups
+})
 </script>

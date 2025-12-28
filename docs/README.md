@@ -121,11 +121,44 @@ Panduan mendalam untuk topik spesifik:
 
 ---
 
+### 🔌 **API Reference** → `api/`
+
+Complete API documentation untuk semua endpoints:
+
+19. **[api/README.md](./api/README.md)** 📡  
+    API hub dengan quick reference dan conventions
+
+20. **[api/user-management.md](./api/user-management.md)** 👥  
+    User Management & Profile API (Sprint 2)
+
+---
+
+### 🗺️ **User Journeys** → `user-journeys/`
+
+Detailed user flows dan interaction patterns:
+
+21. **[user-journeys/user-management/admin-user-management.md](./user-journeys/user-management/admin-user-management.md)** 👨‍💼  
+    Admin user management journey dengan iOS-inspired UX
+
+22. **[user-journeys/user-management/user-profile-management.md](./user-journeys/user-management/user-profile-management.md)** 👤  
+    Self-service profile management journey
+
+---
+
+### 🧪 **Testing** → `testing/`
+
+Comprehensive testing guides dan test scenarios:
+
+23. **[testing/user-management-testing.md](./testing/user-management-testing.md)** ✅  
+    Complete testing guide untuk User Management & Profile
+
+---
+
 ### 🚀 **Deployment** → `deployment/`
 
 Ready untuk production:
 
-19. **[production-deployment.md](./deployment/production-deployment.md)** 🌐  
+24. **[production-deployment.md](./deployment/production-deployment.md)** 🌐  
     Deployment ke production server dengan Nginx + SSL
 
 ---
@@ -134,7 +167,7 @@ Ready untuk production:
 
 Mengalami masalah:
 
-20. **[faq.md](./troubleshooting/faq.md)** 💡  
+25. **[faq.md](./troubleshooting/faq.md)** 💡  
     Common questions dan solusi masalah umum
 
 ---
@@ -224,15 +257,23 @@ sirine-go/
 # Health check
 GET /health
 
-# Examples CRUD
-GET    /api/examples      # Get all
-GET    /api/examples/:id  # Get by ID
-POST   /api/examples      # Create
-PUT    /api/examples/:id  # Update
-DELETE /api/examples/:id  # Delete
+# Authentication
+POST   /api/auth/login    # Login
+POST   /api/auth/logout   # Logout
+GET    /api/auth/me       # Current user
+
+# User Management (Admin)
+GET    /api/users         # List users
+POST   /api/users         # Create user
+PUT    /api/users/:id     # Update user
+DELETE /api/users/:id     # Delete user
+
+# Profile (Self-Service)
+GET    /api/profile       # Get profile
+PUT    /api/profile       # Update profile
 ```
 
-**📖 Detail lengkap:** Lihat [api-documentation.md](./development/api-documentation.md)
+**📖 Detail lengkap:** Lihat [api/README.md](./api/README.md)
 
 ---
 
@@ -292,6 +333,16 @@ README.md (Overview) ← You are here
     ├─ validation/ (Rules & Examples)
     └─ utilities/ (Helpers)
     ↓
+🔌 api/
+    ├─ README.md (API Hub)
+    └─ user-management.md (User APIs)
+    ↓
+🗺️ user-journeys/
+    └─ user-management/ (User flows & UX)
+    ↓
+🧪 testing/
+    └─ user-management-testing.md (Test scenarios)
+    ↓
 🚀 deployment/
     └─ production-deployment.md (Deploy to production)
     ↓
@@ -335,8 +386,8 @@ Ingin berkontribusi? Silakan baca **[CONTRIBUTING.md](./CONTRIBUTING.md)** untuk
 
 ## 📄 Version & License
 
-- **Version:** 1.0.0
-- **Last Updated:** 27 Desember 2025
+- **Version:** 1.1.0 (Sprint 2 Complete)
+- **Last Updated:** 28 Desember 2025
 - **License:** Private & Proprietary
 - **Changelog:** Lihat **[CHANGELOG.md](./CHANGELOG.md)** untuk riwayat perubahan.
 

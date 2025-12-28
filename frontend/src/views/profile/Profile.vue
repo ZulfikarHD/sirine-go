@@ -47,7 +47,10 @@
 
     <!-- Actions -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-      <button class="glass-card p-6 rounded-2xl hover:shadow-lg transition-all text-left active-scale">
+      <button 
+        @click="router.push('/profile/edit')"
+        class="glass-card p-6 rounded-2xl hover:shadow-lg transition-all text-left active-scale"
+      >
         <div class="flex items-center space-x-4">
           <div class="w-12 h-12 rounded-xl bg-indigo-500 flex items-center justify-center">
             <UserCog class="w-6 h-6 text-white" />
@@ -99,10 +102,12 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 import AppLayout from '../../components/layout/AppLayout.vue'
 import { Camera, Mail, IdCard, Phone, UserCog, Lock } from 'lucide-vue-next'
 
+const router = useRouter()
 const authStore = useAuthStore()
 const user = computed(() => authStore.user)
 

@@ -125,4 +125,5 @@ Sebelum commit dokumentasi "How-to" (seperti `quickstart.md`), **COBA DULU** lan
 Pull Request dianggap selesai jika:
 - [ ] Fitur berjalan sesuai spec.
 - [ ] Unit test passed.
+- [ ] Test plan dibuat dengan QA checklist lengkap
 - [ ] **Dokumentasi terkait sudah diupdate** (sesuai checklist di atas).

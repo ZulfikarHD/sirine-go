@@ -6,7 +6,7 @@ import router from '../router'
  * API base URL dari environment variable
  * dengan fallback ke localhost untuk development
  */
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'
 
 /**
  * Axios instance dengan auto token injection dan interceptors
@@ -47,7 +47,7 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true
 
       // Skip auto-redirect jika ini adalah login request yang gagal
-      const isLoginRequest = originalRequest.url?.includes('/api/auth/login')
+      const isLoginRequest = originalRequest.url?.includes('/auth/login')
       if (isLoginRequest) {
         // Untuk login request, reject error tanpa redirect
         return Promise.reject(error)
@@ -56,7 +56,7 @@ apiClient.interceptors.response.use(
       // Coba refresh token untuk request lainnya
       if (authStore.refreshToken) {
         try {
-          const response = await axios.post(`${API_BASE_URL}/api/auth/refresh`, {
+          const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
             refresh_token: authStore.refreshToken,
           })
 
