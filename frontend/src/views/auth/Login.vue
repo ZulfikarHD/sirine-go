@@ -109,6 +109,17 @@
           </button>
         </form>
 
+        <!-- Forgot Password Link -->
+        <div class="mt-4 text-center">
+          <button
+            type="button"
+            @click="router.push('/forgot-password')"
+            class="text-sm text-indigo-600 hover:text-indigo-700 font-medium transition-colors duration-200"
+          >
+            Lupa Password?
+          </button>
+        </div>
+
         <!-- Footer -->
         <div class="mt-6 text-center text-sm text-gray-600">
           <p>© 2025 Sirine Go - Sistem Produksi Pita Cukai</p>

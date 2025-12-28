@@ -48,12 +48,14 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 	{
 		// Authentication routes (public)
 		authService := services.NewAuthService(db, cfg)
-		authHandler := handlers.NewAuthHandler(authService)
+		authHandler := handlers.NewAuthHandler(authService, db, cfg)
 
 		auth := api.Group("/auth")
 		{
 			auth.POST("/login", authHandler.Login)
 			auth.POST("/refresh", authHandler.RefreshToken)
+			auth.POST("/forgot-password", authHandler.ForgotPassword)
+			auth.POST("/reset-password", authHandler.ResetPassword)
 		}
 
 		// Protected authentication routes
@@ -68,6 +70,7 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 		passwordService := services.NewPasswordService()
 		userService := services.NewUserService(db, passwordService)
 		userHandler := handlers.NewUserHandler(userService)
+		passwordHandler := handlers.NewPasswordHandler(db, cfg)
 
 		users := api.Group("/users")
 		users.Use(middleware.AuthMiddleware(db, cfg))
@@ -82,10 +85,12 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 			users.DELETE("/:id", middleware.RequireRole("ADMIN"), userHandler.DeleteUser)
 			users.POST("/bulk-delete", middleware.RequireRole("ADMIN"), userHandler.BulkDeleteUsers)
 			users.POST("/bulk-update-status", middleware.RequireRole("ADMIN"), userHandler.BulkUpdateStatus)
+			users.POST("/:id/reset-password", middleware.RequireRole("ADMIN"), passwordHandler.ForceResetPassword)
 		}
 
 		// Profile routes (Self-service untuk semua authenticated users)
 		profileHandler := handlers.NewProfileHandler(userService)
+		passwordHandler := handlers.NewPasswordHandler(db, cfg)
 
 		profile := api.Group("/profile")
 		profile.Use(middleware.AuthMiddleware(db, cfg))
@@ -93,6 +98,7 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 		{
 			profile.GET("", profileHandler.GetProfile)
 			profile.PUT("", profileHandler.UpdateProfile)
+			profile.PUT("/password", passwordHandler.ChangePassword)
 		}
 
 		// Example routes (protected) - Commented out for Sprint 1

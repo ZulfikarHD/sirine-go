@@ -16,6 +16,24 @@ const routes = [
     meta: { requiresAuth: false, guestOnly: true },
   },
   {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: () => import('../views/auth/ForgotPassword.vue'),
+    meta: { requiresAuth: false, guestOnly: true },
+  },
+  {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: () => import('../views/auth/ResetPassword.vue'),
+    meta: { requiresAuth: false, guestOnly: true },
+  },
+  {
+    path: '/force-change-password',
+    name: 'ForceChangePassword',
+    component: () => import('../views/auth/ForceChangePassword.vue'),
+    meta: { requiresAuth: true, skipPasswordCheck: true },
+  },
+  {
     path: '/dashboard',
     name: 'Dashboard',
     redirect: (to) => {
@@ -61,6 +79,12 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: '/profile/change-password',
+    name: 'ChangePassword',
+    component: () => import('../views/profile/ChangePassword.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/admin/users',
     name: 'UserManagement',
     component: () => import('../views/admin/users/UserList.vue'),
@@ -98,9 +122,16 @@ router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
   const guestOnly = to.matched.some(record => record.meta.guestOnly)
   const requiredRoles = to.meta.roles
+  const skipPasswordCheck = to.matched.some(record => record.meta.skipPasswordCheck)
 
   // Guest only pages (seperti login) - redirect jika sudah login
   if (guestOnly && authStore.isAuthenticated) {
+    // Check jika user harus ganti password
+    if (authStore.user?.must_change_password) {
+      next('/force-change-password')
+      return
+    }
+    
     const dashboardRoute = getDashboardRouteByRole(authStore.user.role)
     next(dashboardRoute)
     return
@@ -113,6 +144,14 @@ router.beforeEach((to, from, next) => {
       query: { redirect: to.fullPath },
     })
     return
+  }
+
+  // Check force change password (kecuali untuk route yang skip check)
+  if (requiresAuth && !skipPasswordCheck && authStore.user?.must_change_password) {
+    if (to.path !== '/force-change-password') {
+      next('/force-change-password')
+      return
+    }
   }
 
   // Role-based access control

@@ -168,6 +168,99 @@ export const useAuth = () => {
   }
 
   /**
+   * Forgot password - request reset link via email
+   * @param {string} nipOrEmail - NIP atau Email user
+   */
+  const forgotPassword = async (nipOrEmail) => {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const response = await api.post('/auth/forgot-password', {
+        nip_or_email: nipOrEmail,
+      })
+
+      if (response.success) {
+        return response
+      } else {
+        throw new Error(response.message || 'Gagal mengirim email reset password')
+      }
+    } catch (err) {
+      error.value = err.response?.data?.message || err.message
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  /**
+   * Reset password menggunakan token dari email
+   * @param {string} token - Reset token dari email
+   * @param {string} newPassword - Password baru
+   */
+  const resetPassword = async (token, newPassword) => {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const response = await api.post('/auth/reset-password', {
+        token,
+        new_password: newPassword,
+      })
+
+      if (response.success) {
+        triggerHapticFeedback('success')
+        return response
+      } else {
+        throw new Error(response.message || 'Gagal reset password')
+      }
+    } catch (err) {
+      error.value = err.response?.data?.message || err.message
+      triggerHapticFeedback('error')
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  /**
+   * Change password untuk user yang sedang login
+   * @param {string} currentPassword - Password saat ini
+   * @param {string} newPassword - Password baru
+   */
+  const changePassword = async (currentPassword, newPassword) => {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const response = await api.put('/profile/password', {
+        current_password: currentPassword,
+        new_password: newPassword,
+      })
+
+      if (response.success) {
+        triggerHapticFeedback('success')
+        
+        // Auto logout setelah change password
+        setTimeout(() => {
+          authStore.clearAuth()
+          router.push('/login')
+        }, 2000)
+        
+        return response
+      } else {
+        throw new Error(response.message || 'Gagal mengubah password')
+      }
+    } catch (err) {
+      error.value = err.response?.data?.message || err.message
+      triggerHapticFeedback('error')
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  /**
    * Trigger haptic feedback (vibration) jika available
    * @param {string} type - Type of feedback: 'success', 'error', 'warning'
    */
@@ -205,6 +298,9 @@ export const useAuth = () => {
     refreshAuth,
     getDashboardRoute,
     triggerHapticFeedback,
+    forgotPassword,
+    resetPassword,
+    changePassword,
 
     // Store access
     isAuthenticated: authStore.isAuthenticated,
