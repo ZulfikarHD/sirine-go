@@ -17,6 +17,7 @@
   "dependencies": {
     "@vueuse/core": "^14.1.0",
     "axios": "^1.13.2",
+    "date-fns": "^4.1.0",
     "lucide-vue-next": "^0.562.0",
     "motion-v": "^1.7.4",
     "pinia": "^2.2.0",

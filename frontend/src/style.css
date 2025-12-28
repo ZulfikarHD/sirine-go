@@ -379,7 +379,8 @@
 
 @media (min-width: 768px) {
   .sidebar-container {
-    @apply static inset-auto;
+    /* Sidebar tetap fixed pada desktop untuk sticky behavior */
+    @apply z-30;
   }
 }
 
@@ -641,6 +642,13 @@
 
 .app-main {
   @apply flex-1 flex flex-col min-w-0;
+}
+
+@media (min-width: 768px) {
+  .app-main {
+    /* Add left margin untuk space sidebar yang fixed */
+    margin-left: 16rem; /* 256px = w-64 */
+  }
 }
 
 .app-content {
