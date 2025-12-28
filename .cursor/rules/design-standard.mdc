@@ -5,7 +5,8 @@ alwaysApply: true
 - App Design is like Apple app
 - Use Indigo and Fuchsia as main theme to be more techy and modern
 - Always think hirarchy for mobile user prespective in user experience when designing the pages
-- use motion-v
+- use motion-vue for animations
+- dont put css on vue files
 
 ### Use iOS Design Principles like
 - **Spring Physics**: Natural, bouncy animations yang terasa like native iOS

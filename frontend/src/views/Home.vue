@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
+  <div class="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 py-8 px-4">
     <div class="max-w-6xl mx-auto">
       <!-- Header -->
       <Motion
