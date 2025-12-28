@@ -120,7 +120,7 @@ POST   /api/auth/logout     # Logout dan revoke session
 GET    /api/auth/me         # Get current user info
 ```
 
-> 📋 **API Details**: Lihat [Authentication API](../api/authentication.md) untuk complete documentation
+> 📋 **API Details**: Lihat [Authentication API](./api-reference.md) untuk complete documentation
 
 ---
 
@@ -208,7 +208,7 @@ GET    /api/auth/me         # Get current user info
 | XSS attempt via input | Numeric validation, parameterized queries | Input sanitized, injection prevented |
 | User deleted while logged in | Token validation checks existence | 401 error, auto-logout |
 
-> 🗺️ **User Journeys**: Lihat [Authentication User Journeys](../guides/authentication-user-journeys.md) untuk detailed flow diagrams
+> 🗺️ **User Journeys**: Lihat [Authentication User Journeys](../../user-journeys/authentication/overview.md) untuk detailed flow diagrams
 
 ---
 
@@ -300,7 +300,7 @@ cd frontend && yarn test
 
 ### Manual Testing
 
-> 📋 **Complete Test Plan**: Lihat [AUTH Test Plan](../testing/AUTH-test-plan.md) untuk:
+> 📋 **Complete Test Plan**: Lihat [Authentication Testing](./testing.md) untuk:
 > - Integration tests (4 scenarios)
 > - Manual testing checklist (10 cases)
 > - Security testing (5 cases)
@@ -361,10 +361,10 @@ cd frontend && yarn test
 
 ## Related Documentation
 
-- **Test Plan**: [AUTH Test Plan](../testing/AUTH-test-plan.md)
-- **User Journeys**: [Authentication User Journeys](../guides/authentication-user-journeys.md)
-- **API Documentation**: [Authentication API](../api/authentication.md)
-- **Testing Guide**: [TESTING_GUIDE.md](../../TESTING_GUIDE.md)
+- **Test Plan**: [Authentication Testing](./testing.md)
+- **User Journeys**: [Authentication User Journeys](../../user-journeys/authentication/overview.md)
+- **API Documentation**: [Authentication API](./api-reference.md)
+- **Testing Guide**: [Testing Guide](../../development/testing.md)
 - **Sprint Implementation**: [SPRINT1_IMPLEMENTATION.md](../../SPRINT1_IMPLEMENTATION.md)
 - **Sprint Summary**: [SPRINT1_SUMMARY.md](../../SPRINT1_SUMMARY.md)
 

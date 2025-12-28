@@ -35,7 +35,7 @@ make dev-frontend  # Terminal 2
 # 5. Buka browser: http://localhost:5173
 ```
 
-**📖 Detail lengkap:** Lihat [getting-started/QUICKSTART.md](./getting-started/QUICKSTART.md)
+**📖 Detail lengkap:** Lihat [getting-started/quickstart.md](./getting-started/quickstart.md)
 
 ---
 
@@ -47,13 +47,13 @@ Dokumentasi terorganisir dalam folders berdasarkan kategori:
 
 Mulai di sini jika baru pertama kali:
 
-1. **[QUICKSTART.md](./getting-started/QUICKSTART.md)** ⚡  
+1. **[quickstart.md](./getting-started/quickstart.md)** ⚡  
    Setup dalam 5 menit - Step-by-step paling simple
 
-2. **[SETUP_GUIDE.md](./getting-started/SETUP_GUIDE.md)** 📋  
+2. **[installation.md](./getting-started/installation.md)** 📋  
    Setup lengkap dengan penjelasan detail setiap step
 
-3. **[CHECKLIST.md](./getting-started/CHECKLIST.md)** ✅  
+3. **[checklist.md](./getting-started/checklist.md)** ✅  
    Checklist untuk verifikasi setup sudah benar
 
 ---
@@ -62,13 +62,13 @@ Mulai di sini jika baru pertama kali:
 
 Pahami struktur dan design decisions:
 
-4. **[ARCHITECTURE_EXPLAINED.md](./architecture/ARCHITECTURE_EXPLAINED.md)** 🏛️  
+4. **[overview.md](./architecture/overview.md)** 🏛️  
    Penjelasan semua package dan kenapa dibutuhkan
 
-5. **[FOLDER_STRUCTURE.md](./architecture/FOLDER_STRUCTURE.md)** 📁  
+5. **[folder-structure.md](./architecture/folder-structure.md)** 📁  
    Struktur folder dan file organization
 
-6. **[PROJECT_SUMMARY.md](./architecture/PROJECT_SUMMARY.md)** 📊  
+6. **[project-summary.md](./architecture/project-summary.md)** 📊  
    Overview lengkap project (features, decisions, metrics)
 
 ---
@@ -77,20 +77,47 @@ Pahami struktur dan design decisions:
 
 Build dan test fitur baru:
 
-7. **[CUSTOMIZATION_GUIDE.md](./development/CUSTOMIZATION_GUIDE.md)** 🎨  
+7. **[customization-guide.md](./development/customization-guide.md)** 🎨  
    Cara menambah model, endpoint, dan component baru
 
-8. **[API_DOCUMENTATION.md](./development/API_DOCUMENTATION.md)** 🔌  
+8. **[api-documentation.md](./development/api-documentation.md)** 🔌  
    Complete API reference dengan contoh request/response
 
-9. **[VALIDATION_GUIDE.md](./VALIDATION_GUIDE.md)** ✅  
-   Server-side validation dengan Gin (Laravel-style)
+9. **[testing.md](./development/testing.md)** 🧪  
+   Testing guide (manual & automated testing)
 
-10. **[VALIDATION_EXAMPLES.md](./VALIDATION_EXAMPLES.md)** 📋  
-    Practical validation examples dan test cases
+---
 
-11. **[TESTING.md](./development/TESTING.md)** 🧪  
-    Testing guide (manual & automated testing)
+### 📖 **Guides** → `guides/`
+
+Panduan mendalam untuk topik spesifik:
+
+10. **[guides/authentication/README.md](./guides/authentication/README.md)** 🔐  
+    Sistem autentikasi, security flows, dan user journeys
+
+11. **[guides/database/management.md](./guides/database/management.md)** 🗄️  
+    Manajemen database, backup, dan maintenance
+
+12. **[guides/database/models.md](./guides/database/models.md)** 📝  
+    Panduan membuat model baru dengan Registry Pattern
+
+13. **[guides/database/migrations.md](./guides/database/migrations.md)** 🔄  
+    Panduan migrasi dan database seeding
+
+14. **[guides/validation/guide.md](./guides/validation/guide.md)** ✅  
+    Server-side validation dengan Gin (Laravel-style)
+
+15. **[guides/security.md](./guides/security.md)** 🛡️  
+    Security best practices dan protection mechanisms
+
+16. **[guides/configuration.md](./guides/configuration.md)** ⚙️  
+    Environment variables dan configuration guide
+
+17. **[guides/documentation-maintenance.md](./guides/documentation-maintenance.md)** 📝  
+    Panduan maintenance dokumentasi (When & How to update)
+
+18. **[guides/utilities/hash-commands.md](./guides/utilities/hash-commands.md)** 🔧  
+    Utility commands untuk hashing dan security
 
 ---
 
@@ -98,7 +125,7 @@ Build dan test fitur baru:
 
 Ready untuk production:
 
-10. **[DEPLOYMENT.md](./deployment/DEPLOYMENT.md)** 🌐  
+19. **[production-deployment.md](./deployment/production-deployment.md)** 🌐  
     Deployment ke production server dengan Nginx + SSL
 
 ---
@@ -107,7 +134,7 @@ Ready untuk production:
 
 Mengalami masalah:
 
-11. **[FAQ.md](./troubleshooting/FAQ.md)** 💡  
+20. **[faq.md](./troubleshooting/faq.md)** 💡  
     Common questions dan solusi masalah umum
 
 ---
@@ -116,7 +143,7 @@ Mengalami masalah:
 
 Pastikan terinstall:
 - ✅ **Go 1.24+** - Backend language
-- ✅ **Node.js 18+ & Yarn** - Frontend tooling  
+- ✅ **Node.js 18+** & **Yarn** - Frontend tooling  
 - ✅ **MySQL 8.0+** - Database
 - ✅ **Git** - Version control
 
@@ -187,7 +214,7 @@ sirine-go/
 └── docs/             # Documentation (you are here!)
 ```
 
-**📖 Detail lengkap:** Lihat [FOLDER_STRUCTURE.md](./FOLDER_STRUCTURE.md)
+**📖 Detail lengkap:** Lihat [folder-structure.md](./architecture/folder-structure.md)
 
 ---
 
@@ -205,7 +232,7 @@ PUT    /api/examples/:id  # Update
 DELETE /api/examples/:id  # Delete
 ```
 
-**📖 Detail lengkap:** Lihat [API_DOCUMENTATION.md](./API_DOCUMENTATION.md)
+**📖 Detail lengkap:** Lihat [api-documentation.md](./development/api-documentation.md)
 
 ---
 
@@ -228,7 +255,7 @@ sudo lsof -i :5173 && sudo kill -9 <PID>  # Frontend
 make clean && make install
 ```
 
-**📖 Solusi lengkap:** Lihat [troubleshooting/FAQ.md](./troubleshooting/FAQ.md)
+**📖 Solusi lengkap:** Lihat [faq.md](./troubleshooting/faq.md)
 
 ---
 
@@ -242,25 +269,34 @@ START HERE
 README.md (Overview) ← You are here
     ↓
 📘 getting-started/
-    ├─ QUICKSTART.md (5 menit setup)
-    ├─ SETUP_GUIDE.md (Detail setup)
-    └─ CHECKLIST.md (Verify setup)
+    ├─ quickstart.md (5 menit setup)
+    ├─ installation.md (Detail setup)
+    └─ checklist.md (Verify setup)
     ↓
 🏗️ architecture/
-    ├─ ARCHITECTURE_EXPLAINED.md (Understand tech)
-    ├─ FOLDER_STRUCTURE.md (Understand structure)
-    └─ PROJECT_SUMMARY.md (Overview)
+    ├─ overview.md (Understand tech)
+    ├─ folder-structure.md (Understand structure)
+    └─ project-summary.md (Overview)
     ↓
 🛠️ development/
-    ├─ CUSTOMIZATION_GUIDE.md (Build features)
-    ├─ API_DOCUMENTATION.md (API reference)
-    └─ TESTING.md (Test your code)
+    ├─ customization-guide.md (Build features)
+    ├─ api-documentation.md (API reference)
+    └─ testing.md (Test your code)
+    ↓
+📖 guides/
+    ├─ authentication/ (Security & Flows)
+    ├─ database/ (Models & Migrations)
+    ├─ security.md (Best Practices)
+    ├─ configuration.md (Env Vars)
+    ├─ documentation-maintenance.md (How-to Doc)
+    ├─ validation/ (Rules & Examples)
+    └─ utilities/ (Helpers)
     ↓
 🚀 deployment/
-    └─ DEPLOYMENT.md (Deploy to production)
+    └─ production-deployment.md (Deploy to production)
     ↓
 ❓ troubleshooting/
-    └─ FAQ.md (When stuck)
+    └─ faq.md (When stuck)
 ```
 
 ---
@@ -282,6 +318,12 @@ README.md (Overview) ← You are here
 
 ---
 
+## 🤝 Contributing
+
+Ingin berkontribusi? Silakan baca **[CONTRIBUTING.md](./CONTRIBUTING.md)** untuk panduan development workflow dan pull request standards.
+
+---
+
 ## 👨‍💻 Developer Info
 
 **Zulfikar Hidayatullah**
@@ -296,6 +338,7 @@ README.md (Overview) ← You are here
 - **Version:** 1.0.0
 - **Last Updated:** 27 Desember 2025
 - **License:** Private & Proprietary
+- **Changelog:** Lihat **[CHANGELOG.md](./CHANGELOG.md)** untuk riwayat perubahan.
 
 ---
 
@@ -303,10 +346,10 @@ README.md (Overview) ← You are here
 
 Pilih path Anda:
 
-- 🚀 **Quick Setup:** [getting-started/QUICKSTART.md](./getting-started/QUICKSTART.md)
-- 📖 **Detail Setup:** [getting-started/SETUP_GUIDE.md](./getting-started/SETUP_GUIDE.md)
+- 🚀 **Quick Setup:** [getting-started/quickstart.md](./getting-started/quickstart.md)
+- 📖 **Detail Setup:** [getting-started/installation.md](./getting-started/installation.md)
 - 🏗️ **Understand Architecture:** [architecture/](./architecture/)
-- 🎨 **Build Features:** [development/CUSTOMIZATION_GUIDE.md](./development/CUSTOMIZATION_GUIDE.md)
-- 🌐 **Deploy:** [deployment/DEPLOYMENT.md](./deployment/DEPLOYMENT.md)
+- 🎨 **Build Features:** [development/customization-guide.md](./development/customization-guide.md)
+- 🌐 **Deploy:** [deployment/production-deployment.md](./deployment/production-deployment.md)
 
 **Happy Coding! 🎯**

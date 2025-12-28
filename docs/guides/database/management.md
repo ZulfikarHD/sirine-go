@@ -233,7 +233,7 @@ Migration system menggunakan **Registry Pattern** dengan GORM AutoMigrate yang:
 
 **Registry Location:** `backend/database/models_registry.go`
 
-Untuk menambahkan model/table baru, lihat: [ADDING_NEW_MODELS.md](./ADDING_NEW_MODELS.md)
+Untuk menambahkan model/table baru, lihat: [Creating New Models](./models.md)
 
 ### Seeding System
 

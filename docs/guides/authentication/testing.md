@@ -726,10 +726,10 @@ ab -n 100 -c 10 -p login.json -T application/json http://localhost:8080/api/auth
 
 ## 🔗 Related Documentation
 
-- **Feature Documentation**: [Authentication System](../features/AUTHENTICATION.md)
-- **User Journeys**: [Authentication User Journeys](../guides/authentication-user-journeys.md)
-- **Testing Guide**: [TESTING_GUIDE.md](../../TESTING_GUIDE.md)
-- **API Documentation**: [Authentication API](../api/authentication.md)
+- **Feature Documentation**: [Authentication System](./implementation.md)
+- **User Journeys**: [Authentication User Journeys](../../user-journeys/authentication/overview.md)
+- **Testing Guide**: [Testing Guide](../../development/testing.md)
+- **API Documentation**: [Authentication API](./api-reference.md)
 
 ---
 

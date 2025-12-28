@@ -6,7 +6,7 @@ Dokumentasi untuk deploy aplikasi ke production server.
 
 ## 📚 Files di Folder Ini
 
-### **[DEPLOYMENT.md](./DEPLOYMENT.md)** 🌐
+### **[production-deployment.md](./production-deployment.md)** 🌐
 Complete production deployment guide.
 - Server requirements & setup
 - Install Go, MySQL, Nginx
@@ -22,6 +22,19 @@ Complete production deployment guide.
 
 **Cocok untuk:** Deploy to production safely dan correctly.
 
+### ⚠️ Catatan Penting Sebelum Deploy
+
+**Lokasi File `.env`:**
+- Kode backend (`backend/cmd/server/main.go`) memuat `.env` dari **root repository** (`../.env` relatif dari `backend/`)
+- Buat file `.env` di **root project** (`/var/www/sirine-go/.env`), bukan di `backend/.env`
+- Atau sesuaikan path di kode jika ingin `.env` di folder `backend/`
+
+**Lokasi Binary Hasil Build:**
+- `Makefile` target `build` menghasilkan binary di **root** (`./sirine-go`)
+- Dokumentasi production-deployment.md menunjukkan binary di `backend/sirine-go`
+- Pastikan path `ExecStart` di systemd service sesuai dengan lokasi binary yang digunakan
+- Rekomendasi: gunakan `make build` dan sesuaikan systemd service path atau build manual sesuai dokumentasi
+
 ---
 
 ## 🎯 Deployment Checklist
@@ -33,7 +46,7 @@ Complete production deployment guide.
 - ✅ Performance optimized
 
 **During deployment:**
-- Follow DEPLOYMENT.md step-by-step
+- Follow production-deployment.md step-by-step
 - Don't skip security steps (SSL, firewall)
 - Test after each major step
 
@@ -59,7 +72,7 @@ Complete production deployment guide.
 - Security headers
 - Regular backups
 
-**See:** DEPLOYMENT.md → Security section
+**See:** production-deployment.md → Security section
 
 ---
 
@@ -67,7 +80,7 @@ Complete production deployment guide.
 
 **Before deployment:**
 - Test thoroughly: [../development/TESTING.md](../development/TESTING.md)
-- Review: [../architecture/PROJECT_SUMMARY.md](../architecture/PROJECT_SUMMARY.md)
+- Review: [../architecture/project-summary.md](../architecture/project-summary.md)
 
 **Deployment issues?**
 - Troubleshooting: [../troubleshooting/FAQ.md](../troubleshooting/FAQ.md) → Deployment section

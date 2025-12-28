@@ -37,7 +37,7 @@ Dokumen ini merupakan panduan komprehensif untuk membuat dan mengelola dokumenta
 
 | Content | ❌ JANGAN di Feature Doc | ✅ TARUH di |
 |---------|--------------------------|-------------|
-| User journey diagrams | ❌ | `docs/guides/{feature}-user-journeys.md` |
+| User journey diagrams | ❌ | `docs/user-journeys/{feature}-user-journeys.md` |
 | Full Manual and System QA test cases | ❌ | `docs/testing/{CODE}-test-plan.md` |
 | Full API routes list | ❌ | `docs/api/{resource}.md` |
 | Step-by-step manual tests | ❌ | `docs/testing/{CODE}-test-plan.md` |

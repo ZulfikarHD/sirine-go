@@ -6,7 +6,7 @@ Dokumentasi untuk memahami struktur, design decisions, dan tech stack aplikasi.
 
 ## 📚 Files di Folder Ini
 
-### **[ARCHITECTURE_EXPLAINED.md](./ARCHITECTURE_EXPLAINED.md)** 🏛️
+### **[overview.md](./overview.md)** 🏛️
 Penjelasan lengkap semua package dan kenapa dibutuhkan.
 - Backend packages (Go/Gin/GORM)
 - Frontend packages (Vue/Vite/Tailwind)
@@ -17,7 +17,7 @@ Penjelasan lengkap semua package dan kenapa dibutuhkan.
 
 ---
 
-### **[FOLDER_STRUCTURE.md](./FOLDER_STRUCTURE.md)** 📁
+### **[folder-structure.md](./folder-structure.md)** 📁
 Struktur folder dan file organization detail.
 - Backend folder structure
 - Frontend folder structure
@@ -28,7 +28,7 @@ Struktur folder dan file organization detail.
 
 ---
 
-### **[PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md)** 📊
+### **[project-summary.md](./project-summary.md)** 📊
 Complete overview of the entire project.
 - Features list
 - Tech stack summary
@@ -43,11 +43,11 @@ Complete overview of the entire project.
 ## 🎯 Recommended Flow
 
 ```
-1. PROJECT_SUMMARY.md (big picture)
+1. project-summary.md (big picture)
       ↓
-2. ARCHITECTURE_EXPLAINED.md (understand tech)
+2. overview.md (understand tech)
       ↓
-3. FOLDER_STRUCTURE.md (know where things are)
+3. folder-structure.md (know where things are)
       ↓
 4. ✅ Ready to customize!
 ```
@@ -57,19 +57,19 @@ Complete overview of the entire project.
 ## 🔗 Related Documentation
 
 **After understanding architecture:**
-- Build features: [../development/CUSTOMIZATION_GUIDE.md](../development/CUSTOMIZATION_GUIDE.md)
-- API reference: [../development/API_DOCUMENTATION.md](../development/API_DOCUMENTATION.md)
+- Build features: [../development/customization-guide.md](../development/customization-guide.md)
+- API reference: [../development/api-documentation.md](../development/api-documentation.md)
 
 **Questions about architecture?**
-- Check: [../troubleshooting/FAQ.md](../troubleshooting/FAQ.md)
+- Check: [../troubleshooting/faq.md](../troubleshooting/faq.md)
 
 ---
 
 ## 📂 Folder Navigation
 
 ← Back to [Documentation Root](../README.md)  
-← Previous: [Getting Started](../getting-started/)  
-→ Next: [Development Documentation](../development/)
+← Previous: [Getting Started](../getting-started/README.md)  
+→ Next: [Development Documentation](../development/README.md)
 
 ---
 
