@@ -11,125 +11,83 @@
     @confirm="handleClose"
     @close="handleClose"
   >
-    <!-- Animated Icon dengan Spring Effect -->
+    <!-- Icon dengan Motion-V Animation -->
     <Motion
-      :initial="{ scale: 0, rotate: -180 }"
-      :animate="{ scale: 1, rotate: 0 }"
-      :transition="{ 
-        duration: 0.6,
-        type: 'spring',
-        stiffness: 200,
-        damping: 15
-      }"
+      v-bind="iconAnimations.popIn"
       class="flex justify-center mb-6"
     >
-      <div 
-        :class="[
-          'relative w-24 h-24 rounded-full flex items-center justify-center',
-          backgroundClasses
-        ]"
-      >
-        <!-- Pulse Ring untuk Success -->
-        <Motion
-          v-if="variant === 'success'"
-          :animate="{ 
-            scale: [1, 1.3, 1.3],
-            opacity: [0.5, 0, 0]
-          }"
-          :transition="{ 
-            duration: 2,
-            repeat: Infinity,
-            ease: 'easeOut'
-          }"
-          :class="['absolute inset-0 rounded-full', backgroundClasses]"
-        />
-
-        <!-- Icon -->
+      <div :class="['dialog-icon-container', iconContainerClass]">
         <component 
           :is="iconComponent" 
-          :class="['w-12 h-12 relative z-10', iconColorClasses]" 
-          :stroke-width="2.5"
+          class="w-10 h-10" 
+          :stroke-width="1.5"
         />
       </div>
     </Motion>
 
-    <!-- Message Content dengan Staggered Animation -->
-    <div class="text-center space-y-3">
-      <Motion
-        :initial="{ opacity: 0, y: 10 }"
-        :animate="{ opacity: 1, y: 0 }"
-        :transition="{ duration: 0.4, delay: 0.2 }"
-      >
-        <p class="text-lg font-semibold text-gray-900">
-          {{ message }}
-        </p>
-      </Motion>
+    <!-- Message Content -->
+    <Motion
+      v-bind="entranceAnimations.fadeUp"
+      class="text-center space-y-2"
+    >
+      <p class="text-xl font-bold text-gray-900">
+        {{ message }}
+      </p>
 
-      <Motion
-        v-if="detail"
-        :initial="{ opacity: 0, y: 10 }"
-        :animate="{ opacity: 1, y: 0 }"
-        :transition="{ duration: 0.4, delay: 0.3 }"
-      >
-        <p class="text-sm text-gray-600 leading-relaxed">
-          {{ detail }}
-        </p>
-      </Motion>
+      <p v-if="detail" class="text-sm text-gray-500 leading-relaxed">
+        {{ detail }}
+      </p>
 
       <slot />
-    </div>
+    </Motion>
 
-    <!-- Additional Content Card (opsional) -->
+    <!-- Additional Content Card -->
     <Motion
       v-if="showContent"
       :initial="{ opacity: 0, y: 10 }"
       :animate="{ opacity: 1, y: 0 }"
-      :transition="{ duration: 0.4, delay: 0.4 }"
-      :class="[
-        'mt-6 p-4 rounded-xl border',
-        contentClasses
-      ]"
+      :transition="{ duration: 0.25, delay: 0.15, ease: 'easeOut' }"
+      :class="['mt-6 p-4 rounded-2xl border', contentBoxClass]"
     >
       <slot name="content" />
     </Motion>
 
-    <!-- Auto-dismiss Timer (visual indicator) -->
+    <!-- Auto-dismiss Timer -->
     <Motion
       v-if="autoDismiss && showTimer"
-      :initial="{ opacity: 0, y: 10 }"
-      :animate="{ opacity: 1, y: 0 }"
-      :transition="{ duration: 0.4, delay: 0.5 }"
-      class="mt-6"
+      :initial="{ opacity: 0 }"
+      :animate="{ opacity: 1 }"
+      :transition="{ duration: 0.2, delay: 0.2 }"
+      class="dialog-timer"
     >
-      <div class="flex items-center justify-center gap-2 text-sm text-gray-500">
-        <div class="relative w-4 h-4">
-          <svg class="w-4 h-4 transform -rotate-90">
-            <circle
-              cx="8"
-              cy="8"
-              r="7"
-              stroke="currentColor"
-              stroke-width="2"
-              fill="none"
-              class="opacity-20"
-            />
-            <circle
-              cx="8"
-              cy="8"
-              r="7"
-              stroke="currentColor"
-              stroke-width="2"
-              fill="none"
-              :style="{
-                strokeDasharray: `${2 * Math.PI * 7}`,
-                strokeDashoffset: `${2 * Math.PI * 7 * (1 - timerProgress)}`,
-                transition: 'stroke-dashoffset 0.1s linear'
-              }"
-            />
-          </svg>
-        </div>
-        <span>Menutup otomatis dalam {{ remainingTime }}s</span>
+      <div class="dialog-timer-ring">
+        <svg viewBox="0 0 20 20">
+          <circle
+            cx="10"
+            cy="10"
+            r="8"
+            stroke="currentColor"
+            stroke-width="2"
+            fill="none"
+            class="opacity-20"
+          />
+          <circle
+            cx="10"
+            cy="10"
+            r="8"
+            :stroke="timerStrokeColor"
+            stroke-width="2"
+            fill="none"
+            stroke-linecap="round"
+            :style="{
+              strokeDasharray: `${2 * Math.PI * 8}`,
+              strokeDashoffset: `${2 * Math.PI * 8 * (1 - timerProgress)}`,
+              transition: 'stroke-dashoffset 0.1s linear'
+            }"
+          />
+        </svg>
       </div>
+      <span>Menutup dalam {{ remainingTime }}s</span>
     </Motion>
   </BaseModal>
 </template>
@@ -145,11 +103,11 @@ import {
   XCircle
 } from 'lucide-vue-next'
 import BaseModal from './BaseModal.vue'
+import { entranceAnimations, iconAnimations } from '../../composables/useMotion'
 
 /**
- * AlertDialog - Komponen alert/notification dialog untuk menampilkan
- * success, error, warning, atau info messages dengan animated feedback
- * dan auto-dismiss capability untuk better user experience
+ * AlertDialog - Komponen alert/notification dialog dengan Motion-V animations
+ * untuk success, error, warning, dan info states
  */
 
 const props = defineProps({
@@ -157,8 +115,6 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-
-  // Content props
   title: {
     type: String,
     default: ''
@@ -171,47 +127,35 @@ const props = defineProps({
     type: String,
     default: ''
   },
-
-  // Alert variant
   variant: {
     type: String,
-    default: 'success', // success, error, warning, info
+    default: 'success',
     validator: (value) => ['success', 'error', 'warning', 'info'].includes(value)
   },
-
-  // Icon customization
   icon: {
     type: [String, Object],
     default: null
   },
-
-  // Button text
   confirmText: {
     type: String,
     default: 'OK'
   },
-
-  // Auto dismiss props
   autoDismiss: {
     type: Boolean,
     default: false
   },
   autoDismissDelay: {
     type: Number,
-    default: 3000 // 3 seconds
+    default: 3000
   },
   showTimer: {
     type: Boolean,
     default: true
   },
-
-  // Additional content
   showContent: {
     type: Boolean,
     default: false
   },
-
-  // Dismissible
   dismissible: {
     type: Boolean,
     default: true
@@ -226,7 +170,6 @@ const timerProgress = ref(0)
 let dismissTimer = null
 let countdownInterval = null
 
-// Watch modelValue
 watch(() => props.modelValue, (newValue) => {
   isOpen.value = newValue
   if (newValue && props.autoDismiss) {
@@ -241,7 +184,7 @@ watch(isOpen, (newValue) => {
   }
 })
 
-// Icon configuration berdasarkan variant
+// Icon configuration
 const iconComponent = computed(() => {
   if (props.icon) return props.icon
 
@@ -254,54 +197,54 @@ const iconComponent = computed(() => {
   return icons[props.variant] || icons.success
 })
 
-const backgroundClasses = computed(() => {
+const iconContainerClass = computed(() => {
   const classes = {
-    success: 'bg-emerald-100',
-    error: 'bg-red-100',
-    warning: 'bg-amber-100',
-    info: 'bg-blue-100'
+    success: 'dialog-icon-success',
+    error: 'dialog-icon-danger',
+    warning: 'dialog-icon-warning',
+    info: 'dialog-icon-info'
   }
   return classes[props.variant] || classes.success
 })
 
-const iconColorClasses = computed(() => {
+const contentBoxClass = computed(() => {
   const classes = {
-    success: 'text-emerald-600',
-    error: 'text-red-600',
-    warning: 'text-amber-600',
-    info: 'text-blue-600'
+    success: 'bg-emerald-50/80 border-emerald-200/50',
+    error: 'bg-red-50/80 border-red-200/50',
+    warning: 'bg-amber-50/80 border-amber-200/50',
+    info: 'bg-blue-50/80 border-blue-200/50'
   }
   return classes[props.variant] || classes.success
 })
 
-const contentClasses = computed(() => {
-  const classes = {
-    success: 'bg-emerald-50 border-emerald-200',
-    error: 'bg-red-50 border-red-200',
-    warning: 'bg-amber-50 border-amber-200',
-    info: 'bg-blue-50 border-blue-200'
+const timerStrokeColor = computed(() => {
+  const colors = {
+    success: '#10b981',
+    error: '#ef4444',
+    warning: '#f59e0b',
+    info: '#3b82f6'
   }
-  return classes[props.variant] || classes.success
+  return colors[props.variant] || colors.success
 })
 
-// Auto dismiss functionality
+// Auto dismiss
 const startAutoDismiss = () => {
   clearTimers()
   
   remainingTime.value = Math.ceil(props.autoDismissDelay / 1000)
   timerProgress.value = 0
 
-  // Countdown timer
+  const totalSeconds = Math.ceil(props.autoDismissDelay / 1000)
+  
   countdownInterval = setInterval(() => {
     remainingTime.value -= 1
-    timerProgress.value = 1 - (remainingTime.value / Math.ceil(props.autoDismissDelay / 1000))
+    timerProgress.value = 1 - (remainingTime.value / totalSeconds)
     
     if (remainingTime.value <= 0) {
       clearInterval(countdownInterval)
     }
   }, 1000)
 
-  // Dismiss timer
   dismissTimer = setTimeout(() => {
     handleClose()
     emit('dismissed')
@@ -319,14 +262,12 @@ const clearTimers = () => {
   }
 }
 
-// Event handlers
 const handleClose = () => {
   clearTimers()
   isOpen.value = false
   emit('close')
 }
 
-// Lifecycle
 onMounted(() => {
   if (props.modelValue && props.autoDismiss) {
     startAutoDismiss()

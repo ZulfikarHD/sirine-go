@@ -1,6 +1,9 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-linear-to-br from-indigo-50 via-fuchsia-50 to-indigo-100 p-4">
-    <div class="text-center">
+    <Motion
+      v-bind="entranceAnimations.fadeScale"
+      class="text-center"
+    >
       <div class="mb-8">
         <h1 class="text-9xl font-bold text-transparent bg-clip-text bg-linear-to-r from-indigo-600 to-fuchsia-600">
           404
@@ -10,25 +13,18 @@
       </div>
       <router-link
         to="/dashboard"
-        class="inline-flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold text-white bg-linear-to-r from-indigo-600 to-fuchsia-600 hover:from-indigo-700 hover:to-fuchsia-700 transition-all active-scale shadow-lg"
+        class="inline-flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold text-white bg-linear-to-r from-indigo-600 to-fuchsia-600 hover:from-indigo-700 hover:to-fuchsia-700 active-scale shadow-lg"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
         <span>Kembali ke Dashboard</span>
       </router-link>
-    </div>
+    </Motion>
   </div>
 </template>
 
 <script setup>
-// No script needed for this simple page
+import { Motion } from 'motion-v'
+import { entranceAnimations } from '../composables/useMotion'
 </script>
-
-<style scoped>
-@import "tailwindcss" reference;
-
-.active-scale {
-  @apply transform transition-transform duration-150 active:scale-95;
-}
-</style>

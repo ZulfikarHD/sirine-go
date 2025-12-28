@@ -1,81 +1,139 @@
 <template>
-  <!-- Mobile Backdrop -->
-  <div 
-    v-if="isOpen" 
-    class="fixed inset-0 z-40 bg-gray-900/50 backdrop-blur-sm md:hidden"
-    @click="$emit('close')"
-  ></div>
+  <!-- Mobile Backdrop dengan Motion-V animation -->
+  <Teleport to="body">
+    <Motion
+      v-if="isOpen"
+      :initial="modalAnimations.backdrop.initial"
+      :animate="modalAnimations.backdrop.animate"
+      :exit="modalAnimations.backdrop.exit"
+      :transition="modalAnimations.backdrop.transition"
+      class="fixed inset-0 z-40 bg-gray-900/60 md:hidden"
+      @click="$emit('close')"
+    />
+  </Teleport>
 
   <!-- Sidebar Container -->
   <aside 
-    class="fixed inset-y-0 left-0 z-50 w-64 bg-white/80 backdrop-blur-xl border-r border-gray-200/50 transform transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:inset-auto md:flex md:flex-col"
-    :class="isOpen ? 'translate-x-0' : '-translate-x-full'"
+    class="sidebar-container"
+    :class="[
+      isOpen ? 'translate-x-0' : '-translate-x-full',
+      'md:translate-x-0'
+    ]"
   >
-    <!-- Logo Section -->
-    <div class="h-16 flex items-center px-6 border-b border-gray-200/50">
+    <!-- Logo Section dengan gradient accent -->
+    <div class="sidebar-header">
       <div class="flex items-center space-x-3">
-        <div class="w-8 h-8 rounded-lg bg-linear-to-br from-indigo-500 to-fuchsia-600 flex items-center justify-center shadow-lg">
+        <div class="sidebar-logo">
           <Siren class="w-5 h-5 text-white" />
         </div>
-        <span class="text-lg font-bold text-gray-900">Sirine Go</span>
+        <div>
+          <span class="text-lg font-bold text-gray-900 tracking-tight">Sirine Go</span>
+          <span class="block text-[10px] font-medium text-gray-400 -mt-0.5">Production System</span>
+        </div>
       </div>
     </div>
 
-    <!-- Navigation -->
+    <!-- Navigation dengan staggered animation -->
     <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1 custom-scrollbar">
       <template v-for="(group, groupIndex) in navigationGroups" :key="groupIndex">
-        <div v-if="group.title" class="px-3 mt-4 mb-2">
-          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ group.title }}</p>
-        </div>
-        
-        <router-link
-          v-for="item in group.items"
-          :key="item.name"
-          :to="item.href"
-          class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200"
-          :class="[
-            isActive(item.href) 
-              ? 'bg-linear-to-r from-indigo-50 to-fuchsia-50 text-indigo-700 shadow-sm ring-1 ring-indigo-200' 
-              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-          ]"
-          @click="$emit('close')"
+        <!-- Group Title dengan fade animation -->
+        <Motion
+          v-if="group.title"
+          :initial="{ opacity: 0, x: -10 }"
+          :animate="{ opacity: 1, x: 0 }"
+          :transition="{ duration: 0.2, delay: groupIndex * 0.08 }"
+          class="px-3 mt-5 mb-2 first:mt-0"
         >
-          <div 
-            class="mr-3 shrink-0 transition-colors duration-200"
-            :class="isActive(item.href) ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-500'"
+          <p class="nav-group-title">{{ group.title }}</p>
+        </Motion>
+        
+        <!-- Navigation Items dengan stagger -->
+        <Motion
+          v-for="(item, itemIndex) in group.items"
+          :key="item.name"
+          v-bind="listItemAnimation(groupIndex * 3 + itemIndex, 0.05)"
+          class="block"
+        >
+          <router-link
+            :to="item.href"
+            class="nav-item group"
+            :class="[
+              isActive(item.href) 
+                ? 'nav-item-active' 
+                : 'nav-item-inactive'
+            ]"
+            @click="$emit('close')"
           >
-            <component :is="item.icon" class="w-5 h-5" />
-          </div>
-          {{ item.name }}
-          
-          <!-- Active Indicator -->
-          <div 
-            v-if="isActive(item.href)" 
-            class="ml-auto w-1.5 h-1.5 rounded-full bg-linear-to-br from-indigo-500 to-fuchsia-600"
-          ></div>
-        </router-link>
+            <!-- Icon Container -->
+            <div 
+              class="nav-icon-container"
+              :class="isActive(item.href) ? 'nav-icon-active' : 'nav-icon-inactive'"
+            >
+              <component :is="item.icon" class="w-[18px] h-[18px]" />
+            </div>
+            
+            <!-- Label -->
+            <span class="flex-1">{{ item.name }}</span>
+            
+            <!-- Active Indicator Dot -->
+            <div 
+              v-if="isActive(item.href)" 
+              class="nav-active-indicator"
+            />
+            
+            <!-- Hover Arrow untuk inactive items -->
+            <ChevronRight 
+              v-if="!isActive(item.href)"
+              class="w-4 h-4 text-gray-300 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5"
+              :style="{ transition: 'all 0.15s ease-out' }"
+            />
+          </router-link>
+        </Motion>
       </template>
     </nav>
 
-    <!-- User Profile (Bottom) -->
-    <div class="p-4 border-t border-gray-200/50 bg-gray-50/50">
-      <div class="flex items-center space-x-3">
-        <div class="w-9 h-9 rounded-full bg-linear-to-br from-indigo-500 to-fuchsia-600 flex items-center justify-center text-white text-sm font-bold shadow-md">
+    <!-- User Profile Section (Bottom) -->
+    <div class="sidebar-footer">
+      <div class="user-profile-card">
+        <!-- Avatar dengan gradient -->
+        <div class="user-avatar">
           {{ userInitial }}
         </div>
+        
+        <!-- User Info -->
         <div class="flex-1 min-w-0">
-          <p class="text-sm font-medium text-gray-900 truncate">{{ user?.full_name || 'User' }}</p>
-          <p class="text-xs text-gray-500 truncate">{{ user?.role || 'Guest' }}</p>
+          <p class="text-sm font-semibold text-gray-900 truncate">
+            {{ user?.full_name || 'User' }}
+          </p>
+          <p class="text-xs text-gray-500 truncate flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            {{ formatRole(user?.role) }}
+          </p>
         </div>
+        
+        <!-- Quick Settings -->
+        <button 
+          class="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 active-scale"
+          aria-label="Pengaturan cepat"
+        >
+          <MoreVertical class="w-4 h-4" />
+        </button>
       </div>
     </div>
   </aside>
 </template>
 
 <script setup>
+/**
+ * Sidebar Navigation Component
+ * Komponen navigasi utama dengan Motion-V animations
+ * untuk smooth transitions dan staggered menu items
+ */
 import { computed } from 'vue'
+import { Motion } from 'motion-v'
 import { useRoute } from 'vue-router'
-import { useAuthStore } from '../../stores/auth'
+import { useAuthStore } from '@/stores/auth'
+import { listItemAnimation, modalAnimations } from '@/composables/useMotion'
 import { 
   Home, 
   Users, 
@@ -85,22 +143,28 @@ import {
   Settings,
   FileText,
   Siren,
-  UserCircle
+  UserCircle,
+  ChevronRight,
+  MoreVertical
 } from 'lucide-vue-next'
 
-const props = defineProps({
+defineProps({
   isOpen: {
     type: Boolean,
     default: false
   }
 })
 
-const emit = defineEmits(['close'])
+defineEmits(['close'])
 
 const route = useRoute()
 const authStore = useAuthStore()
 const user = computed(() => authStore.user)
 
+/**
+ * Generate user initials dari full_name
+ * untuk avatar placeholder
+ */
 const userInitial = computed(() => {
   if (!user.value?.full_name) return '?'
   return user.value.full_name
@@ -111,11 +175,32 @@ const userInitial = computed(() => {
     .toUpperCase()
 })
 
+/**
+ * Format role untuk display yang lebih readable
+ */
+const formatRole = (role) => {
+  const roleMap = {
+    'ADMIN': 'Administrator',
+    'MANAGER': 'Manager',
+    'OPERATOR': 'Operator',
+    'VIEWER': 'Viewer'
+  }
+  return roleMap[role] || role || 'Guest'
+}
+
+/**
+ * Check active route dengan support nested routes
+ */
 const isActive = (path) => {
+  if (path === '/dashboard') {
+    return route.path === '/dashboard'
+  }
   return route.path === path || route.path.startsWith(path + '/')
 }
 
-// Navigation groups dengan role-based visibility
+/**
+ * Navigation structure dengan role-based visibility
+ */
 const navigationGroups = computed(() => {
   const isAdmin = user.value?.role === 'ADMIN' || user.value?.role === 'MANAGER'
   
@@ -136,7 +221,6 @@ const navigationGroups = computed(() => {
     }
   ]
 
-  // Admin/Manager only menu
   if (isAdmin) {
     groups.push({
       title: 'Manajemen',
@@ -147,7 +231,6 @@ const navigationGroups = computed(() => {
     })
   }
 
-  // Profile menu (untuk semua user)
   groups.push({
     title: 'Akun',
     items: [

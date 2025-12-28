@@ -1,7 +1,10 @@
 <template>
   <AppLayout>
     <!-- Header dengan Search dan Actions -->
-    <div class="glass-card p-6 rounded-2xl mb-6">
+    <Motion
+      v-bind="entranceAnimations.fadeUp"
+      class="glass-card p-6 rounded-2xl mb-6"
+    >
       <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
         <div>
           <h1 class="text-2xl font-bold text-gray-900">Manajemen User</h1>
@@ -27,7 +30,7 @@
               @input="debouncedSearch"
               type="text"
               placeholder="Cari berdasarkan NIP atau Nama..."
-              class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all"
+              class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
             />
           </div>
         </div>
@@ -36,7 +39,7 @@
         <select
           v-model="selectedRole"
           @change="applyFilters"
-          class="px-4 py-2.5 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all"
+          class="px-4 py-2.5 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
         >
           <option value="">Semua Role</option>
           <option value="ADMIN">Admin</option>
@@ -52,7 +55,7 @@
         <select
           v-model="selectedDepartment"
           @change="applyFilters"
-          class="px-4 py-2.5 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all"
+          class="px-4 py-2.5 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
         >
           <option value="">Semua Department</option>
           <option value="KHAZWAL">Khazwal</option>
@@ -67,16 +70,21 @@
         <span class="text-sm text-gray-600">Filter aktif:</span>
         <button
           @click="clearFilters"
-          class="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors flex items-center space-x-1"
+          class="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 flex items-center space-x-1"
         >
           <X class="w-3 h-3" />
           <span>Clear All</span>
         </button>
       </div>
-    </div>
+    </Motion>
 
     <!-- Users Table -->
-    <div class="glass-card rounded-2xl overflow-hidden">
+    <Motion
+      :initial="{ opacity: 0, y: 15 }"
+      :animate="{ opacity: 1, y: 0 }"
+      :transition="{ duration: 0.25, delay: 0.1, ease: 'easeOut' }"
+      class="glass-card rounded-2xl overflow-hidden"
+    >
       <!-- Loading State -->
       <div v-if="userStore.loading" class="p-12 text-center">
         <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-indigo-500 border-t-transparent"></div>
@@ -109,10 +117,14 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
-            <tr 
-              v-for="user in userStore.users" 
+            <Motion
+              v-for="(user, index) in userStore.users" 
               :key="user.id"
-              class="hover:bg-gray-50 transition-colors"
+              as="tr"
+              :initial="{ opacity: 0, x: -10 }"
+              :animate="{ opacity: 1, x: 0 }"
+              :transition="{ duration: 0.2, delay: index * 0.03, ease: 'easeOut' }"
+              class="hover:bg-gray-50"
             >
               <td class="px-6 py-4">
                 <div class="flex items-center space-x-3">
@@ -150,21 +162,21 @@
                 <div class="flex items-center justify-end space-x-2">
                   <button
                     @click="openEditModal(user)"
-                    class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors active-scale"
+                    class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg active-scale"
                     title="Edit"
                   >
                     <Edit class="w-4 h-4" />
                   </button>
                   <button
                     @click="confirmDelete(user)"
-                    class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors active-scale"
+                    class="p-2 text-red-600 hover:bg-red-50 rounded-lg active-scale"
                     title="Hapus"
                   >
                     <Trash2 class="w-4 h-4" />
                   </button>
                 </div>
               </td>
-            </tr>
+            </Motion>
           </tbody>
         </table>
       </div>
@@ -178,7 +190,7 @@
           <button
             @click="goToPage(userStore.currentPage - 1)"
             :disabled="userStore.currentPage === 1"
-            class="px-3 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="px-3 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Previous
           </button>
@@ -191,7 +203,7 @@
                 'bg-indigo-600 text-white': page === userStore.currentPage,
                 'text-gray-700 hover:bg-gray-50': page !== userStore.currentPage
               }"
-              class="px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+              class="px-3 py-2 rounded-lg text-sm font-medium"
             >
               {{ page }}
             </button>
@@ -199,13 +211,13 @@
           <button
             @click="goToPage(userStore.currentPage + 1)"
             :disabled="userStore.currentPage === userStore.totalPages"
-            class="px-3 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="px-3 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next
           </button>
         </div>
       </div>
-    </div>
+    </Motion>
 
     <!-- User Form Modal -->
     <UserFormModal
@@ -214,21 +226,51 @@
       @close="closeFormModal"
       @success="handleFormSuccess"
     />
+
+    <!-- Confirm Dialog untuk Delete -->
+    <ConfirmDialog
+      v-model="confirmDialog.isOpen.value"
+      :title="confirmDialog.config.value.title"
+      :message="confirmDialog.config.value.message"
+      :variant="confirmDialog.config.value.variant"
+      :loading="confirmDialog.loading.value"
+      :show-warning="confirmDialog.config.value.showWarning"
+      :confirm-text="confirmDialog.config.value.confirmText"
+      @confirm="confirmDialog.handleConfirm"
+      @cancel="confirmDialog.handleCancel"
+    />
+
+    <!-- Alert Dialog untuk Success/Error -->
+    <AlertDialog
+      v-model="alertDialog.isOpen.value"
+      :title="alertDialog.config.value.title"
+      :message="alertDialog.config.value.message"
+      :variant="alertDialog.config.value.variant"
+      :detail="alertDialog.config.value.detail"
+      @close="alertDialog.handleClose"
+    />
   </AppLayout>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { Motion } from 'motion-v'
 import { useUserStore } from '../../../stores/user'
 import { useRouter } from 'vue-router'
 import AppLayout from '../../../components/layout/AppLayout.vue'
 import RoleBadge from '../../../components/admin/RoleBadge.vue'
 import UserFormModal from '../../../components/admin/UserFormModal.vue'
+import { ConfirmDialog, AlertDialog } from '../../../components/common'
+import { useConfirmDialog, useAlertDialog } from '../../../composables/useModal'
+import { entranceAnimations } from '../../../composables/useMotion'
 import { UserPlus, Search, Users, Edit, Trash2, X } from 'lucide-vue-next'
-import { animate, stagger } from 'motion-v'
 
 const userStore = useUserStore()
 const router = useRouter()
+
+// Modal composables
+const confirmDialog = useConfirmDialog()
+const alertDialog = useAlertDialog()
 
 // State
 const searchQuery = ref('')
@@ -246,14 +288,13 @@ const debouncedSearch = () => {
   }, 300)
 }
 
-// Apply filters dengan animation
+// Apply filters
 const applyFilters = async () => {
   await userStore.setFilters({
     search: searchQuery.value,
     role: selectedRole.value,
     department: selectedDepartment.value
   })
-  animateRows()
 }
 
 // Clear filters
@@ -264,23 +305,10 @@ const clearFilters = () => {
   userStore.clearFilters()
 }
 
-// Animate new rows saat data berubah
-const animateRows = async () => {
-  await nextTick()
-  if (userStore.hasUsers) {
-    animate(
-      'tbody tr',
-      { opacity: [0, 1] },
-      { duration: 0.3 }
-    )
-  }
-}
-
-// Pagination dengan animation
+// Pagination
 const goToPage = async (page) => {
   if (page >= 1 && page <= userStore.totalPages) {
     await userStore.fetchUsers(page)
-    animateRows()
   }
 }
 
@@ -289,11 +317,9 @@ const visiblePages = computed(() => {
   const total = userStore.totalPages
   const pages = []
   
-  // Show max 5 pages
   let start = Math.max(1, current - 2)
   let end = Math.min(total, start + 4)
   
-  // Adjust start if we're near the end
   if (end - start < 4) {
     start = Math.max(1, end - 4)
   }
@@ -324,18 +350,38 @@ const closeFormModal = () => {
 const handleFormSuccess = async () => {
   closeFormModal()
   await userStore.fetchUsers(userStore.currentPage)
-  animateRows()
 }
 
 // Delete user
 const confirmDelete = async (user) => {
-  if (confirm(`Apakah Anda yakin ingin menghapus user ${user.full_name}?`)) {
+  const confirmed = await confirmDialog.confirm({
+    title: 'Hapus User',
+    message: `Yakin ingin menghapus user "${user.full_name}"?`,
+    detail: `NIP: ${user.nip} | Role: ${user.role}`,
+    variant: 'danger',
+    confirmText: 'Ya, Hapus',
+    showWarning: true,
+    warningMessage: 'Data user yang dihapus tidak dapat dikembalikan.'
+  })
+
+  if (confirmed) {
+    confirmDialog.loading.value = true
     try {
       await userStore.deleteUser(user.id)
-      // Show success notification (will implement in Sprint 4)
-      alert('User berhasil dihapus')
+      confirmDialog.close()
+      
+      await alertDialog.success('User berhasil dihapus!', {
+        detail: `${user.full_name} telah dihapus dari sistem.`,
+        autoDismiss: true,
+        autoDismissDelay: 3000
+      })
+      
+      await userStore.fetchUsers(userStore.currentPage)
     } catch (error) {
-      alert(error.message || 'Gagal menghapus user')
+      confirmDialog.close()
+      await alertDialog.error('Gagal menghapus user', {
+        detail: error.message || 'Terjadi kesalahan saat menghapus user.'
+      })
     }
   }
 }
@@ -354,24 +400,5 @@ const getUserInitial = (fullName) => {
 // Lifecycle
 onMounted(async () => {
   await userStore.fetchUsers(1)
-  
-  // Animate page entrance dengan iOS spring physics
-  await nextTick()
-  
-  // Header card animation
-  animate(
-    '.glass-card',
-    { opacity: [0, 1], transform: ['translateY(-20px)', 'translateY(0)'] },
-    { duration: 0.6, easing: 'spring' }
-  )
-  
-  // Table rows staggered animation
-  if (userStore.hasUsers) {
-    animate(
-      'tbody tr',
-      { opacity: [0, 1], transform: ['translateX(-20px)', 'translateX(0)'] },
-      { duration: 0.5, delay: stagger(0.05), easing: 'spring' }
-    )
-  }
 })
 </script>

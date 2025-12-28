@@ -3,6 +3,7 @@
     v-model="isOpen"
     :title="title"
     :subtitle="subtitle"
+    :title-gradient="variant === 'default'"
     size="sm"
     :show-footer="true"
     :show-cancel="true"
@@ -17,56 +18,54 @@
     @cancel="handleCancel"
     @close="handleClose"
   >
-    <!-- Icon dengan Animated Scale -->
+    <!-- Icon dengan Motion-V animation -->
     <Motion
-      :initial="{ scale: 0, rotate: -180 }"
-      :animate="{ scale: 1, rotate: 0 }"
-      :transition="{ 
-        duration: 0.5,
-        type: 'spring',
-        stiffness: 200,
-        damping: 15
-      }"
+      v-bind="iconAnimations.popIn"
       class="flex justify-center mb-6"
     >
-      <div 
-        :class="[
-          'w-20 h-20 rounded-full flex items-center justify-center',
-          iconClasses
-        ]"
-      >
-        <component :is="iconComponent" :class="['w-10 h-10', iconColorClasses]" />
+      <div :class="['dialog-icon-container', iconContainerClass]">
+        <component 
+          :is="iconComponent" 
+          class="w-10 h-10" 
+          :stroke-width="1.5"
+        />
       </div>
     </Motion>
 
     <!-- Message Content -->
-    <div class="text-center space-y-3">
-      <p v-if="message" class="text-base text-gray-700 leading-relaxed">
+    <Motion
+      v-bind="entranceAnimations.fadeUp"
+      class="text-center space-y-2"
+    >
+      <p v-if="message" class="text-lg text-gray-800 leading-relaxed font-medium">
         {{ message }}
       </p>
+      
       <slot />
 
-      <!-- Detail Message (opsional) -->
-      <p v-if="detail" class="text-sm text-gray-500">
+      <p v-if="detail" class="text-sm text-gray-500 leading-relaxed">
         {{ detail }}
       </p>
-    </div>
+    </Motion>
 
-    <!-- Warning Badge (untuk destructive actions) -->
-    <div 
+    <!-- Warning Box untuk Destructive Actions -->
+    <Motion
       v-if="variant === 'danger' && showWarning"
-      class="mt-6 p-4 bg-red-50 border border-red-200 rounded-xl"
+      :initial="{ opacity: 0, y: 10 }"
+      :animate="{ opacity: 1, y: 0 }"
+      :transition="{ duration: 0.25, delay: 0.15, ease: 'easeOut' }"
+      class="dialog-warning-box"
     >
       <div class="flex items-start gap-3">
-        <AlertTriangle class="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+        <AlertTriangle class="dialog-warning-box-icon" />
         <div class="flex-1">
-          <p class="text-sm font-semibold text-red-900">Peringatan</p>
-          <p class="text-sm text-red-700 mt-1">
+          <p class="dialog-warning-box-title">Peringatan</p>
+          <p class="dialog-warning-box-text">
             {{ warningMessage || 'Tindakan ini tidak dapat dibatalkan.' }}
           </p>
         </div>
       </div>
-    </div>
+    </Motion>
   </BaseModal>
 </template>
 
@@ -81,11 +80,11 @@ import {
   CheckCircle2
 } from 'lucide-vue-next'
 import BaseModal from './BaseModal.vue'
+import { entranceAnimations, iconAnimations } from '../../composables/useMotion'
 
 /**
- * ConfirmDialog - Komponen confirmation dialog dengan visual feedback
- * untuk mengkonfirmasi user actions seperti delete, submit, atau cancel
- * operations dengan clear visual hierarchy dan haptic feedback
+ * ConfirmDialog - Komponen confirmation dialog dengan iOS-inspired design
+ * yang mengimplementasikan Motion-V animations untuk smooth UX
  */
 
 const props = defineProps({
@@ -93,8 +92,6 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-
-  // Content props
   title: {
     type: String,
     default: 'Konfirmasi'
@@ -111,21 +108,15 @@ const props = defineProps({
     type: String,
     default: ''
   },
-
-  // Variant untuk different types of confirmation
   variant: {
     type: String,
-    default: 'default', // default, danger, warning, info, success
+    default: 'default',
     validator: (value) => ['default', 'danger', 'warning', 'info', 'success'].includes(value)
   },
-
-  // Icon customization
   icon: {
     type: [String, Object],
     default: null
   },
-
-  // Button texts
   confirmText: {
     type: String,
     default: 'Ya, Lanjutkan'
@@ -138,8 +129,6 @@ const props = defineProps({
     type: String,
     default: 'Memproses...'
   },
-
-  // Warning props (untuk danger variant)
   showWarning: {
     type: Boolean,
     default: true
@@ -148,8 +137,6 @@ const props = defineProps({
     type: String,
     default: ''
   },
-
-  // Loading state
   loading: {
     type: Boolean,
     default: false
@@ -160,7 +147,6 @@ const emit = defineEmits(['update:modelValue', 'confirm', 'cancel', 'close'])
 
 const isOpen = ref(props.modelValue)
 
-// Watch modelValue
 watch(() => props.modelValue, (newValue) => {
   isOpen.value = newValue
 })
@@ -169,7 +155,7 @@ watch(isOpen, (newValue) => {
   emit('update:modelValue', newValue)
 })
 
-// Icon configuration berdasarkan variant
+// Icon configuration
 const iconComponent = computed(() => {
   if (props.icon) return props.icon
 
@@ -183,30 +169,19 @@ const iconComponent = computed(() => {
   return icons[props.variant] || icons.default
 })
 
-const iconClasses = computed(() => {
+const iconContainerClass = computed(() => {
   const classes = {
-    default: 'bg-indigo-100',
-    danger: 'bg-red-100',
-    warning: 'bg-amber-100',
-    info: 'bg-blue-100',
-    success: 'bg-emerald-100'
-  }
-  return classes[props.variant] || classes.default
-})
-
-const iconColorClasses = computed(() => {
-  const classes = {
-    default: 'text-indigo-600',
-    danger: 'text-red-600',
-    warning: 'text-amber-600',
-    info: 'text-blue-600',
-    success: 'text-emerald-600'
+    default: 'dialog-icon-default',
+    danger: 'dialog-icon-danger',
+    warning: 'dialog-icon-warning',
+    info: 'dialog-icon-info',
+    success: 'dialog-icon-success'
   }
   return classes[props.variant] || classes.default
 })
 
 // Event handlers
-const handleConfirm = async () => {
+const handleConfirm = () => {
   emit('confirm')
 }
 

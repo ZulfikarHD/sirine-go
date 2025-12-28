@@ -1,58 +1,56 @@
 <template>
-  <!-- Modal Backdrop dengan Glass Effect -->
+  <!-- Modal Backdrop - iOS-inspired smooth animation -->
   <Teleport to="body">
     <Motion
       v-if="isOpen"
       :initial="{ opacity: 0 }"
       :animate="{ opacity: 1 }"
       :exit="{ opacity: 0 }"
-      :transition="{ duration: 0.3 }"
-      class="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-end sm:items-center justify-center"
+      :transition="{ duration: 0.2, ease: 'easeOut' }"
+      class="modal-backdrop"
       @click.self="handleBackdropClick"
     >
-      <!-- Modal Content dengan Spring Animation -->
+      <!-- Modal Container - iOS-like spring physics -->
       <Motion
-        :initial="mobileView ? { opacity: 0, y: 100 } : { opacity: 0, scale: 0.95, y: 20 }"
-        :animate="mobileView ? { opacity: 1, y: 0 } : { opacity: 1, scale: 1, y: 0 }"
-        :exit="mobileView ? { opacity: 0, y: 100 } : { opacity: 0, scale: 0.95, y: 20 }"
+        :initial="mobileView 
+          ? { opacity: 0, y: '100%' } 
+          : { opacity: 0, scale: 0.95, y: 20 }"
+        :animate="mobileView 
+          ? { opacity: 1, y: 0 } 
+          : { opacity: 1, scale: 1, y: 0 }"
+        :exit="mobileView 
+          ? { opacity: 0, y: '100%' } 
+          : { opacity: 0, scale: 0.95, y: 20 }"
         :transition="{ 
-          duration: 0.4, 
-          easing: 'spring',
           type: 'spring',
-          stiffness: 300,
-          damping: 30
+          stiffness: 500,
+          damping: 40,
+          mass: 0.8
         }"
         :class="[
-          'glass-card shadow-2xl overflow-hidden',
-          mobileView 
-            ? 'w-full max-h-[90vh] rounded-t-3xl' 
-            : 'w-full mx-4 rounded-2xl max-h-[90vh]',
+          'modal-container',
+          mobileView ? 'modal-mobile' : 'modal-desktop',
           sizeClasses
         ]"
         @click.stop
       >
-        <!-- Header dengan Gradient Accent -->
-        <div 
-          v-if="showHeader"
-          :class="[
-            'sticky top-0 z-10 px-6 py-4 border-b border-gray-200/50',
-            mobileView ? 'glass-navbar' : 'bg-white/95 backdrop-blur-xl'
-          ]"
-        >
+        <!-- Header dengan Gradient Accent Line -->
+        <div v-if="showHeader" class="modal-header">
           <!-- Mobile Drag Handle -->
-          <div v-if="mobileView && dismissible" class="flex justify-center mb-3">
-            <div class="w-12 h-1.5 bg-gray-300 rounded-full active-scale cursor-grab" />
-          </div>
+          <div 
+            v-if="mobileView && dismissible" 
+            class="modal-drag-handle"
+            @click="handleClose"
+          />
 
           <div class="flex items-start justify-between">
             <div class="flex-1 pr-4">
-              <!-- Title dengan Gradient -->
+              <!-- Title dengan Optional Gradient -->
               <h2 
                 v-if="title"
                 :class="[
-                  'font-bold leading-tight',
-                  mobileView ? 'text-xl' : 'text-2xl',
-                  titleGradient ? 'text-gradient-indigo-fuchsia' : 'text-gray-900'
+                  'modal-title',
+                  titleGradient ? 'modal-title-gradient' : ''
                 ]"
               >
                 {{ title }}
@@ -60,10 +58,7 @@
               <slot name="title" />
 
               <!-- Subtitle -->
-              <p 
-                v-if="subtitle"
-                class="text-sm text-gray-600 mt-1.5"
-              >
+              <p v-if="subtitle" class="modal-subtitle">
                 {{ subtitle }}
               </p>
               <slot name="subtitle" />
@@ -73,42 +68,36 @@
             <button
               v-if="dismissible"
               @click="handleClose"
-              class="p-2.5 hover:bg-gray-100 rounded-xl transition-all duration-200 active:scale-95 shrink-0"
-              :aria-label="$t?.('close') || 'Tutup'"
+              class="modal-close-btn"
+              aria-label="Tutup"
             >
-              <X class="w-5 h-5 text-gray-500" />
+              <X />
             </button>
           </div>
         </div>
 
-        <!-- Content dengan Custom Scrollbar -->
+        <!-- Content Area dengan Custom Scrollbar -->
         <div 
           :class="[
-            'custom-scrollbar',
+            'modal-content custom-scrollbar',
             scrollable ? 'overflow-y-auto' : '',
-            noPadding ? '' : 'p-6'
+            noPadding ? 'p-0!' : ''
           ]"
           :style="{ maxHeight: contentMaxHeight }"
         >
           <slot />
         </div>
 
-        <!-- Footer Sticky (untuk actions) -->
-        <div 
-          v-if="showFooter"
-          :class="[
-            'sticky bottom-0 px-6 py-4 border-t border-gray-200/50',
-            mobileView ? 'glass-navbar' : 'bg-white/95 backdrop-blur-xl'
-          ]"
-        >
+        <!-- Footer dengan Glass Effect -->
+        <div v-if="showFooter" class="modal-footer">
           <slot name="footer">
             <!-- Default Footer Actions -->
-            <div class="flex items-center gap-3">
+            <div class="modal-actions">
               <button
                 v-if="showCancel"
                 @click="handleCancel"
                 :disabled="loading"
-                class="flex-1 sm:flex-none btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+                class="modal-btn-secondary"
               >
                 {{ cancelText }}
               </button>
@@ -117,13 +106,10 @@
                 v-if="showConfirm"
                 @click="handleConfirm"
                 :disabled="loading || confirmDisabled"
-                :class="[
-                  'flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed',
-                  confirmDanger ? 'bg-linear-to-r! from-red-600! to-pink-600! hover:from-red-700! hover:to-pink-700!' : ''
-                ]"
+                :class="confirmDanger ? 'modal-btn-danger' : 'modal-btn-primary'"
               >
                 <span v-if="loading" class="flex items-center justify-center gap-2">
-                  <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <div class="modal-spinner" />
                   {{ loadingText }}
                 </span>
                 <span v-else>{{ confirmText }}</span>
@@ -144,8 +130,8 @@ import { useWindowSize } from '@vueuse/core'
 
 /**
  * BaseModal - Komponen modal reusable dengan iOS-inspired design
- * untuk CRUD operations, confirmations, dan alerts dengan
- * spring physics animations serta glass morphism effect
+ * yang mengimplementasikan spring physics animations, glass morphism,
+ * dan Indigo-Fuchsia gradient theme untuk consistent UX
  */
 
 const props = defineProps({
@@ -176,7 +162,7 @@ const props = defineProps({
   // Size variants untuk different use cases
   size: {
     type: String,
-    default: 'md', // xs, sm, md, lg, xl, full
+    default: 'md',
     validator: (value) => ['xs', 'sm', 'md', 'lg', 'xl', 'full'].includes(value)
   },
 
@@ -246,7 +232,7 @@ const props = defineProps({
     default: false
   },
 
-  // Haptic feedback (untuk mobile)
+  // Haptic feedback untuk mobile
   enableHaptics: {
     type: Boolean,
     default: true
@@ -260,16 +246,16 @@ const isOpen = ref(props.modelValue)
 const { width } = useWindowSize()
 
 // Computed properties
-const mobileView = computed(() => width.value < 640) // sm breakpoint
+const mobileView = computed(() => width.value < 640)
 
 const sizeClasses = computed(() => {
   const sizes = {
-    xs: 'sm:max-w-xs',
-    sm: 'sm:max-w-sm',
-    md: 'sm:max-w-md',
-    lg: 'sm:max-w-lg',
-    xl: 'sm:max-w-xl',
-    full: 'sm:max-w-7xl'
+    xs: 'modal-xs',
+    sm: 'modal-sm',
+    md: 'modal-md',
+    lg: 'modal-lg',
+    xl: 'modal-xl',
+    full: 'modal-full'
   }
   return sizes[props.size] || sizes.md
 })
@@ -298,7 +284,6 @@ const triggerHaptic = (type = 'light') => {
 }
 
 const handleOpen = () => {
-  // Prevent body scroll saat modal open
   document.body.style.overflow = 'hidden'
   triggerHaptic('light')
   emit('opened')
@@ -310,13 +295,12 @@ const handleClose = () => {
   isOpen.value = false
   triggerHaptic('light')
   
-  // Restore body scroll
   setTimeout(() => {
     document.body.style.overflow = ''
     emit('update:modelValue', false)
     emit('close')
     emit('closed')
-  }, 300)
+  }, 250)
 }
 
 const handleBackdropClick = () => {

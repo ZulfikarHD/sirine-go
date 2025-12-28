@@ -3,9 +3,7 @@
     <div class="max-w-6xl mx-auto">
       <!-- Header -->
       <Motion
-        :initial="{ opacity: 0, y: -20 }"
-        :animate="{ opacity: 1, y: 0 }"
-        :transition="{ duration: 0.5 }"
+        v-bind="entranceAnimations.fadeUp"
         class="text-center mb-8"
       >
         <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-2">
@@ -29,9 +27,7 @@
 
       <!-- Add Button -->
       <Motion
-        :initial="{ opacity: 0 }"
-        :animate="{ opacity: 1 }"
-        :transition="{ duration: 0.5, delay: 0.1 }"
+        v-bind="entranceAnimations.fade"
         class="mb-6"
       >
         <button
@@ -44,14 +40,20 @@
       </Motion>
 
       <!-- Form -->
-      <div v-if="showForm" class="mb-8">
+      <Motion
+        v-if="showForm"
+        :initial="{ opacity: 0, y: 15 }"
+        :animate="{ opacity: 1, y: 0 }"
+        :transition="{ duration: 0.25, ease: 'easeOut' }"
+        class="mb-8"
+      >
         <ExampleForm
           :initial-data="editingExample"
           :loading="loading"
           @submit="handleSubmit"
           @cancel="cancelForm"
         />
-      </div>
+      </Motion>
 
       <!-- Loading State -->
       <div v-if="loading && !showForm" class="text-center py-12">
@@ -62,9 +64,10 @@
       <!-- Error State -->
       <Motion
         v-if="error && !loading"
-        :initial="{ opacity: 0, scale: 0.9 }"
+        :initial="{ opacity: 0, scale: 0.95 }"
         :animate="{ opacity: 1, scale: 1 }"
-        class="card bg-red-50 border-2 border-red-200 mb-6"
+        :transition="{ ...springPresets.snappy }"
+        class="glass-card bg-red-50 border-2 border-red-200 mb-6 p-4 rounded-xl"
       >
         <p class="text-red-800">{{ error }}</p>
       </Motion>
@@ -72,9 +75,7 @@
       <!-- Empty State -->
       <Motion
         v-if="!loading && examples.length === 0 && !showForm"
-        :initial="{ opacity: 0 }"
-        :animate="{ opacity: 1 }"
-        :transition="{ duration: 0.5 }"
+        v-bind="entranceAnimations.fade"
         class="text-center py-12"
       >
         <div class="text-6xl mb-4">📝</div>
@@ -91,13 +92,19 @@
         v-if="!loading && examples.length > 0"
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
       >
-        <ExampleCard
-          v-for="example in examples"
+        <Motion
+          v-for="(example, index) in examples"
           :key="example.id"
-          :example="example"
-          @edit="handleEdit"
-          @delete="handleDelete"
-        />
+          :initial="{ opacity: 0, y: 15 }"
+          :animate="{ opacity: 1, y: 0 }"
+          :transition="{ duration: 0.25, delay: index * 0.05, ease: 'easeOut' }"
+        >
+          <ExampleCard
+            :example="example"
+            @edit="handleEdit"
+            @delete="handleDelete"
+          />
+        </Motion>
       </div>
     </div>
   </div>
@@ -108,6 +115,7 @@ import { ref, onMounted } from 'vue'
 import { Motion } from 'motion-v'
 import { useOnline } from '@vueuse/core'
 import { useExamples } from '../composables/useExamples'
+import { entranceAnimations, springPresets } from '../composables/useMotion'
 import ExampleCard from '../components/ExampleCard.vue'
 import ExampleForm from '../components/ExampleForm.vue'
 

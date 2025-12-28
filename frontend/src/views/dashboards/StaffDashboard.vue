@@ -1,21 +1,38 @@
 <template>
   <AppLayout>
     <!-- Welcome Section -->
-    <div class="mb-8 animate-fade-in">
+    <Motion
+      :initial="{ opacity: 0, y: 10 }"
+      :animate="{ opacity: 1, y: 0 }"
+      :transition="{ duration: 0.3, ease: 'easeOut' }"
+      class="mb-8"
+    >
       <h1 class="text-3xl font-bold text-gray-900 mb-2">
         Selamat Datang, {{ user?.full_name }}!
       </h1>
       <p class="text-gray-600">Dashboard {{ user?.department }} - Shift {{ user?.shift }}</p>
-    </div>
+    </Motion>
 
     <!-- My Tasks -->
-    <div class="mb-8">
+    <Motion
+      :initial="{ opacity: 0 }"
+      :animate="{ opacity: 1 }"
+      :transition="{ duration: 0.25, delay: 0.1 }"
+      class="mb-8"
+    >
       <h2 class="text-xl font-semibold text-gray-900 mb-4">Tugas Hari Ini</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div 
+        <Motion 
           v-for="(task, index) in tasks" 
           :key="index"
-          class="glass-card p-6 rounded-2xl hover:shadow-lg transition-all active-scale"
+          :initial="{ opacity: 0, y: 15 }"
+          :animate="{ opacity: 1, y: 0 }"
+          :transition="{ 
+            duration: 0.25, 
+            delay: 0.15 + (index * 0.05),
+            ease: 'easeOut'
+          }"
+          class="glass-card p-6 rounded-2xl active-scale"
         >
           <div class="flex items-start justify-between mb-4">
             <div :class="`w-12 h-12 rounded-xl ${task.bgColor} flex items-center justify-center`">
@@ -31,14 +48,19 @@
             <span>{{ task.progress }}</span>
             <span>{{ task.deadline }}</span>
           </div>
-        </div>
+        </Motion>
       </div>
-    </div>
+    </Motion>
 
     <!-- Performance -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Today's Performance -->
-      <div class="glass-card p-6 rounded-2xl">
+      <Motion
+        :initial="{ opacity: 0, y: 10 }"
+        :animate="{ opacity: 1, y: 0 }"
+        :transition="{ duration: 0.25, delay: 0.3 }"
+        class="glass-card p-6 rounded-2xl"
+      >
         <h2 class="text-xl font-semibold text-gray-900 mb-4">Performa Hari Ini</h2>
         <div class="space-y-4">
           <div v-for="(metric, index) in performance" :key="index">
@@ -54,16 +76,21 @@
             </div>
           </div>
         </div>
-      </div>
+      </Motion>
 
       <!-- Notifications -->
-      <div class="glass-card p-6 rounded-2xl">
+      <Motion
+        :initial="{ opacity: 0, y: 10 }"
+        :animate="{ opacity: 1, y: 0 }"
+        :transition="{ duration: 0.25, delay: 0.35 }"
+        class="glass-card p-6 rounded-2xl"
+      >
         <h2 class="text-xl font-semibold text-gray-900 mb-4">Notifikasi</h2>
         <div class="space-y-3">
           <div 
             v-for="(notif, index) in notifications" 
             :key="index"
-            class="flex items-start space-x-3 p-3 rounded-xl hover:bg-gray-50 transition-colors"
+            class="flex items-start space-x-3 p-3 rounded-xl hover:bg-gray-50"
           >
             <div :class="`w-2 h-2 rounded-full ${notif.color} mt-2 shrink-0`"></div>
             <div class="flex-1 min-w-0">
@@ -72,7 +99,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </Motion>
     </div>
   </AppLayout>
 </template>
@@ -81,6 +108,7 @@
 import { ref, computed } from 'vue'
 import { useAuthStore } from '../../stores/auth'
 import AppLayout from '../../components/layout/AppLayout.vue'
+import { Motion } from 'motion-v'
 import { ClipboardList, CheckCircle, CheckSquare } from 'lucide-vue-next'
 
 const authStore = useAuthStore()
@@ -161,6 +189,3 @@ const notifications = ref([
   },
 ])
 </script>
-
-<style scoped>
-</style>

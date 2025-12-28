@@ -1,44 +1,23 @@
 <template>
-  <!-- Modal Backdrop -->
-  <Teleport to="body">
-    <Motion
-      v-if="isOpen"
-      :initial="{ opacity: 0 }"
-      :animate="{ opacity: 1 }"
-      :exit="{ opacity: 0 }"
-      :transition="{ duration: 0.3 }"
-      class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-      @click.self="handleClose"
-    >
-      <!-- Modal Content -->
-      <Motion
-        :initial="{ opacity: 0, scale: 0.95, y: 20 }"
-        :animate="{ opacity: 1, scale: 1, y: 0 }"
-        :exit="{ opacity: 0, scale: 0.95, y: 20 }"
-        :transition="{ duration: 0.3, easing: 'spring' }"
-        class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-        @click.stop
-      >
-            <!-- Header -->
-            <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
-              <div>
-                <h2 class="text-xl font-bold text-gray-900">
-                  {{ isEditMode ? 'Edit User' : 'Tambah User Baru' }}
-                </h2>
-                <p class="text-sm text-gray-600 mt-1">
-                  {{ isEditMode ? 'Update informasi user' : 'Buat user baru dengan kredensial auto-generated' }}
-                </p>
-              </div>
-              <button
-                @click="handleClose"
-                class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <X class="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
+  <BaseModal
+    v-model="isOpen"
+    :title="isEditMode ? 'Edit User' : 'Tambah User Baru'"
+    :subtitle="isEditMode ? 'Update informasi user' : 'Buat user baru dengan kredensial auto-generated'"
+    size="lg"
+    :show-footer="!generatedPassword"
+    :show-cancel="!loading"
+    :show-confirm="true"
+    :confirm-text="isEditMode ? 'Simpan Perubahan' : 'Buat User'"
+    :loading="loading"
+    :loading-text="isEditMode ? 'Menyimpan...' : 'Membuat...'"
+    :dismissible="!loading"
+    @confirm="handleSubmit"
+    @cancel="handleClose"
+    @close="handleClose"
+  >
+    <!-- Form Content -->
 
-            <!-- Form -->
-            <form @submit.prevent="handleSubmit" class="p-6 space-y-5">
+    <form @submit.prevent="handleSubmit" class="space-y-5">
               <!-- NIP (only for create) -->
               <div v-if="!isEditMode">
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
@@ -172,81 +151,67 @@
                 </div>
               </div>
 
-              <!-- Error Message -->
-              <div v-if="errorMessage" class="p-4 bg-red-50 border border-red-200 rounded-xl">
-                <p class="text-sm text-red-700">{{ errorMessage }}</p>
-              </div>
+      <!-- Error Message -->
+      <div v-if="errorMessage" class="p-4 bg-red-50 border border-red-200 rounded-xl">
+        <p class="text-sm text-red-700">{{ errorMessage }}</p>
+      </div>
+    </form>
 
-              <!-- Success Message (untuk create dengan generated password) -->
-              <div v-if="generatedPassword" class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl space-y-3">
-                <div class="flex items-start space-x-3">
-                  <CheckCircle class="w-5 h-5 text-emerald-600 mt-0.5" />
-                  <div class="flex-1">
-                    <p class="text-sm font-semibold text-emerald-900">User berhasil dibuat!</p>
-                    <p class="text-sm text-emerald-700 mt-1">Password telah di-generate otomatis. Pastikan untuk menyimpan password ini:</p>
-                  </div>
-                </div>
-                <div class="flex items-center space-x-2 bg-white p-3 rounded-lg border border-emerald-200">
-                  <code class="flex-1 text-sm font-mono text-gray-900">{{ generatedPassword }}</code>
-                  <button
-                    type="button"
-                    @click="copyPassword"
-                    class="p-2 hover:bg-emerald-50 rounded-lg transition-colors"
-                    title="Copy password"
-                  >
-                    <Copy class="w-4 h-4 text-emerald-600" />
-                  </button>
-                </div>
-                <p class="text-xs text-emerald-600">
-                  ⚠️ Password ini hanya ditampilkan sekali. User harus mengubah password saat login pertama kali.
-                </p>
-              </div>
+    <!-- Custom Footer untuk Success State -->
+    <template v-if="generatedPassword" #footer>
+      <!-- Success Message dengan Generated Password -->
+      <div class="space-y-4">
+        <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl space-y-3">
+          <div class="flex items-start space-x-3">
+            <CheckCircle class="w-5 h-5 text-emerald-600 mt-0.5" />
+            <div class="flex-1">
+              <p class="text-sm font-semibold text-emerald-900">User berhasil dibuat!</p>
+              <p class="text-sm text-emerald-700 mt-1">Password telah di-generate otomatis. Pastikan untuk menyimpan password ini:</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2 bg-white p-3 rounded-lg border border-emerald-200">
+            <code class="flex-1 text-sm font-mono text-gray-900">{{ generatedPassword }}</code>
+            <button
+              type="button"
+              @click="copyPassword"
+              class="p-2 hover:bg-emerald-50 rounded-lg transition-colors active-scale"
+              title="Copy password"
+            >
+              <Copy class="w-4 h-4 text-emerald-600" />
+            </button>
+          </div>
+          <p class="text-xs text-emerald-600">
+            ⚠️ Password ini hanya ditampilkan sekali. User harus mengubah password saat login pertama kali.
+          </p>
+        </div>
+        
+        <!-- Close Button -->
+        <button
+          type="button"
+          @click="handleClose"
+          class="w-full btn-primary"
+        >
+          Selesai
+        </button>
+      </div>
+    </template>
+  </BaseModal>
 
-              <!-- Actions -->
-              <div class="flex items-center space-x-3 pt-4">
-                <button
-                  v-if="!generatedPassword"
-                  type="submit"
-                  :disabled="loading"
-                  class="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <span v-if="loading" class="flex items-center justify-center">
-                    <div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    {{ isEditMode ? 'Menyimpan...' : 'Membuat...' }}
-                  </span>
-                  <span v-else>
-                    {{ isEditMode ? 'Simpan Perubahan' : 'Buat User' }}
-                  </span>
-                </button>
-                <button
-                  v-if="generatedPassword"
-                  type="button"
-                  @click="handleClose"
-                  class="flex-1 btn-primary"
-                >
-                  Selesai
-                </button>
-                <button
-                  v-if="!generatedPassword"
-                  type="button"
-                  @click="handleClose"
-                  :disabled="loading"
-                  class="px-6 py-2.5 rounded-xl border border-gray-200 text-gray-700 font-semibold hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Batal
-                </button>
-              </div>
-            </form>
-          </Motion>
-        </Motion>
-  </Teleport>
+  <!-- Alert Dialog untuk Copy Success -->
+  <AlertDialog
+    v-model="alertDialog.isOpen.value"
+    :message="alertDialog.config.value.message"
+    :variant="alertDialog.config.value.variant"
+    @close="alertDialog.handleClose"
+  />
 </template>
 
 <script setup>
 import { ref, reactive, computed, watch } from 'vue'
 import { useUserStore } from '../../stores/user'
-import { Motion } from 'motion-v'
-import { X, CheckCircle, Copy } from 'lucide-vue-next'
+import { BaseModal, AlertDialog } from '../common'
+import { useAlertDialog } from '../../composables/useModal'
+import { CheckCircle, Copy } from 'lucide-vue-next'
 
 const props = defineProps({
   user: {
@@ -258,6 +223,8 @@ const props = defineProps({
 const emit = defineEmits(['close', 'success'])
 
 const userStore = useUserStore()
+const alertDialog = useAlertDialog()
+
 const isOpen = ref(true)
 const loading = ref(false)
 const errorMessage = ref('')
@@ -331,10 +298,20 @@ const handleSubmit = async () => {
   }
 }
 
-// Copy password
-const copyPassword = () => {
-  navigator.clipboard.writeText(generatedPassword.value)
-  alert('Password berhasil di-copy!')
+// Copy password dengan AlertDialog
+const copyPassword = async () => {
+  try {
+    await navigator.clipboard.writeText(generatedPassword.value)
+    await alertDialog.success('Password berhasil di-copy!', {
+      detail: 'Password telah disalin ke clipboard.',
+      autoDismiss: true,
+      autoDismissDelay: 2000
+    })
+  } catch (error) {
+    await alertDialog.error('Gagal menyalin password', {
+      detail: 'Silakan copy secara manual.'
+    })
+  }
 }
 
 // Close modal

@@ -2,16 +2,140 @@
 alwaysApply: true
 ---
 
-- App Design is like Apple app
-- Use Indigo and Fuchsia as main theme to be more techy and modern
-- Always think hirarchy for mobile user prespective in user experience when designing the pages
-- use motion-vue for animations
-- dont put css on vue files
+# Design Standard - Sirine Go
 
-### Use iOS Design Principles like
-- **Spring Physics**: Natural, bouncy animations yang terasa like native iOS
-- **Press Feedback**: Scale-down effect saat element di-tap (0.97 scale)
-- **Glass Effect**: Frosted glass navbar dan footer dengan backdrop blur
-- **Haptic Feedback**: Vibration API untuk tactile response
-- **Staggered Animations**: Sequential entrance animations untuk lists
-- **Gesture Recognition**: Swipe-to-delete, pull-to-refresh, drag-to-dismiss
+## Theme & Aesthetic
+- **Apple-inspired design** dengan Indigo (#6366f1) & Fuchsia (#d946ef) gradient
+- Mobile-first hierarchy, prioritas UX untuk pengguna mobile
+- Minimal visual weight, fokus pada content
+
+## Animation System - Motion-V Only
+
+### Core Principle
+Semua animasi menggunakan **Motion-V** (`motion-v` package), bukan CSS animations.
+CSS hanya untuk: hover, focus, active states, dan transform feedback.
+
+### Import Pattern
+```javascript
+import { Motion } from 'motion-v'
+import { entranceAnimations, springPresets, iconAnimations } from '@/composables/useMotion'
+```
+
+### Spring Presets (iOS-like)
+```javascript
+// Default - natural, balanced
+{ type: 'spring', stiffness: 400, damping: 30, mass: 0.8 }
+
+// Snappy - quick responsive
+{ type: 'spring', stiffness: 500, damping: 35, mass: 0.6 }
+
+// Gentle - subtle, soft
+{ type: 'spring', stiffness: 300, damping: 25, mass: 1 }
+```
+
+### Page/Section Entrance
+```vue
+<Motion v-bind="entranceAnimations.fadeUp" class="...">
+  <!-- content -->
+</Motion>
+```
+
+Available presets: `fadeUp`, `fadeScale`, `fade`, `slideLeft`, `slideRight`
+
+### Staggered List Items
+```vue
+<Motion
+  v-for="(item, index) in items"
+  :key="item.id"
+  :initial="{ opacity: 0, y: 15 }"
+  :animate="{ opacity: 1, y: 0 }"
+  :transition="{ duration: 0.25, delay: index * 0.05, ease: 'easeOut' }"
+>
+```
+
+### Modal/Dialog Animations
+```vue
+<!-- Backdrop -->
+<Motion
+  :initial="{ opacity: 0 }"
+  :animate="{ opacity: 1 }"
+  :exit="{ opacity: 0 }"
+  :transition="{ duration: 0.2, ease: 'easeOut' }"
+>
+
+<!-- Modal Container -->
+<Motion
+  :initial="{ opacity: 0, scale: 0.95, y: 20 }"
+  :animate="{ opacity: 1, scale: 1, y: 0 }"
+  :transition="{ type: 'spring', stiffness: 500, damping: 40, mass: 0.8 }"
+>
+```
+
+### Icon Pop-in (Dialogs)
+```vue
+<Motion v-bind="iconAnimations.popIn">
+  <IconComponent />
+</Motion>
+```
+
+## CSS Guidelines
+
+### Allowed in CSS
+- Hover states: `hover:bg-gray-50`
+- Focus states: `focus:ring-4 focus:ring-indigo-100`
+- Active feedback: `.active-scale:active { transform: scale(0.97) }`
+- Transitions for states: `transition: border-color 0.15s ease-out`
+- Spinner animation: `animation: spin 0.6s linear infinite`
+
+### NOT Allowed in CSS
+- `@keyframes` untuk entrance/exit animations
+- `animation-*` properties (kecuali spinner)
+- `transition-all` (gunakan specific properties)
+- Heavy `backdrop-filter: blur()` pada banyak elemen
+
+## Interactive Elements
+
+### Press Feedback (iOS-like)
+```vue
+<button class="active-scale">
+  <!-- Scale to 0.97 on press -->
+</button>
+```
+
+### Haptic Feedback
+```javascript
+if ('vibrate' in navigator) {
+  navigator.vibrate(10) // light tap
+  navigator.vibrate([30, 100, 30]) // error pattern
+}
+```
+
+## Component Structure
+
+### Glass Card (Performance Optimized)
+```css
+.glass-card {
+  @apply bg-white/95 border border-gray-200/30;
+  /* NO backdrop-filter untuk cards */
+}
+
+.glass-navbar {
+  backdrop-filter: blur(8px); /* HANYA untuk navbar */
+}
+```
+
+### Modal Size Classes
+`modal-xs`, `modal-sm`, `modal-md`, `modal-lg`, `modal-xl`, `modal-full`
+
+## Performance Rules
+1. Gunakan `will-change: transform` hanya pada elemen yang akan di-animate
+2. Prefer `transform` dan `opacity` untuk animasi (GPU-accelerated)
+3. Maksimal 1 `backdrop-filter` visible per viewport (navbar saja)
+4. Stagger delay maksimal 0.05s antar item
+5. Duration entrance animations: 0.2s - 0.3s
+6. Hindari nested Motion components yang berlebihan
+
+## File Organization
+- Animations: `src/composables/useMotion.js`
+- Global styles: `src/style.css` (minimal, structure only)
+- NO `<style>` blocks in Vue files

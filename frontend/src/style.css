@@ -1,195 +1,109 @@
 @import "tailwindcss";
 
+/* ============================================
+   BASE STYLES - iOS Font Smoothing & Accessibility
+   ============================================ */
 @layer base {
-  /* Base styles dengan iOS-inspired font smoothing */
   body {
     @apply bg-gray-50 text-gray-900;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-      sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+      'Helvetica Neue', sans-serif;
   }
 
   * {
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* Smooth scrolling */
-  html {
-    scroll-behavior: smooth;
+  /* Reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
+/* ============================================
+   COMPONENT CLASSES - Interactive Elements
+   Note: All animations handled by Motion-V
+   CSS only handles hover/focus/active states
+   ============================================ */
 @layer components {
-  /* Primary button dengan Indigo & Fuchsia gradient theme */
+  /* Primary Button - Indigo & Fuchsia gradient */
   .btn-primary {
     @apply px-6 py-3 rounded-xl font-semibold text-white
            bg-linear-to-r from-indigo-600 to-fuchsia-600
-           hover:from-indigo-700 hover:to-fuchsia-700
            focus:outline-none focus:ring-4 focus:ring-indigo-200
            disabled:opacity-50 disabled:cursor-not-allowed
-           transform transition-all duration-200
-           active:scale-[0.97] shadow-lg;
-  }
-  
-  /* Secondary button */
-  .btn-secondary {
-    @apply px-6 py-3 rounded-xl font-semibold text-gray-700
-           bg-gray-100 hover:bg-gray-200
-           focus:outline-none focus:ring-4 focus:ring-gray-200
-           transform transition-all duration-200
-           active:scale-[0.97];
-  }
-  
-  /* Glass effect card */
-  .glass-card {
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
-    background-color: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(209, 213, 219, 0.3);
+           shadow-lg select-none;
   }
 
-  .glass-navbar {
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
+  .btn-primary:hover:not(:disabled) {
+    @apply from-indigo-700 to-fuchsia-700;
+  }
+
+  .btn-primary:active:not(:disabled) {
+    transform: scale(0.97);
   }
   
-  /* Input field dengan iOS-style */
+  /* Secondary Button */
+  .btn-secondary {
+    @apply px-6 py-3 rounded-xl font-semibold text-gray-700
+           bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200
+           select-none;
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    @apply bg-gray-200;
+  }
+
+  .btn-secondary:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+  
+  /* Glass Card - Performance optimized (no blur on cards) */
+  .glass-card {
+    @apply bg-white/95 border border-gray-200/30;
+  }
+
+  /* Glass Navbar - Light blur for nav only */
+  .glass-navbar {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    @apply bg-white/85;
+  }
+  
+  /* Input Field - iOS style */
   .input,
   .input-field {
     @apply w-full px-4 py-3 rounded-xl border-2 border-gray-200 
            focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 
-           transition-all duration-200 outline-none
-           text-gray-900 placeholder-gray-400;
+           outline-none text-gray-900 placeholder-gray-400;
+    transition: border-color 0.15s ease-out, box-shadow 0.15s ease-out;
   }
 
-  /* Active scale effect untuk interactive elements (iOS-like) */
+  /* Active Scale - Press feedback for interactive elements */
   .active-scale {
-    @apply transform transition-transform duration-150 active:scale-95;
+    @apply select-none;
   }
 
-  /* Press feedback untuk buttons (iOS-like) */
-  .press-feedback {
-    @apply transform transition-transform duration-150 active:scale-[0.97];
+  .active-scale:active {
+    transform: scale(0.97);
+  }
+
+  /* Press Feedback - Alternative naming */
+  .press-feedback:active {
+    transform: scale(0.97);
   }
 }
 
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
 @layer utilities {
-  /* iOS Spring Physics Animations */
-  @keyframes springIn {
-    0% {
-      opacity: 0;
-      transform: scale(0.9);
-    }
-    50% {
-      transform: scale(1.02);
-    }
-    100% {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  @keyframes springOut {
-    0% {
-      opacity: 1;
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.02);
-    }
-    100% {
-      opacity: 0;
-      transform: scale(0.9);
-    }
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes bounce {
-    0%, 100% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.1);
-    }
-  }
-
-  @keyframes shake {
-    0%, 100% {
-      transform: translateX(0);
-    }
-    25% {
-      transform: translateX(-10px);
-    }
-    50% {
-      transform: translateX(10px);
-    }
-    75% {
-      transform: translateX(-10px);
-    }
-  }
-
-  @keyframes pulse {
-    0%, 100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.5;
-    }
-  }
-
-  /* Animation classes */
-  .animate-spring-in {
-    animation: springIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  .animate-spring-out {
-    animation: springOut 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  .animate-fade-in {
-    animation: fadeIn 0.6s ease-in-out;
-  }
-
-  .animate-slide-up {
-    animation: slideUp 0.4s ease-out;
-  }
-
-  .animate-bounce {
-    animation: bounce 0.6s ease-in-out;
-  }
-
-  .animate-shake {
-    animation: shake 0.4s ease-in-out;
-  }
-
-  .animate-pulse {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-
-  /* Gradient text utilities untuk theme */
+  /* Gradient Text */
   .text-gradient-indigo-fuchsia {
     @apply text-transparent bg-clip-text bg-linear-to-r from-indigo-600 to-fuchsia-600;
   }
@@ -198,43 +112,554 @@
     @apply bg-linear-to-r from-indigo-600 to-fuchsia-600;
   }
 
-  .bg-gradient-primary-hover {
-    @apply bg-linear-to-r from-indigo-700 to-fuchsia-700;
-  }
-
-  /* Scrollbar styling untuk iOS-like appearance */
+  /* Custom Scrollbar - iOS like */
   .custom-scrollbar::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.05);
-    border-radius: 10px;
+    background: transparent;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(99, 102, 241, 0.3);
+    background: rgba(99, 102, 241, 0.25);
     border-radius: 10px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(99, 102, 241, 0.5);
+    background: rgba(99, 102, 241, 0.4);
   }
 }
 
-/* Transitions untuk router views */
-.v-enter-active,
-.v-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
+/* ============================================
+   MODAL SYSTEM - Structure Only
+   Animations handled by Motion-V
+   ============================================ */
+
+.modal-backdrop {
+  @apply fixed inset-0 z-50 flex items-end sm:items-center justify-center;
+  background: rgba(0, 0, 0, 0.4);
 }
 
-.v-enter-from {
-  opacity: 0;
-  transform: translateY(10px);
+.modal-container {
+  @apply relative overflow-hidden shadow-2xl bg-white;
+  border: 1px solid rgba(99, 102, 241, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
-.v-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
+.modal-desktop {
+  @apply w-full mx-4 rounded-3xl max-h-[85vh];
+}
+
+.modal-mobile {
+  @apply w-full max-h-[92vh];
+  border-radius: 2rem 2rem 0 0;
+}
+
+/* Modal Size Variants */
+.modal-xs { @apply sm:max-w-xs; }
+.modal-sm { @apply sm:max-w-sm; }
+.modal-md { @apply sm:max-w-md; }
+.modal-lg { @apply sm:max-w-lg; }
+.modal-xl { @apply sm:max-w-xl; }
+.modal-full { @apply sm:max-w-4xl; }
+
+.modal-header {
+  @apply sticky top-0 z-10 px-6 py-5 bg-white border-b border-indigo-500/10;
+}
+
+/* Gradient line accent */
+.modal-header::before {
+  content: '';
+  @apply absolute top-0 left-1/2 -translate-x-1/2 w-3/5 h-0.5 rounded-b;
+  background: linear-gradient(90deg, #6366f1 0%, #d946ef 100%);
+  opacity: 0.8;
+}
+
+.modal-drag-handle {
+  @apply w-10 h-1 rounded-full mx-auto mb-4 cursor-grab bg-gray-300;
+}
+
+.modal-drag-handle:hover {
+  @apply w-14 bg-gray-400;
+}
+
+.modal-title {
+  @apply text-xl sm:text-2xl font-bold leading-tight tracking-tight text-gray-900;
+}
+
+.modal-title-gradient {
+  @apply text-transparent bg-clip-text;
+  background: linear-gradient(135deg, #6366f1 0%, #d946ef 100%);
+}
+
+.modal-subtitle {
+  @apply text-sm text-gray-500 mt-1.5 leading-relaxed;
+}
+
+.modal-close-btn {
+  @apply p-2.5 rounded-xl bg-indigo-500/5;
+}
+
+.modal-close-btn:hover {
+  @apply bg-indigo-500/10;
+}
+
+.modal-close-btn:active {
+  transform: scale(0.92);
+}
+
+.modal-close-btn svg {
+  @apply w-5 h-5 text-indigo-500;
+}
+
+.modal-content {
+  @apply p-6 overflow-y-auto;
+}
+
+.modal-footer {
+  @apply sticky bottom-0 px-6 py-5 bg-white border-t border-indigo-500/10;
+}
+
+.modal-actions {
+  @apply flex items-center gap-3;
+}
+
+/* Modal Buttons */
+.modal-btn-primary {
+  @apply flex-1 px-6 py-3.5 rounded-2xl font-semibold text-white shadow-lg;
+  background: linear-gradient(135deg, #6366f1 0%, #d946ef 100%);
+  box-shadow: 0 4px 15px -3px rgba(99, 102, 241, 0.4);
+}
+
+.modal-btn-primary:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.modal-btn-primary:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+.modal-btn-danger {
+  @apply flex-1 px-6 py-3.5 rounded-2xl font-semibold text-white shadow-lg;
+  background: linear-gradient(135deg, #ef4444 0%, #ec4899 100%);
+  box-shadow: 0 4px 15px -3px rgba(239, 68, 68, 0.4);
+}
+
+.modal-btn-danger:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.modal-btn-secondary {
+  @apply flex-1 sm:flex-none px-6 py-3.5 rounded-2xl font-semibold 
+         text-indigo-600 bg-indigo-500/10 border border-indigo-500/15;
+}
+
+.modal-btn-secondary:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* ============================================
+   DIALOG ICONS - Structure Only
+   ============================================ */
+
+.dialog-icon-container {
+  @apply relative w-20 h-20 rounded-full flex items-center justify-center;
+}
+
+.dialog-icon-default { @apply bg-indigo-50 border-2 border-indigo-100; }
+.dialog-icon-success { @apply bg-emerald-50 border-2 border-emerald-100; }
+.dialog-icon-danger { @apply bg-red-50 border-2 border-red-100; }
+.dialog-icon-warning { @apply bg-amber-50 border-2 border-amber-100; }
+.dialog-icon-info { @apply bg-blue-50 border-2 border-blue-100; }
+
+.dialog-icon-default svg { @apply text-indigo-500; }
+.dialog-icon-success svg { @apply text-emerald-500; }
+.dialog-icon-danger svg { @apply text-red-500; }
+.dialog-icon-warning svg { @apply text-amber-500; }
+.dialog-icon-info svg { @apply text-blue-500; }
+
+/* ============================================
+   INFO/WARNING/ERROR BOXES
+   ============================================ */
+
+.dialog-warning-box {
+  @apply mt-6 p-4 rounded-2xl bg-red-50 border border-red-100;
+}
+
+.dialog-warning-box-icon { @apply w-5 h-5 shrink-0 mt-0.5 text-red-500; }
+.dialog-warning-box-title { @apply text-sm font-semibold text-red-800; }
+.dialog-warning-box-text { @apply text-sm mt-1 text-red-700; }
+
+.dialog-info-box {
+  @apply mt-4 p-4 rounded-2xl bg-indigo-50 border border-indigo-100;
+}
+
+.dialog-info-box-icon { @apply w-5 h-5 shrink-0 mt-0.5 text-indigo-500; }
+.dialog-info-box-text { @apply text-sm text-indigo-700; }
+
+.dialog-error-box {
+  @apply mt-4 p-4 rounded-2xl bg-red-50 border border-red-200;
+}
+
+.dialog-timer {
+  @apply flex items-center justify-center gap-2 mt-6 text-sm text-gray-400;
+}
+
+.dialog-timer-ring {
+  @apply relative w-5 h-5;
+}
+
+.dialog-timer-ring svg {
+  @apply w-5 h-5 -rotate-90;
+}
+
+/* ============================================
+   PASSWORD INPUT
+   ============================================ */
+
+.password-input-wrapper {
+  @apply relative;
+}
+
+.password-input-field {
+  @apply w-full px-4 py-3.5 pr-14 rounded-2xl text-gray-900 
+         placeholder-gray-400 bg-gray-50 border-2 border-gray-200
+         focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100
+         outline-none;
+  transition: border-color 0.15s ease-out, box-shadow 0.15s ease-out;
+}
+
+.password-input-field:disabled {
+  @apply opacity-60 cursor-not-allowed;
+}
+
+.password-toggle-btn {
+  @apply absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-xl
+         bg-indigo-50 text-indigo-500;
+}
+
+.password-toggle-btn:active {
+  transform: translateY(-50%) scale(0.92);
+}
+
+.password-toggle-btn svg {
+  @apply w-5 h-5;
+}
+
+/* ============================================
+   LOADING SPINNER - CSS Animation (required)
+   ============================================ */
+
+.modal-spinner {
+  @apply w-5 h-5 border-2 border-white border-t-transparent rounded-full;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Generic spinner class */
+.animate-spin {
+  animation: spin 0.8s linear infinite;
+}
+
+/* ============================================
+   LAYOUT - Sidebar
+   ============================================ */
+
+.sidebar-container {
+  @apply fixed inset-y-0 left-0 z-50 w-64 
+         bg-white border-r border-gray-200/60 
+         flex flex-col;
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (min-width: 768px) {
+  .sidebar-container {
+    @apply static inset-auto;
+  }
+}
+
+.sidebar-header {
+  @apply h-16 flex items-center px-5 border-b border-gray-200/60;
+  background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(249,250,251,0.5) 100%);
+}
+
+.sidebar-logo {
+  @apply w-9 h-9 rounded-xl flex items-center justify-center shadow-lg;
+  background: linear-gradient(135deg, #6366f1 0%, #d946ef 100%);
+  box-shadow: 0 4px 12px -2px rgba(99, 102, 241, 0.4);
+}
+
+.sidebar-footer {
+  @apply p-4 border-t border-gray-200/60;
+  background: linear-gradient(180deg, rgba(249,250,251,0.3) 0%, rgba(249,250,251,0.8) 100%);
+}
+
+/* Navigation Items */
+.nav-group-title {
+  @apply text-[11px] font-semibold text-gray-400 uppercase tracking-wider;
+}
+
+.nav-item {
+  @apply flex items-center px-3 py-2.5 text-sm font-medium rounded-xl;
+  transition: all 0.15s ease-out;
+}
+
+.nav-item-active {
+  @apply text-indigo-700 shadow-sm;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(217, 70, 239, 0.06) 100%);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+}
+
+.nav-item-inactive {
+  @apply text-gray-600 border border-transparent;
+}
+
+.nav-item-inactive:hover {
+  @apply bg-gray-50/80 text-gray-900;
+}
+
+.nav-icon-container {
+  @apply mr-3 shrink-0 p-1 rounded-lg;
+  transition: all 0.15s ease-out;
+}
+
+.nav-icon-active {
+  @apply text-indigo-600 bg-indigo-100/60;
+}
+
+.nav-icon-inactive {
+  @apply text-gray-400;
+}
+
+.nav-item:hover .nav-icon-inactive {
+  @apply text-gray-600 bg-gray-100;
+}
+
+.nav-active-indicator {
+  @apply w-2 h-2 rounded-full;
+  background: linear-gradient(135deg, #6366f1 0%, #d946ef 100%);
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+}
+
+/* User Profile Card */
+.user-profile-card {
+  @apply flex items-center space-x-3 p-2 rounded-xl;
+  transition: background-color 0.15s ease-out;
+}
+
+.user-profile-card:hover {
+  @apply bg-white;
+}
+
+.user-avatar {
+  @apply w-10 h-10 rounded-full flex items-center justify-center 
+         text-white text-sm font-bold shadow-lg;
+  background: linear-gradient(135deg, #6366f1 0%, #d946ef 100%);
+  box-shadow: 0 4px 12px -2px rgba(99, 102, 241, 0.35);
+}
+
+/* ============================================
+   LAYOUT - Navbar
+   ============================================ */
+
+.navbar {
+  @apply sticky top-0 z-40 border-b border-gray-200/60;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.navbar-inner {
+  @apply max-w-7xl mx-auto px-4 flex justify-between items-center h-14;
+}
+
+@media (min-width: 640px) {
+  .navbar-inner {
+    @apply px-6;
+  }
+}
+
+@media (min-width: 1024px) {
+  .navbar-inner {
+    @apply px-8;
+  }
+}
+
+.navbar-menu-btn {
+  @apply mr-2 p-2 -ml-1 rounded-xl text-gray-500 
+         hover:bg-gray-100 hover:text-gray-700 
+         focus:outline-none select-none;
+  transition: all 0.15s ease-out;
+}
+
+.navbar-menu-btn:active {
+  transform: scale(0.97);
+}
+
+.navbar-logo {
+  @apply w-9 h-9 rounded-xl flex items-center justify-center shadow-md;
+  background: linear-gradient(135deg, #6366f1 0%, #d946ef 100%);
+}
+
+.navbar-icon-btn {
+  @apply relative p-2 rounded-xl text-gray-500 
+         hover:bg-gray-100 hover:text-gray-700
+         items-center justify-center select-none;
+  transition: all 0.15s ease-out;
+}
+
+.navbar-icon-btn:active {
+  transform: scale(0.97);
+}
+
+.notification-badge {
+  @apply absolute -top-0.5 -right-0.5 w-4 h-4 
+         text-[10px] font-bold text-white 
+         flex items-center justify-center rounded-full;
+  background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+}
+
+/* User Menu */
+.user-menu-btn {
+  @apply flex items-center gap-2 px-2 py-1.5 rounded-xl select-none;
+  transition: all 0.15s ease-out;
+}
+
+.user-menu-btn:active {
+  transform: scale(0.97);
+}
+
+.user-menu-btn:hover,
+.user-menu-btn-active {
+  @apply bg-gray-100/80;
+}
+
+.user-avatar-sm {
+  @apply w-8 h-8 rounded-full flex items-center justify-center 
+         text-white text-xs font-bold shadow-md;
+  background: linear-gradient(135deg, #6366f1 0%, #d946ef 100%);
+}
+
+.user-avatar-md {
+  @apply w-10 h-10 rounded-full flex items-center justify-center 
+         text-white text-sm font-bold shadow-lg;
+  background: linear-gradient(135deg, #6366f1 0%, #d946ef 100%);
+  box-shadow: 0 4px 12px -2px rgba(99, 102, 241, 0.35);
+}
+
+/* Dropdown Menu */
+.dropdown-backdrop {
+  @apply fixed inset-0;
+  z-index: 9998;
+}
+
+.dropdown-menu {
+  @apply w-64 rounded-2xl shadow-2xl bg-white overflow-hidden;
+  border: 1px solid rgba(99, 102, 241, 0.1);
+  box-shadow: 
+    0 20px 40px -12px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(0, 0, 0, 0.03);
+}
+
+.dropdown-header {
+  @apply px-4 py-3.5 border-b border-gray-100;
+  background: linear-gradient(180deg, rgba(99, 102, 241, 0.03) 0%, transparent 100%);
+}
+
+.dropdown-role-badge {
+  @apply px-2 py-0.5 text-[10px] font-semibold rounded-full 
+         text-indigo-600 bg-indigo-50 border border-indigo-100;
+}
+
+.dropdown-dept-badge {
+  @apply px-2 py-0.5 text-[10px] font-medium rounded-full 
+         text-gray-500 bg-gray-100;
+}
+
+.dropdown-body {
+  @apply py-1.5;
+}
+
+.dropdown-item {
+  @apply flex items-center gap-3 px-4 py-2.5 text-left w-full;
+  transition: background-color 0.12s ease-out;
+}
+
+.dropdown-item:hover {
+  @apply bg-gray-50;
+}
+
+.dropdown-item:active {
+  @apply bg-gray-100;
+}
+
+.dropdown-item-icon {
+  @apply w-8 h-8 rounded-lg flex items-center justify-center shrink-0;
+}
+
+.dropdown-item-icon-default {
+  @apply bg-gray-100 text-gray-600;
+}
+
+.dropdown-item:hover .dropdown-item-icon-default {
+  @apply bg-indigo-100 text-indigo-600;
+}
+
+.dropdown-item-icon-danger {
+  @apply bg-red-50 text-red-500;
+}
+
+.dropdown-item-label {
+  @apply block text-sm font-medium text-gray-700;
+}
+
+.dropdown-item-desc {
+  @apply block text-[11px] text-gray-400 leading-tight;
+}
+
+.dropdown-item-danger .dropdown-item-label {
+  @apply text-red-600;
+}
+
+.dropdown-footer {
+  @apply py-1.5 border-t border-gray-100;
+}
+
+/* ============================================
+   LAYOUT - App Layout
+   ============================================ */
+
+.app-layout {
+  @apply min-h-screen flex;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.app-main {
+  @apply flex-1 flex flex-col min-w-0;
+}
+
+.app-content {
+  @apply flex-1 overflow-y-auto;
+}
+
+.app-content-inner {
+  @apply max-w-7xl mx-auto px-4 py-5;
+  min-height: calc(100vh - 3.5rem);
+}
+
+@media (min-width: 640px) {
+  .app-content-inner {
+    @apply px-6 py-6;
+  }
+}
+
+@media (min-width: 1024px) {
+  .app-content-inner {
+    @apply px-8 py-8;
+  }
 }

@@ -1,20 +1,31 @@
 <template>
   <AppLayout>
     <!-- Welcome Section -->
-    <div class="mb-8 animate-fade-in">
+    <Motion
+      :initial="{ opacity: 0, y: 10 }"
+      :animate="{ opacity: 1, y: 0 }"
+      :transition="{ duration: 0.3, ease: 'easeOut' }"
+      class="mb-8"
+    >
       <h1 class="text-3xl font-bold text-gray-900 mb-2">
         Selamat Datang, {{ user?.full_name }}!
       </h1>
       <p class="text-gray-600">Dashboard Administrator - Sistem Produksi Pita Cukai</p>
-    </div>
+    </Motion>
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <div 
+      <Motion 
         v-for="(stat, index) in stats" 
         :key="index"
-        class="glass-card p-6 rounded-2xl transform transition-all duration-300 hover:scale-105 cursor-pointer"
-        :style="{ animationDelay: `${index * 100}ms` }"
+        :initial="{ opacity: 0, y: 15 }"
+        :animate="{ opacity: 1, y: 0 }"
+        :transition="{ 
+          duration: 0.25, 
+          delay: index * 0.05,
+          ease: 'easeOut'
+        }"
+        class="glass-card p-6 rounded-2xl active-scale cursor-pointer"
       >
         <div class="flex items-center justify-between">
           <div>
@@ -26,17 +37,22 @@
             <component :is="stat.icon" class="w-6 h-6 text-white" />
           </div>
         </div>
-      </div>
+      </Motion>
     </div>
 
     <!-- Quick Actions -->
-    <div class="mb-8">
+    <Motion
+      :initial="{ opacity: 0 }"
+      :animate="{ opacity: 1 }"
+      :transition="{ duration: 0.25, delay: 0.2 }"
+      class="mb-8"
+    >
       <h2 class="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <button 
           v-for="(action, index) in quickActions" 
           :key="index"
-          class="glass-card p-4 rounded-xl flex flex-col items-center justify-center space-y-2 hover:bg-indigo-50 transition-colors active-scale"
+          class="glass-card p-4 rounded-xl flex flex-col items-center justify-center space-y-2 hover:bg-indigo-50 active-scale"
         >
           <div :class="`w-10 h-10 rounded-lg ${action.bgColor} flex items-center justify-center`">
             <component :is="action.icon" class="w-5 h-5 text-white" />
@@ -44,16 +60,21 @@
           <span class="text-sm font-medium text-gray-700">{{ action.label }}</span>
         </button>
       </div>
-    </div>
+    </Motion>
 
     <!-- Recent Activity -->
-    <div class="glass-card p-6 rounded-2xl">
+    <Motion
+      :initial="{ opacity: 0, y: 10 }"
+      :animate="{ opacity: 1, y: 0 }"
+      :transition="{ duration: 0.25, delay: 0.25 }"
+      class="glass-card p-6 rounded-2xl"
+    >
       <h2 class="text-xl font-semibold text-gray-900 mb-4">Aktivitas Terkini</h2>
       <div class="space-y-4">
         <div 
           v-for="(activity, index) in recentActivities" 
           :key="index"
-          class="flex items-center space-x-4 p-3 rounded-xl hover:bg-gray-50 transition-colors"
+          class="flex items-center space-x-4 p-3 rounded-xl hover:bg-gray-50"
         >
           <div :class="`w-10 h-10 rounded-full ${activity.bgColor} flex items-center justify-center shrink-0`">
             <span class="text-white font-semibold">{{ activity.initial }}</span>
@@ -67,15 +88,15 @@
           </div>
         </div>
       </div>
-    </div>
+    </Motion>
   </AppLayout>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useAuthStore } from '../../stores/auth'
 import AppLayout from '../../components/layout/AppLayout.vue'
-import { animate, stagger } from 'motion-v'
+import { Motion } from 'motion-v'
 import { 
   Users, 
   ClipboardList, 
@@ -169,16 +190,4 @@ const recentActivities = ref([
     bgColor: 'bg-emerald-500',
   },
 ])
-
-onMounted(() => {
-  // Staggered animation untuk stats cards
-  animate(
-    '.glass-card',
-    { opacity: [0, 1], transform: ['translateY(20px)', 'translateY(0)'] },
-    { duration: 0.5, delay: stagger(0.1) }
-  )
-})
 </script>
-
-<style scoped>
-</style>

@@ -15,5 +15,3 @@ export { default as PasswordConfirmDialog } from './PasswordConfirmDialog.vue'
 // Other Common Components
 export { default as Breadcrumbs } from './Breadcrumbs.vue'
 
-// Example Component (untuk development/testing)
-export { default as ModalExamples } from './ModalExamples.vue'

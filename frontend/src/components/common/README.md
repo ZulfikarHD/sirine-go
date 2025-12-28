@@ -1,112 +1,148 @@
-# Common Components
+# Common Components - Modal System
 
 ## Overview
 
-Common components merupakan kumpulan reusable UI components yang digunakan di seluruh aplikasi, yaitu: modal system, dialogs, breadcrumbs, dan shared UI elements dengan consistent design language dan behavior patterns.
+Modal system dengan iOS-inspired design yang mengimplementasikan:
+- **Spring Physics**: Natural, bouncy animations dengan motion-v
+- **Glass Morphism**: Frosted glass effect dengan backdrop blur
+- **Indigo-Fuchsia Theme**: Gradient theme yang modern dan techy
+- **Press Feedback**: Scale-down effect saat element di-tap (0.97 scale)
+- **Haptic Feedback**: Vibration API untuk tactile response
+- **Mobile-First**: Bottom sheet style pada mobile dengan drag handle
 
 ## Components
 
-### Modal System
+### 1. BaseModal
+Modal dasar yang reusable untuk CRUD operations dan custom content.
 
-#### BaseModal
-Core modal component untuk CRUD operations, form submissions, dan general-purpose dialogs.
-
-```javascript
-import { BaseModal } from '@/components/common'
+```vue
+<BaseModal
+  v-model="isOpen"
+  title="Tambah Data"
+  subtitle="Isi form berikut"
+  title-gradient
+  size="md"
+  :show-footer="true"
+  :loading="loading"
+  @confirm="handleSubmit"
+  @cancel="handleCancel"
+>
+  <!-- Content -->
+</BaseModal>
 ```
 
-**Use Cases:**
-- Form modals (create/edit)
-- Detail views
-- Multi-step wizards
-- Content previews
+**Props:**
+- `size`: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full'
+- `title-gradient`: Boolean - Menggunakan gradient Indigo-Fuchsia
+- `confirm-danger`: Boolean - Menggunakan danger button style
 
-#### ConfirmDialog
-Specialized confirmation dialog untuk user action confirmations.
+### 2. ConfirmDialog
+Dialog konfirmasi dengan animated icons dan variant-based styling.
 
-```javascript
-import { ConfirmDialog } from '@/components/common'
+```vue
+<ConfirmDialog
+  v-model="isOpen"
+  title="Hapus Data"
+  message="Yakin ingin menghapus?"
+  variant="danger"
+  :show-warning="true"
+  @confirm="handleDelete"
+/>
 ```
 
-**Use Cases:**
-- Delete confirmations
-- Destructive action warnings
-- Navigation confirmations
-- Save/discard prompts
+**Variants:**
+- `default`: Indigo theme dengan HelpCircle icon
+- `danger`: Red-Pink gradient dengan Trash icon
+- `warning`: Amber theme dengan AlertTriangle icon
+- `success`: Emerald theme dengan CheckCircle icon
+- `info`: Blue theme dengan AlertCircle icon
 
-#### AlertDialog
-Notification dialog untuk success, error, warning, dan info messages.
+### 3. AlertDialog
+Alert/notification dialog dengan auto-dismiss dan visual timer.
 
-```javascript
-import { AlertDialog } from '@/components/common'
+```vue
+<AlertDialog
+  v-model="isOpen"
+  message="Data berhasil disimpan!"
+  variant="success"
+  :auto-dismiss="true"
+  :auto-dismiss-delay="3000"
+/>
 ```
 
-**Use Cases:**
-- Success notifications
-- Error messages
-- Warning alerts
-- Info announcements
+**Variants:**
+- `success`: Emerald dengan pulse animation
+- `error`: Red dengan XCircle icon
+- `warning`: Amber dengan AlertTriangle icon
+- `info`: Blue dengan Info icon
 
-### Navigation
+### 4. PasswordConfirmDialog
+Password verification dialog untuk sensitive actions.
 
-#### Breadcrumbs
-Breadcrumb navigation component untuk hierarchical navigation.
-
-```javascript
-import { Breadcrumbs } from '@/components/common'
+```vue
+<PasswordConfirmDialog
+  v-model="isOpen"
+  title="Konfirmasi Password"
+  message="Masukkan password untuk melanjutkan"
+  :show-security-notice="true"
+  @confirm="handleVerify"
+/>
 ```
-
-## Quick Import
-
-```javascript
-// Import individual components
-import { 
-  BaseModal, 
-  ConfirmDialog, 
-  AlertDialog,
-  Breadcrumbs 
-} from '@/components/common'
-
-// Import composables
-import { 
-  useModal, 
-  useConfirmDialog, 
-  useAlertDialog 
-} from '@/composables/useModal'
-```
-
-## Documentation
-
-- **Modal System Full Docs:** `/docs/components/modal-system.md`
-- **Quick Start Guide:** `/docs/components/QUICK_START_MODAL.md`
-- **Interactive Examples:** Navigate to `/dev/modal-examples`
 
 ## Design Principles
 
-Semua components mengikuti design standards:
-- ✅ iOS-inspired animations
-- ✅ Indigo & Fuchsia color theme
-- ✅ Mobile-first responsive
-- ✅ Glass morphism effects
-- ✅ Haptic feedback
-- ✅ Press feedback
-- ✅ Spring physics animations
+### iOS-Inspired Animations
+- Spring physics dengan stiffness: 380, damping: 32
+- Staggered entrance animations dengan delay
+- Pulse rings untuk success states
+- Shake animation untuk error states
 
-## Development
+### Glass Morphism
+- Backdrop blur: 8-20px
+- Semi-transparent backgrounds
+- Subtle borders dengan opacity
+- Gradient shadows
 
-### Adding New Components
+### Theme Colors
+- Primary: Indigo (#6366f1) to Fuchsia (#d946ef)
+- Success: Emerald (#10b981)
+- Danger: Red (#ef4444) to Pink (#ec4899)
+- Warning: Amber (#f59e0b)
+- Info: Blue (#3b82f6)
 
-1. Create component file di `/components/common/`
-2. Follow naming convention: PascalCase
-3. Add comprehensive JSDoc comments
-4. Export dari `index.js`
-5. Add documentation
-6. Create usage examples
+## Composables
 
-### Testing Components
+Gunakan composables untuk programmatic control:
 
-Use ModalExamples.vue sebagai template untuk creating interactive component demos.
+```javascript
+import { useModal, useConfirmDialog, useAlertDialog } from '@/composables/useModal'
 
-## Support
+const modal = useModal()
+const confirm = useConfirmDialog()
+const alert = useAlertDialog()
 
-Developer: Zulfikar Hidayatullah (+62 857-1583-8733)
+// Confirm dialog
+const result = await confirm.confirm({
+  title: 'Hapus Data',
+  message: 'Yakin?',
+  variant: 'danger'
+})
+
+// Alert dialog
+await alert.success('Berhasil!')
+await alert.error('Gagal!')
+```
+
+## CSS Classes
+
+Semua styles didefinisikan di `src/style.css`:
+- `.modal-backdrop` - Frosted glass backdrop
+- `.modal-container` - Glass card container
+- `.modal-header` - Header dengan gradient accent
+- `.modal-btn-primary` - Gradient primary button
+- `.modal-btn-danger` - Gradient danger button
+- `.dialog-icon-*` - Icon container variants
+
+## Developer
+
+Zulfikar Hidayatullah (+62 857-1583-8733)

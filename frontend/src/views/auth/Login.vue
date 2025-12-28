@@ -1,12 +1,12 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-linear-to-br from-indigo-50 via-fuchsia-50 to-indigo-100 p-4">
-    <!-- Login Card dengan glass effect -->
-    <div 
+    <!-- Login Card -->
+    <Motion
+      v-bind="entranceAnimations.fadeScale"
       class="w-full max-w-md"
-      :style="cardAnimation"
     >
       <!-- Glass Card -->
-      <div class="glass-card rounded-3xl p-8 shadow-2xl backdrop-blur-xl bg-white/80 border border-white/20">
+      <div ref="cardRef" class="glass-card rounded-3xl p-8 shadow-2xl bg-white/90 border border-white/20">
         <!-- Logo & Title -->
         <div class="text-center mb-8">
           <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-linear-to-br from-indigo-500 to-fuchsia-600 mb-4 shadow-lg">
@@ -19,12 +19,15 @@
         </div>
 
         <!-- Error Message -->
-        <div 
-          v-if="errorMessage" 
-          class="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 animate-shake"
+        <Motion
+          v-if="errorMessage"
+          :initial="{ opacity: 0, x: -10 }"
+          :animate="{ opacity: 1, x: 0 }"
+          :transition="{ ...springPresets.snappy }"
+          class="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200"
         >
           <p class="text-red-600 text-sm text-center font-medium">{{ errorMessage }}</p>
-        </div>
+        </Motion>
 
         <!-- Login Form -->
         <form @submit.prevent="handleLogin" class="space-y-5">
@@ -40,7 +43,7 @@
               placeholder="Masukkan NIP atau Email"
               required
               class="input-field"
-              :class="{ 'border-red-300': errors.nip }"
+              :class="{ 'border-red-300!': errors.nip }"
               @focus="clearError('nip')"
             />
             <p v-if="errors.nip" class="mt-1 text-xs text-red-600">{{ errors.nip }}</p>
@@ -59,13 +62,13 @@
                 placeholder="Masukkan password"
                 required
                 class="input-field pr-12"
-                :class="{ 'border-red-300': errors.password }"
+                :class="{ 'border-red-300!': errors.password }"
                 @focus="clearError('password')"
               />
               <button
                 type="button"
                 @click="showPassword = !showPassword"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors active-scale"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 active-scale"
               >
                 <svg v-if="!showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -100,10 +103,7 @@
           >
             <span v-if="!isLoading">Masuk</span>
             <span v-else class="flex items-center justify-center">
-              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
+              <div class="modal-spinner mr-3"></div>
               Memproses...
             </span>
           </button>
@@ -114,19 +114,23 @@
           <p>© 2025 Sirine Go - Sistem Produksi Pita Cukai</p>
         </div>
       </div>
-    </div>
+    </Motion>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref } from 'vue'
+import { Motion, animate } from 'motion-v'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuth } from '../../composables/useAuth'
-import { animate } from 'motion-v'
+import { entranceAnimations, springPresets, shakeAnimation } from '../../composables/useMotion'
 
 const router = useRouter()
 const route = useRoute()
-const { login, isLoading, error, getDashboardRoute, triggerHapticFeedback } = useAuth()
+const { login, isLoading, getDashboardRoute, triggerHapticFeedback } = useAuth()
+
+// Refs
+const cardRef = ref(null)
 
 // Form state
 const form = ref({
@@ -142,22 +146,6 @@ const errors = ref({
 })
 const errorMessage = ref('')
 
-// Animations
-const cardAnimation = ref({})
-
-onMounted(() => {
-  // Spring entrance animation untuk card
-  try {
-    animate(
-      '.glass-card',
-      { opacity: [0, 1], transform: ['scale(0.95)', 'scale(1)'] },
-      { duration: 0.6, easing: [0.34, 1.56, 0.64, 1] }
-    )
-  } catch (error) {
-    console.log('Animation not available:', error)
-  }
-})
-
 /**
  * Clear error untuk field tertentu
  */
@@ -167,12 +155,22 @@ const clearError = (field) => {
 }
 
 /**
- * Handle login form submission dengan validasi flexible untuk NIP atau Email
- * Memastikan tidak ada full page reload dengan proper error handling
+ * Shake card animation untuk error
+ */
+const shakeCard = () => {
+  if (cardRef.value) {
+    animate(
+      cardRef.value,
+      { x: [0, -8, 8, -8, 0] },
+      { duration: 0.4 }
+    )
+  }
+}
+
+/**
+ * Handle login form submission
  */
 const handleLogin = async (event) => {
-  // CRITICAL: Prevent default form submission behavior untuk avoid full reload
-  // This is a safeguard even though form has @submit.prevent
   event?.preventDefault()
   event?.stopPropagation()
 
@@ -192,7 +190,7 @@ const handleLogin = async (event) => {
   }
 
   try {
-    const response = await login(
+    await login(
       form.value.nip.trim(),
       form.value.password,
       form.value.rememberMe
@@ -202,30 +200,17 @@ const handleLogin = async (event) => {
     const redirectPath = route.query.redirect || getDashboardRoute()
     await router.push(redirectPath)
 
-    // Trigger success haptic
     triggerHapticFeedback('success')
 
   } catch (err) {
-    // Handle error tanpa page reload
     console.error('Login error:', err)
     errorMessage.value = err.response?.data?.message || 'NIP/Email atau password salah'
     
     // Shake animation untuk error
-    try {
-      animate(
-        '.glass-card',
-        { transform: ['translateX(0)', 'translateX(-10px)', 'translateX(10px)', 'translateX(-10px)', 'translateX(0)'] },
-        { duration: 0.4 }
-      )
-    } catch (animError) {
-      console.log('Animation error:', animError)
-    }
-
-    // Trigger error haptic
+    shakeCard()
     triggerHapticFeedback('error')
   }
   
-  // Ensure we never reload
   return false
 }
 </script>

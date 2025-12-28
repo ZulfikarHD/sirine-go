@@ -3,6 +3,7 @@
     v-model="isOpen"
     :title="title"
     :subtitle="subtitle"
+    title-gradient
     size="sm"
     :show-footer="true"
     :show-cancel="true"
@@ -17,49 +18,45 @@
     @cancel="handleCancel"
     @close="handleClose"
   >
-    <!-- Icon dengan Animated Scale -->
+    <!-- Security Icon -->
     <Motion
-      :initial="{ scale: 0, rotate: -180 }"
-      :animate="{ scale: 1, rotate: 0 }"
-      :transition="{ 
-        duration: 0.5,
-        type: 'spring',
-        stiffness: 200,
-        damping: 15
-      }"
+      v-bind="iconAnimations.popIn"
       class="flex justify-center mb-6"
     >
-      <div class="w-20 h-20 rounded-full bg-indigo-100 flex items-center justify-center">
-        <ShieldCheck class="w-10 h-10 text-indigo-600" />
+      <div class="dialog-icon-container dialog-icon-default">
+        <ShieldCheck class="w-10 h-10" :stroke-width="1.5" />
       </div>
     </Motion>
 
     <!-- Message Content -->
-    <div class="text-center space-y-3 mb-6">
+    <Motion
+      v-bind="entranceAnimations.fadeUp"
+      class="text-center space-y-2 mb-6"
+    >
       <p v-if="message" class="text-base text-gray-700 leading-relaxed">
         {{ message }}
       </p>
       <p v-if="detail" class="text-sm text-gray-500">
         {{ detail }}
       </p>
-    </div>
+    </Motion>
 
-    <!-- Password Input -->
+    <!-- Password Input Field -->
     <Motion
       :initial="{ opacity: 0, y: 10 }"
       :animate="{ opacity: 1, y: 0 }"
-      :transition="{ duration: 0.4, delay: 0.2 }"
+      :transition="{ duration: 0.25, delay: 0.1, ease: 'easeOut' }"
     >
       <div class="space-y-2">
         <label class="block text-sm font-semibold text-gray-700">
-          Password <span class="text-red-500">*</span>
+          Password <span class="text-fuchsia-500">*</span>
         </label>
-        <div class="relative">
+        <div class="password-input-wrapper">
           <input
             ref="passwordInput"
             v-model="password"
             :type="showPassword ? 'text' : 'password'"
-            class="input-field pr-12"
+            class="password-input-field"
             placeholder="Masukkan password Anda"
             autocomplete="current-password"
             :disabled="loading"
@@ -68,15 +65,15 @@
           <button
             type="button"
             @click="togglePasswordVisibility"
-            class="absolute right-3 top-1/2 -translate-y-1/2 p-2 hover:bg-gray-100 rounded-lg transition-colors active:scale-95"
+            class="password-toggle-btn"
             :disabled="loading"
           >
-            <EyeOff v-if="showPassword" class="w-5 h-5 text-gray-500" />
-            <Eye v-else class="w-5 h-5 text-gray-500" />
+            <EyeOff v-if="showPassword" />
+            <Eye v-else />
           </button>
         </div>
-        <p class="text-xs text-gray-500">
-          Konfirmasi password Anda untuk melanjutkan tindakan ini
+        <p class="text-xs text-gray-400">
+          Konfirmasi password Anda untuk melanjutkan
         </p>
       </div>
     </Motion>
@@ -86,32 +83,32 @@
       v-if="errorMessage"
       :initial="{ opacity: 0, x: -10 }"
       :animate="{ opacity: 1, x: 0 }"
-      :transition="{ duration: 0.3 }"
-      class="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl"
+      :transition="{ ...springPresets.snappy }"
+      class="dialog-error-box"
     >
       <div class="flex items-start gap-3">
-        <AlertCircle class="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+        <AlertCircle class="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
         <div class="flex-1">
-          <p class="text-sm font-semibold text-red-900">Password Salah</p>
-          <p class="text-sm text-red-700 mt-1">
+          <p class="text-sm font-semibold text-red-800">Verifikasi Gagal</p>
+          <p class="text-sm text-red-600 mt-1">
             {{ errorMessage }}
           </p>
         </div>
       </div>
     </Motion>
 
-    <!-- Security Notice (opsional) -->
+    <!-- Security Notice -->
     <Motion
       v-if="showSecurityNotice"
-      :initial="{ opacity: 0, y: 10 }"
-      :animate="{ opacity: 1, y: 0 }"
-      :transition="{ duration: 0.4, delay: 0.3 }"
-      class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl"
+      :initial="{ opacity: 0 }"
+      :animate="{ opacity: 1 }"
+      :transition="{ duration: 0.2, delay: 0.15 }"
+      class="dialog-info-box"
     >
       <div class="flex items-start gap-3">
-        <Info class="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-        <p class="text-sm text-blue-700">
-          {{ securityNotice || 'Password Anda tidak akan disimpan dan hanya digunakan untuk verifikasi tindakan ini.' }}
+        <Info class="dialog-info-box-icon" />
+        <p class="dialog-info-box-text">
+          {{ securityNotice || 'Password Anda tidak akan disimpan dan hanya digunakan untuk verifikasi.' }}
         </p>
       </div>
     </Motion>
@@ -119,7 +116,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 import { Motion } from 'motion-v'
 import { 
   ShieldCheck, 
@@ -129,12 +126,11 @@ import {
   Info
 } from 'lucide-vue-next'
 import BaseModal from './BaseModal.vue'
+import { entranceAnimations, iconAnimations, springPresets } from '../../composables/useMotion'
 
 /**
- * PasswordConfirmDialog - Komponen untuk password confirmation yang digunakan
- * untuk memverifikasi identitas user sebelum melakukan sensitive actions
- * seperti delete account, change settings, atau approve critical operations
- * dengan security-focused design dan clear error handling
+ * PasswordConfirmDialog - Komponen untuk password confirmation
+ * dengan security-focused UX dan Motion-V animations
  */
 
 const props = defineProps({
@@ -142,8 +138,6 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-
-  // Content props
   title: {
     type: String,
     default: 'Konfirmasi Password'
@@ -160,14 +154,10 @@ const props = defineProps({
     type: String,
     default: ''
   },
-
-  // Button text
   confirmText: {
     type: String,
     default: 'Verifikasi'
   },
-
-  // Security notice
   showSecurityNotice: {
     type: Boolean,
     default: true
@@ -176,14 +166,10 @@ const props = defineProps({
     type: String,
     default: ''
   },
-
-  // Validation function (opsional - untuk client-side check)
   validatePassword: {
     type: Function,
     default: null
   },
-
-  // Auto-clear password on close
   autoClearPassword: {
     type: Boolean,
     default: true
@@ -199,15 +185,12 @@ const showPassword = ref(false)
 const errorMessage = ref('')
 const passwordInput = ref(null)
 
-// Watch modelValue untuk sync
 watch(() => props.modelValue, (newValue) => {
   isOpen.value = newValue
   if (newValue) {
-    // Focus input saat modal dibuka
     nextTick(() => {
       passwordInput.value?.focus()
     })
-    // Clear previous state
     errorMessage.value = ''
     if (props.autoClearPassword) {
       password.value = ''
@@ -220,10 +203,9 @@ watch(isOpen, (newValue) => {
   emit('update:modelValue', newValue)
 })
 
-// Toggle password visibility
+// Toggle password visibility dengan haptic
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value
-  // Trigger light haptic
   if ('vibrate' in navigator) {
     navigator.vibrate(10)
   }
@@ -237,24 +219,25 @@ const handleConfirm = async () => {
   loading.value = true
 
   try {
-    // Client-side validation jika ada
     if (props.validatePassword) {
       const isValid = await props.validatePassword(password.value)
       if (!isValid) {
         errorMessage.value = 'Password yang Anda masukkan tidak valid.'
         loading.value = false
+        if ('vibrate' in navigator) {
+          navigator.vibrate([30, 100, 30])
+        }
         return
       }
     }
 
-    // Emit password untuk parent component verify
     emit('confirm', password.value)
-    
-    // Note: Parent component harus handle verification dan close modal
-    // Jangan auto-close disini karena parent perlu verify dulu
   } catch (error) {
     errorMessage.value = error.message || 'Terjadi kesalahan saat verifikasi.'
     loading.value = false
+    if ('vibrate' in navigator) {
+      navigator.vibrate([30, 100, 30])
+    }
   }
 }
 
@@ -281,11 +264,10 @@ const handleClose = () => {
   emit('close')
 }
 
-// Public methods untuk parent component
+// Public methods
 const setError = (message) => {
   errorMessage.value = message
   loading.value = false
-  // Shake animation via haptic
   if ('vibrate' in navigator) {
     navigator.vibrate([30, 100, 30])
   }
@@ -300,7 +282,6 @@ const close = () => {
   handleClose()
 }
 
-// Expose methods
 defineExpose({
   setError,
   setLoading,

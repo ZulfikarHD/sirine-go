@@ -1,14 +1,17 @@
 <template>
   <AppLayout>
     <!-- Profile Header -->
-    <div class="glass-card p-8 rounded-2xl mb-6">
+    <Motion
+      v-bind="entranceAnimations.fadeUp"
+      class="glass-card p-8 rounded-2xl mb-6"
+    >
       <div class="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-6">
         <!-- Avatar -->
         <div class="relative">
           <div class="w-24 h-24 rounded-full bg-linear-to-br from-indigo-500 to-fuchsia-600 flex items-center justify-center text-white text-3xl font-bold shadow-xl">
             {{ userInitial }}
           </div>
-          <button class="absolute bottom-0 right-0 w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white shadow-lg hover:bg-indigo-700 transition-colors">
+          <button class="absolute bottom-0 right-0 w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white shadow-lg hover:bg-indigo-700">
             <Camera class="w-4 h-4" />
           </button>
         </div>
@@ -43,40 +46,57 @@
           </div>
         </div>
       </div>
-    </div>
+    </Motion>
 
     <!-- Actions -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-      <button 
-        @click="router.push('/profile/edit')"
-        class="glass-card p-6 rounded-2xl hover:shadow-lg transition-all text-left active-scale"
+      <Motion
+        :initial="{ opacity: 0, y: 15 }"
+        :animate="{ opacity: 1, y: 0 }"
+        :transition="{ duration: 0.25, delay: 0.1, ease: 'easeOut' }"
       >
-        <div class="flex items-center space-x-4">
-          <div class="w-12 h-12 rounded-xl bg-indigo-500 flex items-center justify-center">
-            <UserCog class="w-6 h-6 text-white" />
+        <button 
+          @click="router.push('/profile/edit')"
+          class="glass-card p-6 rounded-2xl hover:shadow-lg text-left active-scale w-full"
+        >
+          <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-xl bg-indigo-500 flex items-center justify-center">
+              <UserCog class="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 class="font-semibold text-gray-900">Edit Profile</h3>
+              <p class="text-sm text-gray-600">Ubah informasi profile Anda</p>
+            </div>
           </div>
-          <div>
-            <h3 class="font-semibold text-gray-900">Edit Profile</h3>
-            <p class="text-sm text-gray-600">Ubah informasi profile Anda</p>
-          </div>
-        </div>
-      </button>
+        </button>
+      </Motion>
 
-      <button class="glass-card p-6 rounded-2xl hover:shadow-lg transition-all text-left active-scale">
-        <div class="flex items-center space-x-4">
-          <div class="w-12 h-12 rounded-xl bg-fuchsia-500 flex items-center justify-center">
-            <Lock class="w-6 h-6 text-white" />
+      <Motion
+        :initial="{ opacity: 0, y: 15 }"
+        :animate="{ opacity: 1, y: 0 }"
+        :transition="{ duration: 0.25, delay: 0.15, ease: 'easeOut' }"
+      >
+        <button class="glass-card p-6 rounded-2xl hover:shadow-lg text-left active-scale w-full">
+          <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-xl bg-fuchsia-500 flex items-center justify-center">
+              <Lock class="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 class="font-semibold text-gray-900">Ganti Password</h3>
+              <p class="text-sm text-gray-600">Update password keamanan Anda</p>
+            </div>
           </div>
-          <div>
-            <h3 class="font-semibold text-gray-900">Ganti Password</h3>
-            <p class="text-sm text-gray-600">Update password keamanan Anda</p>
-          </div>
-        </div>
-      </button>
+        </button>
+      </Motion>
     </div>
 
     <!-- Account Info -->
-    <div class="glass-card p-6 rounded-2xl">
+    <Motion
+      :initial="{ opacity: 0, y: 15 }"
+      :animate="{ opacity: 1, y: 0 }"
+      :transition="{ duration: 0.25, delay: 0.2, ease: 'easeOut' }"
+      class="glass-card p-6 rounded-2xl"
+    >
       <h2 class="text-xl font-semibold text-gray-900 mb-4">Informasi Akun</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="p-4 bg-gray-50 rounded-xl">
@@ -96,15 +116,17 @@
           <p class="font-semibold text-gray-900">#{{ user?.id }}</p>
         </div>
       </div>
-    </div>
+    </Motion>
   </AppLayout>
 </template>
 
 <script setup>
 import { computed } from 'vue'
+import { Motion } from 'motion-v'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 import AppLayout from '../../components/layout/AppLayout.vue'
+import { entranceAnimations } from '../../composables/useMotion'
 import { Camera, Mail, IdCard, Phone, UserCog, Lock } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -133,6 +155,3 @@ const formatDate = (dateString) => {
   })
 }
 </script>
-
-<style scoped>
-</style>
