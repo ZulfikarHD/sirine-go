@@ -69,6 +69,16 @@ const routes = [
       roles: ['ADMIN', 'MANAGER'],
     },
   },
+  // Development/Demo routes
+  {
+    path: '/dev/modal-examples',
+    name: 'ModalExamples',
+    component: () => import('../components/common/ModalExamples.vue'),
+    meta: { 
+      requiresAuth: false,
+      title: 'Modal Examples'
+    },
+  },
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
