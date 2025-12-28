@@ -94,6 +94,23 @@ const routes = [
     },
   },
   {
+    path: '/admin/audit',
+    name: 'ActivityLogs',
+    component: () => import('../views/admin/audit/ActivityLogs.vue'),
+    meta: { 
+      requiresAuth: true,
+      roles: ['ADMIN', 'MANAGER'],
+    },
+  },
+  {
+    path: '/notifications',
+    name: 'NotificationCenter',
+    component: () => import('../views/notifications/NotificationCenter.vue'),
+    meta: { 
+      requiresAuth: true,
+    },
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('../views/NotFound.vue'),

@@ -145,7 +145,9 @@ import {
   Siren,
   UserCircle,
   ChevronRight,
-  MoreVertical
+  MoreVertical,
+  Bell,
+  ScrollText
 } from 'lucide-vue-next'
 
 defineProps({
@@ -226,6 +228,7 @@ const navigationGroups = computed(() => {
       title: 'Manajemen',
       items: [
         { name: 'Manajemen User', href: '/admin/users', icon: Users },
+        { name: 'Audit Logs', href: '/admin/audit', icon: ScrollText },
         { name: 'Statistik', href: '/dashboard/stats', icon: BarChart3 },
       ]
     })
@@ -235,6 +238,7 @@ const navigationGroups = computed(() => {
     title: 'Akun',
     items: [
       { name: 'Profile', href: '/profile', icon: UserCircle },
+      { name: 'Notifikasi', href: '/notifications', icon: Bell },
       { name: 'Pengaturan', href: '/dashboard/settings', icon: Settings },
     ]
   })

@@ -76,7 +76,9 @@
         :animate="{ opacity: 1, y: 0 }"
         :transition="{ duration: 0.25, delay: 0.15, ease: 'easeOut' }"
       >
-        <button class="glass-card p-6 rounded-2xl hover:shadow-lg text-left active-scale w-full">
+        <button 
+        @click="router.push('/profile/change-password')" 
+        class="glass-card p-6 rounded-2xl hover:shadow-lg text-left active-scale w-full">
           <div class="flex items-center space-x-4">
             <div class="w-12 h-12 rounded-xl bg-fuchsia-500 flex items-center justify-center">
               <Lock class="w-6 h-6 text-white" />

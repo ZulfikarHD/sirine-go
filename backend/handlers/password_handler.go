@@ -75,7 +75,7 @@ type ForceResetPasswordRequest struct {
 func (h *PasswordHandler) ForceResetPassword(c *gin.Context) {
 	// Get user ID dari URL parameter
 	userIDStr := c.Param("id")
-	userID, err := strconv.ParseUint(userIDStr, 10, 64)
+	_, err := strconv.ParseUint(userIDStr, 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "ID user tidak valid",
@@ -100,7 +100,7 @@ func (h *PasswordHandler) ForceResetPassword(c *gin.Context) {
 	}
 
 	// Hash password
-	hashedPassword, err := h.passwordService.HashPassword(req.NewPassword)
+	_, err = h.passwordService.HashPassword(req.NewPassword)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Gagal memproses password",

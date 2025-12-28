@@ -30,15 +30,8 @@
 
       <!-- Right Section: User Menu -->
       <div class="flex items-center gap-2">
-        <!-- Notification Bell (Placeholder) -->
-        <button 
-          class="navbar-icon-btn hidden sm:flex"
-          aria-label="Notifikasi"
-        >
-          <Bell class="w-5 h-5" />
-          <!-- Notification Badge -->
-          <span class="notification-badge">2</span>
-        </button>
+        <!-- Notification Bell Component -->
+        <NotificationBell />
 
         <!-- User Menu Trigger -->
         <div class="relative" ref="menuRef">
@@ -178,8 +171,9 @@ import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { Motion } from 'motion-v'
 import { useAuthStore } from '@/stores/auth'
 import { useAuth } from '@/composables/useAuth'
-import { Menu, Siren, ChevronDown, User, LogOut, Bell, Settings } from 'lucide-vue-next'
+import { Menu, Siren, ChevronDown, User, LogOut, Settings } from 'lucide-vue-next'
 import Breadcrumbs from '@/components/common/Breadcrumbs.vue'
+import NotificationBell from './NotificationBell.vue'
 
 defineProps({
   showBrand: {

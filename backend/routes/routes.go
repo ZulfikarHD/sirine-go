@@ -90,7 +90,6 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 
 		// Profile routes (Self-service untuk semua authenticated users)
 		profileHandler := handlers.NewProfileHandler(userService)
-		passwordHandler := handlers.NewPasswordHandler(db, cfg)
 
 		profile := api.Group("/profile")
 		profile.Use(middleware.AuthMiddleware(db, cfg))
@@ -99,6 +98,42 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 			profile.GET("", profileHandler.GetProfile)
 			profile.PUT("", profileHandler.UpdateProfile)
 			profile.PUT("/password", passwordHandler.ChangePassword)
+		}
+
+		// Notification routes (Protected - All authenticated users)
+		notificationService := services.NewNotificationService(db)
+		notificationHandler := handlers.NewNotificationHandler(notificationService)
+
+		notifications := api.Group("/notifications")
+		notifications.Use(middleware.AuthMiddleware(db, cfg))
+		{
+			notifications.GET("", notificationHandler.GetUserNotifications)
+			notifications.GET("/unread-count", notificationHandler.GetUnreadCount)
+			notifications.GET("/recent", notificationHandler.GetRecentNotifications)
+			notifications.PUT("/:id/read", notificationHandler.MarkAsRead)
+			notifications.PUT("/read-all", notificationHandler.MarkAllAsRead)
+			notifications.DELETE("/:id", notificationHandler.DeleteNotification)
+		}
+
+		// Activity Log routes (Admin only)
+		activityLogService := services.NewActivityLogService(db)
+		activityLogHandler := handlers.NewActivityLogHandler(activityLogService)
+
+		activityLogs := api.Group("/admin/activity-logs")
+		activityLogs.Use(middleware.AuthMiddleware(db, cfg))
+		activityLogs.Use(middleware.RequireRole("ADMIN", "MANAGER"))
+		{
+			activityLogs.GET("", activityLogHandler.GetActivityLogs)
+			activityLogs.GET("/stats", activityLogHandler.GetActivityStats)
+			activityLogs.GET("/:id", activityLogHandler.GetActivityLogByID)
+			activityLogs.GET("/user/:id", activityLogHandler.GetUserActivity)
+		}
+
+		// Profile activity logs (Self-service)
+		profileActivity := api.Group("/profile")
+		profileActivity.Use(middleware.AuthMiddleware(db, cfg))
+		{
+			profileActivity.GET("/activity", activityLogHandler.GetMyActivity)
 		}
 
 		// Example routes (protected) - Commented out for Sprint 1
