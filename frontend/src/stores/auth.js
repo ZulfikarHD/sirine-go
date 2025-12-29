@@ -59,8 +59,9 @@ export const useAuthStore = defineStore('auth', () => {
   /**
    * Validate JWT token format dan struktur
    * untuk memastikan token valid sebelum digunakan
+   * Note: Tidak check expiry untuk access token, biarkan interceptor handle dengan refresh token
    */
-  const isValidTokenFormat = (token) => {
+  const isValidTokenFormat = (token, checkExpiry = false) => {
     if (!token || typeof token !== 'string') return false
     
     // JWT format: header.payload.signature
@@ -68,11 +69,11 @@ export const useAuthStore = defineStore('auth', () => {
     if (parts.length !== 3) return false
     
     try {
-      // Decode payload untuk check expiry
+      // Decode payload untuk validate structure
       const payload = JSON.parse(atob(parts[1]))
       
-      // Check jika token sudah expired
-      if (payload.exp && payload.exp * 1000 < Date.now()) {
+      // Check expiry hanya jika diminta (untuk refresh token validation)
+      if (checkExpiry && payload.exp && payload.exp * 1000 < Date.now()) {
         console.warn('Token sudah expired')
         return false
       }
@@ -87,22 +88,28 @@ export const useAuthStore = defineStore('auth', () => {
   /**
    * Restore authentication dari localStorage
    * untuk persistent login setelah page reload
+   * 
+   * Strategy: Restore semua tokens jika format valid, tanpa check expiry access token.
+   * Biarkan API interceptor handle expired access token dengan refresh token automatically.
    */
   const restoreAuth = () => {
     const storedToken = localStorage.getItem('auth_token')
     const storedRefreshToken = localStorage.getItem('refresh_token')
     const storedUser = localStorage.getItem('user_data')
 
-    if (storedToken && storedUser) {
-      // Validate token format sebelum restore
-      if (!isValidTokenFormat(storedToken)) {
-        console.warn('Stored token tidak valid atau expired, clearing auth')
+    // Butuh minimal refresh token dan user data untuk restore session
+    if (storedRefreshToken && storedUser) {
+      // Validate refresh token format dan expiry
+      if (!isValidTokenFormat(storedRefreshToken, true)) {
+        console.warn('Refresh token tidak valid atau expired, clearing auth')
         clearAuth()
         return
       }
 
+      // Restore semua data (access token boleh expired, akan di-refresh oleh interceptor)
       token.value = storedToken
       refreshToken.value = storedRefreshToken
+      
       try {
         user.value = JSON.parse(storedUser)
       } catch (e) {
@@ -110,8 +117,8 @@ export const useAuthStore = defineStore('auth', () => {
         clearAuth()
       }
     } else if (storedToken || storedRefreshToken || storedUser) {
-      // Jika ada incomplete auth data, clear semua
-      console.warn('Incomplete auth data detected, clearing all')
+      // Jika ada incomplete auth data (missing refresh token atau user), clear semua
+      console.warn('Incomplete auth data detected (missing refresh token or user), clearing all')
       clearAuth()
     }
   }

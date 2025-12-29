@@ -160,6 +160,9 @@ Complete API documentation untuk semua endpoints:
 20. **[api/user-management.md](./04-api-reference/user-management.md)** 👥  
     User Management & Profile API (Sprint 2)
 
+21. **[api/khazwal.md](./04-api-reference/khazwal.md)** 📦  
+    Khazwal Material Preparation API (Sprint Khazwal)
+
 ---
 
 ### 🗺️ **User Journeys** → `user-journeys/`
@@ -172,14 +175,20 @@ Detailed user flows dan interaction patterns:
 22. **[user-journeys/user-management/user-profile-management.md](./07-user-journeys/user-management/user-profile-management.md)** 👤  
     Self-service profile management journey
 
+23. **[user-journeys/khazwal/material-prep-flow.md](./07-user-journeys/khazwal/material-prep-flow.md)** 📦  
+    Khazwal material preparation workflow journey
+
 ---
 
 ### 🧪 **Testing** → `testing/`
 
 Comprehensive testing guides dan test scenarios:
 
-23. **[testing/user-management-testing.md](./06-testing/user-management-testing.md)** ✅  
+24. **[testing/user-management-testing.md](./06-testing/user-management-testing.md)** ✅  
     Complete testing guide untuk User Management & Profile
+
+25. **[testing/khazwal-testing.md](./06-testing/khazwal-testing.md)** 📦  
+    Complete testing guide untuk Khazwal Material Preparation
 
 ---
 
@@ -253,6 +262,16 @@ go version && node --version && yarn --version && mysql --version
 - Haptic feedback (7 patterns)
 - Loading skeletons untuk better UX
 - Animated points counter
+
+### **📦 Khazwal Material Preparation (Sprint Khazwal)**
+- Queue management untuk Production Orders
+- Multi-step workflow (Plat, Kertas, Tinta)
+- Barcode scanner dengan camera integration
+- Real-time variance calculation
+- Photo upload untuk material evidence
+- Automatic notification ke Unit Cetak
+- Supervisor monitoring dashboard
+- History tracking dengan date filters
 
 ### **🎨 Modern UI/UX**
 - Apple-inspired design (Indigo & Fuchsia gradient)
@@ -378,6 +397,21 @@ GET    /api/profile/achievements    # User achievements
 GET    /api/profile/stats           # User gamification stats
 POST   /api/admin/achievements/award # Award achievement
 GET    /api/admin/users/:id/achievements # User achievements (Admin)
+
+# Khazwal Material Preparation (Sprint Khazwal)
+GET    /api/khazwal/material-prep/queue         # Queue PO
+GET    /api/khazwal/material-prep/:id           # Detail PO
+POST   /api/khazwal/material-prep/:id/start     # Start preparation
+POST   /api/khazwal/material-prep/:id/confirm-plat # Confirm plat
+PATCH  /api/khazwal/material-prep/:id/kertas    # Update kertas
+PATCH  /api/khazwal/material-prep/:id/tinta     # Update tinta
+POST   /api/khazwal/material-prep/:id/finalize  # Finalize preparation
+GET    /api/khazwal/material-prep/history       # History
+GET    /api/khazwal/monitoring                  # Supervisor monitoring
+
+# Cetak Queue (Sprint Khazwal)
+GET    /api/cetak/queue             # Queue PO siap cetak
+GET    /api/cetak/queue/:id         # Detail PO untuk cetak
 ```
 
 **📖 Detail lengkap:** Lihat [development/api-documentation.md](./03-development/api-documentation.md)
@@ -493,8 +527,8 @@ Ingin berkontribusi? Silakan baca **[CONTRIBUTING.md](./CONTRIBUTING.md)** untuk
 
 ## 📄 Version & License
 
-- **Version:** 1.5.0 (Sprint 5 Complete)
-- **Last Updated:** 28 Desember 2025
+- **Version:** 1.6.0 (Sprint Khazwal Complete)
+- **Last Updated:** 29 Desember 2025
 - **License:** Private & Proprietary
 - **Changelog:** Lihat **[CHANGELOG.md](../CHANGELOG.md)** untuk complete changelog Sprint 1-5
 
@@ -507,6 +541,7 @@ Ingin berkontribusi? Silakan baca **[CONTRIBUTING.md](./CONTRIBUTING.md)** untuk
 | **Sprint 3** | ✅ Complete | Password Management, Forgot/Reset, Force Change |
 | **Sprint 4** | ✅ Complete | Notifications, Activity Logs, Audit Trail |
 | **Sprint 5** | ✅ Complete | Gamification, Photo Upload, CSV Import/Export |
+| **Sprint Khazwal** | ✅ Complete | Material Preparation, Workflow, Monitoring |
 | **Sprint 6** | 🚧 Next | Testing, Optimization, Production Deployment |
 
 ---

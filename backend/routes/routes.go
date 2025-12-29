@@ -172,6 +172,51 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 			profileActivity.GET("/activity", activityLogHandler.GetMyActivity)
 		}
 
+		// Khazwal Material Preparation routes
+		khazwalService := services.NewKhazwalService(db)
+		khazwalHandler := handlers.NewKhazwalHandler(khazwalService)
+
+		khazwal := api.Group("/khazwal")
+		khazwal.Use(middleware.AuthMiddleware(db, cfg))
+		khazwal.Use(middleware.RequireRole("STAFF_KHAZWAL", "ADMIN", "MANAGER"))
+		khazwal.Use(middleware.ActivityLogger(db))
+		{
+			// Material Preparation - Queue & Detail
+			khazwal.GET("/material-prep/queue", khazwalHandler.GetQueue)
+			khazwal.GET("/material-prep/:id", khazwalHandler.GetDetail)
+			
+			// Material Preparation - Workflow Actions (Sprint 2, 3, 4)
+			khazwal.POST("/material-prep/:id/start", khazwalHandler.StartPrep)
+			khazwal.POST("/material-prep/:id/confirm-plat", khazwalHandler.ConfirmPlat)
+			khazwal.PATCH("/material-prep/:id/kertas", khazwalHandler.UpdateKertas)
+			khazwal.PATCH("/material-prep/:id/tinta", khazwalHandler.UpdateTinta)
+			khazwal.POST("/material-prep/:id/finalize", khazwalHandler.Finalize)
+
+			// Material Preparation - History (Sprint 5)
+			khazwal.GET("/material-prep/history", khazwalHandler.GetHistory)
+		}
+
+		// Khazwal Monitoring routes (Supervisor only) - Sprint 5
+		khazwalMonitoring := api.Group("/khazwal")
+		khazwalMonitoring.Use(middleware.AuthMiddleware(db, cfg))
+		khazwalMonitoring.Use(middleware.RequireRole("SUPERVISOR_KHAZWAL", "ADMIN", "MANAGER"))
+		{
+			khazwalMonitoring.GET("/monitoring", khazwalHandler.GetMonitoring)
+		}
+
+		// Cetak routes (Sprint 5)
+		cetakService := services.NewCetakService(db)
+		cetakHandler := handlers.NewCetakHandler(cetakService)
+
+		cetak := api.Group("/cetak")
+		cetak.Use(middleware.AuthMiddleware(db, cfg))
+		cetak.Use(middleware.RequireRole("OPERATOR_CETAK", "SUPERVISOR_CETAK", "ADMIN", "MANAGER"))
+		cetak.Use(middleware.ActivityLogger(db))
+		{
+			cetak.GET("/queue", cetakHandler.GetQueue)
+			cetak.GET("/queue/:id", cetakHandler.GetDetail)
+		}
+
 		// Example routes (protected) - Commented out for Sprint 1
 		// Will be re-enabled when needed
 		// exampleService := services.NewExampleService()

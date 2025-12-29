@@ -147,7 +147,11 @@ import {
   ChevronRight,
   MoreVertical,
   Bell,
-  ScrollText
+  ScrollText,
+  Package,
+  History,
+  Activity,
+  Printer
 } from 'lucide-vue-next'
 
 defineProps({
@@ -184,8 +188,13 @@ const formatRole = (role) => {
   const roleMap = {
     'ADMIN': 'Administrator',
     'MANAGER': 'Manager',
-    'OPERATOR': 'Operator',
-    'VIEWER': 'Viewer'
+    'STAFF_KHAZWAL': 'Staff Khazanah Awal',
+    'SUPERVISOR_KHAZWAL': 'Supervisor Khazwal',
+    'OPERATOR_CETAK': 'Operator Cetak',
+    'SUPERVISOR_CETAK': 'Supervisor Cetak',
+    'QC_INSPECTOR': 'QC Inspector',
+    'VERIFIKATOR': 'Verifikator',
+    'STAFF_KHAZKHIR': 'Staff Khazanah Akhir'
   }
   return roleMap[role] || role || 'Guest'
 }
@@ -205,6 +214,9 @@ const isActive = (path) => {
  */
 const navigationGroups = computed(() => {
   const isAdmin = user.value?.role === 'ADMIN' || user.value?.role === 'MANAGER'
+  const isKhazwal = user.value?.role === 'STAFF_KHAZWAL'
+  const isKhazwalSupervisor = user.value?.role === 'SUPERVISOR_KHAZWAL'
+  const isCetak = user.value?.role === 'OPERATOR_CETAK' || user.value?.role === 'SUPERVISOR_CETAK'
   
   const groups = [
     {
@@ -222,6 +234,34 @@ const navigationGroups = computed(() => {
       ]
     }
   ]
+
+  // Khazwal Material Preparation - visible untuk STAFF_KHAZWAL, SUPERVISOR_KHAZWAL, ADMIN, MANAGER
+  if (isKhazwal || isKhazwalSupervisor || isAdmin) {
+    const khazwalItems = [
+      { name: 'Persiapan Material', href: '/khazwal/material-prep', icon: Package },
+      { name: 'Riwayat', href: '/khazwal/material-prep/history', icon: History },
+    ]
+    
+    // Monitoring hanya untuk Supervisor dan Admin
+    if (isKhazwalSupervisor || isAdmin) {
+      khazwalItems.push({ name: 'Monitoring', href: '/khazwal/monitoring', icon: Activity })
+    }
+    
+    groups.push({
+      title: 'Khazanah Awal',
+      items: khazwalItems
+    })
+  }
+
+  // Unit Cetak - visible untuk OPERATOR_CETAK, SUPERVISOR_CETAK, ADMIN, MANAGER
+  if (isCetak || isAdmin) {
+    groups.push({
+      title: 'Unit Cetak',
+      items: [
+        { name: 'Antrian Cetak', href: '/cetak/queue', icon: Printer },
+      ]
+    })
+  }
 
   if (isAdmin) {
     groups.push({

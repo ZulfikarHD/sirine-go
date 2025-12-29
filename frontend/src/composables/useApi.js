@@ -101,6 +101,19 @@ apiClient.interceptors.response.use(
 
       // Coba refresh token untuk request lainnya
       if (authStore.refreshToken) {
+        // Validate refresh token format dan expiry sebelum attempt refresh
+        const isRefreshTokenValid = authStore.isValidTokenFormat(authStore.refreshToken, true)
+        
+        if (!isRefreshTokenValid) {
+          // Refresh token sudah expired (>30 hari), langsung logout
+          console.warn('API Error: refresh token expired, memerlukan login ulang')
+          authStore.clearAuth()
+          if (window.location.pathname !== '/login') {
+            router.push('/login').catch(() => {})
+          }
+          return Promise.reject(new Error('Session expired, silakan login kembali'))
+        }
+
         isRefreshing = true
 
         try {
@@ -120,7 +133,8 @@ apiClient.interceptors.response.use(
           }
         } catch (refreshError) {
           // Refresh token gagal, logout user
-          console.error('API Error: gagal refresh token -', refreshError.response?.data?.message || 'Token expired')
+          const errorMsg = refreshError.response?.data?.message || 'Token expired'
+          console.error('API Error: gagal refresh token -', errorMsg)
           isRefreshing = false
           processQueue(refreshError, null)
           authStore.clearAuth()
@@ -138,6 +152,7 @@ apiClient.interceptors.response.use(
         if (window.location.pathname !== '/login') {
           router.push('/login').catch(() => {})
         }
+        return Promise.reject(new Error('No refresh token available'))
       }
     }
 

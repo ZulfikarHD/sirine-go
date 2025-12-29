@@ -117,6 +117,66 @@ const routes = [
     },
   },
   {
+    path: '/khazwal/material-prep',
+    name: 'MaterialPrepQueue',
+    component: () => import('../views/khazwal/MaterialPrepQueuePage.vue'),
+    meta: { 
+      requiresAuth: true,
+      roles: ['STAFF_KHAZWAL', 'ADMIN', 'MANAGER'],
+      title: 'Persiapan Material'
+    }
+  },
+  {
+    path: '/khazwal/material-prep/:id',
+    name: 'MaterialPrepDetail',
+    component: () => import('../views/khazwal/MaterialPrepDetailPage.vue'),
+    meta: { 
+      requiresAuth: true,
+      roles: ['STAFF_KHAZWAL', 'ADMIN', 'MANAGER'],
+      title: 'Detail Persiapan'
+    }
+  },
+  {
+    path: '/khazwal/material-prep/:id/process',
+    name: 'MaterialPrepProcess',
+    component: () => import('../views/khazwal/MaterialPrepProcessPage.vue'),
+    meta: { 
+      requiresAuth: true,
+      roles: ['STAFF_KHAZWAL', 'ADMIN', 'MANAGER'],
+      title: 'Proses Persiapan'
+    }
+  },
+  {
+    path: '/khazwal/material-prep/history',
+    name: 'MaterialPrepHistory',
+    component: () => import('../views/khazwal/MaterialPrepHistoryPage.vue'),
+    meta: { 
+      requiresAuth: true,
+      roles: ['STAFF_KHAZWAL', 'SUPERVISOR_KHAZWAL', 'ADMIN', 'MANAGER'],
+      title: 'Riwayat Persiapan'
+    }
+  },
+  {
+    path: '/khazwal/monitoring',
+    name: 'KhazwalMonitoring',
+    component: () => import('../views/khazwal/SupervisorMonitoringPage.vue'),
+    meta: { 
+      requiresAuth: true,
+      roles: ['SUPERVISOR_KHAZWAL', 'ADMIN', 'MANAGER'],
+      title: 'Monitoring Khazwal'
+    }
+  },
+  {
+    path: '/cetak/queue',
+    name: 'CetakQueue',
+    component: () => import('../views/cetak/CetakQueuePage.vue'),
+    meta: { 
+      requiresAuth: true,
+      roles: ['OPERATOR_CETAK', 'SUPERVISOR_CETAK', 'ADMIN', 'MANAGER'],
+      title: 'Antrian Cetak'
+    }
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('../views/NotFound.vue'),

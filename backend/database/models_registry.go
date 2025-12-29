@@ -27,6 +27,11 @@ func NewModelsRegistry() *ModelsRegistry {
 	registry.Register(&models.ActivityLog{}, "activity_logs")
 	registry.Register(&models.Notification{}, "notifications")
 
+	// Production Order & Khazwal models
+	registry.Register(&models.ProductionOrder{}, "production_orders")
+	registry.Register(&models.POStageTracking{}, "po_stage_trackings")
+	registry.Register(&models.KhazwalMaterialPreparation{}, "khazwal_material_preparations")
+
 	// TODO: Tambahkan models baru di sini untuk auto-migration
 	// registry.Register(&models.NewModel{}, "new_model_table")
 

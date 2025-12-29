@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"time"
 	"sirine-go/backend/config"
 	"sirine-go/backend/database"
 	"sirine-go/backend/models"
@@ -29,6 +30,7 @@ func main() {
 	// Seed data
 	seedAdminUser()
 	seedDemoUsers()
+	seedProductionOrders()
 
 	log.Println("✅ Database seeding completed!")
 }
@@ -37,9 +39,9 @@ func main() {
 func seedAdminUser() {
 	db := database.GetDB()
 
-	// Check apakah admin sudah ada
+	// Check apakah admin sudah ada (check by NIP or email)
 	var existingAdmin models.User
-	if err := db.Where("nip = ?", "99999").First(&existingAdmin).Error; err == nil {
+	if err := db.Where("nip = ? OR email = ?", "99999", "admin@sirine.local").First(&existingAdmin).Error; err == nil {
 		log.Println("ℹ️  Admin user sudah ada, skip seeding admin")
 		return
 	}
@@ -66,7 +68,8 @@ func seedAdminUser() {
 	}
 
 	if err := db.Create(&adminUser).Error; err != nil {
-		log.Fatal("Failed to seed admin user:", err)
+		log.Printf("Warning: Failed to seed admin user (might already exist): %v", err)
+		return
 	}
 
 	log.Println("✅ Admin user seeded successfully")
@@ -174,4 +177,186 @@ func seedDemoUsers() {
 
 	log.Println("\n📝 Demo users credentials:")
 	log.Println("   Password untuk semua demo users: Demo@123")
+}
+
+// seedProductionOrders membuat sample Production Orders untuk testing
+func seedProductionOrders() {
+	db := database.GetDB()
+
+	// Check apakah PO sudah ada
+	var count int64
+	db.Model(&models.ProductionOrder{}).Count(&count)
+	if count > 0 {
+		log.Printf("ℹ️  Production Orders sudah ada (%d records), skip seeding PO", count)
+		return
+	}
+
+	// Sample PO data dengan berbagai status dan priority
+	samplePOs := []models.ProductionOrder{
+		{
+			PONumber:                  1001,
+			OBCNumber:                 "OBC000001",
+			SAPCustomerCode:           "CUST-001",
+			SAPProductCode:            "PROD-A123",
+			ProductName:               "Kertas HVS A4 80gsm",
+			QuantityOrdered:           50000,
+			QuantityTargetLembarBesar: 1000,
+			EstimatedRims:             100,
+			OrderDate:                 time.Now().AddDate(0, 0, -5),
+			DueDate:                   time.Now().AddDate(0, 0, 2), // 2 hari dari sekarang - URGENT
+			Priority:                  models.PriorityUrgent,
+			PriorityScore:             0, // akan di-calculate
+			CurrentStage:              models.StageKhazwalMaterialPrep,
+			CurrentStatus:             models.StatusWaitingMaterialPrep,
+			Notes:                     "PO urgent untuk customer priority",
+		},
+		{
+			PONumber:                  1002,
+			OBCNumber:                 "OBC000002",
+			SAPCustomerCode:           "CUST-002",
+			SAPProductCode:            "PROD-B456",
+			ProductName:               "Kertas Art Paper A3 120gsm",
+			QuantityOrdered:           30000,
+			QuantityTargetLembarBesar: 600,
+			EstimatedRims:             60,
+			OrderDate:                 time.Now().AddDate(0, 0, -3),
+			DueDate:                   time.Now().AddDate(0, 0, 7), // 7 hari dari sekarang
+			Priority:                  models.PriorityNormal,
+			PriorityScore:             0,
+			CurrentStage:              models.StageKhazwalMaterialPrep,
+			CurrentStatus:             models.StatusWaitingMaterialPrep,
+		},
+		{
+			PONumber:                  1003,
+			OBCNumber:                 "OBC000003",
+			SAPCustomerCode:           "CUST-003",
+			SAPProductCode:            "PROD-C789",
+			ProductName:               "Kertas Duplex A4 250gsm",
+			QuantityOrdered:           20000,
+			QuantityTargetLembarBesar: 400,
+			EstimatedRims:             40,
+			OrderDate:                 time.Now().AddDate(0, 0, -7),
+			DueDate:                   time.Now().AddDate(0, 0, 14), // 14 hari dari sekarang
+			Priority:                  models.PriorityLow,
+			PriorityScore:             0,
+			CurrentStage:              models.StageKhazwalMaterialPrep,
+			CurrentStatus:             models.StatusWaitingMaterialPrep,
+		},
+		{
+			PONumber:                  1004,
+			OBCNumber:                 "OBC000004",
+			SAPCustomerCode:           "CUST-001",
+			SAPProductCode:            "PROD-D012",
+			ProductName:               "Kertas Glossy A4 150gsm",
+			QuantityOrdered:           40000,
+			QuantityTargetLembarBesar: 800,
+			EstimatedRims:             80,
+			OrderDate:                 time.Now().AddDate(0, 0, -2),
+			DueDate:                   time.Now().AddDate(0, 0, 3), // 3 hari dari sekarang
+			Priority:                  models.PriorityUrgent,
+			PriorityScore:             0,
+			CurrentStage:              models.StageKhazwalMaterialPrep,
+			CurrentStatus:             models.StatusWaitingMaterialPrep,
+			Notes:                     "Rush order - priority tinggi",
+		},
+		{
+			PONumber:                  1005,
+			OBCNumber:                 "OBC000005",
+			SAPCustomerCode:           "CUST-004",
+			SAPProductCode:            "PROD-E345",
+			ProductName:               "Kertas Manila A4 100gsm",
+			QuantityOrdered:           25000,
+			QuantityTargetLembarBesar: 500,
+			EstimatedRims:             50,
+			OrderDate:                 time.Now().AddDate(0, 0, -4),
+			DueDate:                   time.Now().AddDate(0, 0, 10), // 10 hari dari sekarang
+			Priority:                  models.PriorityNormal,
+			PriorityScore:             0,
+			CurrentStage:              models.StageKhazwalMaterialPrep,
+			CurrentStatus:             models.StatusWaitingMaterialPrep,
+		},
+		{
+			PONumber:                  1006,
+			OBCNumber:                 "OBC000006",
+			SAPCustomerCode:           "CUST-005",
+			SAPProductCode:            "PROD-F678",
+			ProductName:               "Kertas Ivory A3 200gsm",
+			QuantityOrdered:           15000,
+			QuantityTargetLembarBesar: 300,
+			EstimatedRims:             30,
+			OrderDate:                 time.Now().AddDate(0, 0, -1),
+			DueDate:                   time.Now().AddDate(0, 0, 5), // 5 hari dari sekarang
+			Priority:                  models.PriorityNormal,
+			PriorityScore:             0,
+			CurrentStage:              models.StageKhazwalMaterialPrep,
+			CurrentStatus:             models.StatusWaitingMaterialPrep,
+		},
+		{
+			PONumber:                  1007,
+			OBCNumber:                 "OBC000007",
+			SAPCustomerCode:           "CUST-002",
+			SAPProductCode:            "PROD-G901",
+			ProductName:               "Kertas Matte A4 180gsm",
+			QuantityOrdered:           35000,
+			QuantityTargetLembarBesar: 700,
+			EstimatedRims:             70,
+			OrderDate:                 time.Now().AddDate(0, 0, -6),
+			DueDate:                   time.Now().AddDate(0, 0, 1), // 1 hari dari sekarang - SANGAT URGENT
+			Priority:                  models.PriorityUrgent,
+			PriorityScore:             0,
+			CurrentStage:              models.StageKhazwalMaterialPrep,
+			CurrentStatus:             models.StatusWaitingMaterialPrep,
+			Notes:                     "Deadline ketat - perlu perhatian segera",
+		},
+		{
+			PONumber:                  1008,
+			OBCNumber:                 "OBC000008",
+			SAPCustomerCode:           "CUST-006",
+			SAPProductCode:            "PROD-H234",
+			ProductName:               "Kertas Concorde A4 220gsm",
+			QuantityOrdered:           10000,
+			QuantityTargetLembarBesar: 200,
+			EstimatedRims:             20,
+			OrderDate:                 time.Now().AddDate(0, 0, -8),
+			DueDate:                   time.Now().AddDate(0, 0, 20), // 20 hari dari sekarang
+			Priority:                  models.PriorityLow,
+			PriorityScore:             0,
+			CurrentStage:              models.StageKhazwalMaterialPrep,
+			CurrentStatus:             models.StatusWaitingMaterialPrep,
+		},
+	}
+
+	// Insert PO data dan calculate priority score
+	for i := range samplePOs {
+		samplePOs[i].UpdatePriorityScore()
+
+		if err := db.Create(&samplePOs[i]).Error; err != nil {
+			log.Printf("Warning: Failed to seed PO %d: %v", samplePOs[i].PONumber, err)
+			continue
+		}
+
+		// Create corresponding Khazwal Material Preparation record
+		khazwalPrep := models.KhazwalMaterialPreparation{
+			ProductionOrderID:    samplePOs[i].ID,
+			SAPPlatCode:          "PLAT-" + samplePOs[i].SAPProductCode,
+			KertasBlankoQuantity: samplePOs[i].QuantityTargetLembarBesar,
+			TintaRequirements:    []byte(`{"cyan": 2, "magenta": 2, "yellow": 2, "black": 3}`),
+			Status:               models.MaterialPrepPending,
+		}
+
+		if err := db.Create(&khazwalPrep).Error; err != nil {
+			log.Printf("Warning: Failed to seed Khazwal Prep for PO %d: %v", samplePOs[i].PONumber, err)
+		}
+
+		log.Printf("✅ PO seeded: %d - %s (Priority: %s, Score: %d)", 
+			samplePOs[i].PONumber, 
+			samplePOs[i].ProductName, 
+			samplePOs[i].Priority,
+			samplePOs[i].PriorityScore)
+	}
+
+	log.Println("\n📦 Production Orders Summary:")
+	log.Printf("   Total POs: %d", len(samplePOs))
+	log.Println("   Status: WAITING_MATERIAL_PREP")
+	log.Println("   Stage: KHAZWAL_MATERIAL_PREP")
 }
