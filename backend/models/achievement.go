@@ -20,8 +20,8 @@ const (
 // AchievementCriteria merupakan struktur untuk criteria unlock achievement
 // yang berisi kondisi yang harus dipenuhi untuk unlock achievement
 type AchievementCriteria struct {
-	Type  string      `json:"type"`
-	Value interface{} `json:"value,omitempty"`
+	Type      string      `json:"type"`
+	Threshold interface{} `json:"threshold,omitempty"`
 }
 
 // Scan mengimplementasikan sql.Scanner interface untuk database scanning

@@ -4,6 +4,24 @@ Complete testing guides untuk Sirine Go App mencakup backend, frontend, API, dan
 
 ---
 
+## 🎯 Sprint 6 Testing Status
+
+### **⚠️ [SPRINT6_TESTING.md](./SPRINT6_TESTING.md)** - **READ THIS FIRST**
+**CRITICAL**: Honest report dari Sprint 6 testing implementation dan actual execution results.
+
+**Status**: 🟡 In Progress (Tests created, partial execution)
+
+**What you'll find:**
+- ✅ Actual test execution results (not just plans)
+- ⚠️ Issues found and fixes applied
+- 🔄 What's working vs what needs fixing
+- 📊 Real coverage numbers (not estimates)
+- 💡 Lessons learned from testing process
+
+**Key Takeaway**: Tests were **created** but **not all run** during initial sprint. This doc shows the honest reality of testing status.
+
+---
+
 ## 📚 Testing Guides
 
 ### **📖 [overview.md](./overview.md)**
@@ -293,13 +311,13 @@ Jika ada pertanyaan tentang testing:
 ```
 06-testing/
 ├── README.md                        # This file - Testing hub
+├── SPRINT6_TESTING.md               # 🆕 Sprint 6 actual test results & lessons
 ├── overview.md                      # Testing strategy & manual testing
 ├── backend-testing.md               # Go unit testing guide
 ├── frontend-testing.md              # Vue/Vitest testing guide
 ├── api-testing.md                   # API & integration testing
 ├── performance-testing.md           # Performance & compatibility
-└── test-scenarios/                  # Feature-specific tests
-    └── user-management-testing.md   # User Management test cases
+└── user-management-testing.md       # User Management test cases
 ```
 
 ---
@@ -308,7 +326,9 @@ Jika ada pertanyaan tentang testing:
 
 Comprehensive testing ensures high-quality, reliable aplikasi yang ready untuk production.
 
+**⚠️ Pro Tip**: Always **run tests immediately** after writing them. Don't defer execution!
+
 ---
 
-**Last Updated:** 28 Desember 2025  
-**Version:** 2.0.0 (Phase 2 Restructure)
+**Last Updated:** 29 Januari 2025  
+**Version:** 2.1.0 (Sprint 6 - Testing Phase)

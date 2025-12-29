@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
-	"image/png"
+	_ "image/png"  // Register PNG decoder
 	"io"
 	"mime/multipart"
 	"os"

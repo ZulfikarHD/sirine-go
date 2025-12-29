@@ -39,6 +39,35 @@ make dev-frontend  # Terminal 2
 
 ---
 
+## 🆕 Recent Updates
+
+### Sprint 6: Testing, Optimization & Deployment (2025-01-29)
+
+**Status**: 🟡 In Progress - Testing Phase
+
+**Quick Links:**
+- 📊 **[SPRINT6_SUMMARY.md](./SPRINT6_SUMMARY.md)** - Complete sprint summary (updated with actual results)
+- 🧪 **[06-testing/SPRINT6_TESTING.md](./06-testing/SPRINT6_TESTING.md)** - Honest test execution report
+- 🚀 **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Production deployment guide
+- 🔐 **[AUTHENTICATION.md](./AUTHENTICATION.md)** - Authentication system documentation
+
+**What's Done:**
+- ✅ Comprehensive test suite created (70+ test cases)
+- ✅ Database optimization (composite indexes, stored procedures)
+- ✅ Frontend optimization (code splitting, 300KB bundle)
+- ✅ PWA configured (offline support, installable)
+- ✅ Security hardening (rate limiting, security headers)
+- ✅ Complete deployment documentation
+
+**What's In Progress:**
+- ⚠️ Test execution (~50% run, 94% passing of those run)
+- ⚠️ Fixing test mocks (axios, localStorage)
+- 🔄 Running complete test suite
+
+**Honest Note**: Tests were created but not all executed during initial sprint. Documentation now reflects actual testing reality with transparent reporting.
+
+---
+
 ## 📖 Dokumentasi
 
 Dokumentasi terorganisir dalam folders berdasarkan kategori:

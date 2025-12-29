@@ -2,8 +2,24 @@
 
 **Quick Reference Index** untuk navigasi cepat ke semua dokumentasi.
 
-**Last Updated:** 28 Desember 2025  
-**Version:** 1.5.0 (Sprint 5 Complete)
+**Last Updated:** 29 Januari 2025  
+**Version:** 1.6.0 (Sprint 6 - Testing Phase)
+
+---
+
+## 🆕 Sprint 6 Documentation (NEW!)
+
+**Recent additions** dari Sprint 6: Testing, Optimization & Deployment
+
+| File | Description | Priority |
+|------|-------------|----------|
+| 🧪 [SPRINT6_TESTING.md](./06-testing/SPRINT6_TESTING.md) | **Honest test execution report** | 🔴 READ FIRST |
+| 📊 [SPRINT6_SUMMARY.md](./SPRINT6_SUMMARY.md) | Complete sprint summary | 🟡 High |
+| 🚀 [DEPLOYMENT.md](./DEPLOYMENT.md) | Production deployment guide | 🟡 High |
+| 🔐 [AUTHENTICATION.md](./AUTHENTICATION.md) | Authentication system docs | 🟡 High |
+| ⚡ [TESTING_QUICK_GUIDE.md](./TESTING_QUICK_GUIDE.md) | Quick testing commands | 🟢 Reference |
+
+**Status**: 🟡 In Progress - Tests created, execution ongoing
 
 ---
 
@@ -25,6 +41,10 @@
 - [README.md](./README.md) - Documentation hub & overview
 - [CHANGELOG.md](../CHANGELOG.md) - Complete changelog Sprint 1-5
 - [DOCUMENTATION_UPDATE_SUMMARY.md](./DOCUMENTATION_UPDATE_SUMMARY.md) - Latest doc updates
+- 🆕 [SPRINT6_SUMMARY.md](./SPRINT6_SUMMARY.md) - Sprint 6 summary (Testing & Deployment)
+- 🆕 [DEPLOYMENT.md](./DEPLOYMENT.md) - Production deployment guide
+- 🆕 [AUTHENTICATION.md](./AUTHENTICATION.md) - Authentication documentation
+- 🆕 [TESTING_QUICK_GUIDE.md](./TESTING_QUICK_GUIDE.md) - Quick testing reference
 
 ---
 
