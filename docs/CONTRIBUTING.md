@@ -11,7 +11,7 @@ Terima kasih telah tertarik untuk berkontribusi pada pengembangan Sirine Go App!
    ```
 
 2. **Setup Environment**
-   Ikuti langkah-langkah di [Getting Started Guide](./getting-started/quickstart.md).
+   Ikuti langkah-langkah di [Getting Started Guide](./01-getting-started/quickstart.md).
 
 3. **Create Branch**
    Buat branch baru untuk fitur atau fix Anda. Gunakan naming convention:
@@ -45,7 +45,7 @@ Terima kasih telah tertarik untuk berkontribusi pada pengembangan Sirine Go App!
 
 ## 🏗️ Project Structure
 
-Pahami struktur project di [Folder Structure](./architecture/folder-structure.md) sebelum memulai.
+Pahami struktur project di [Folder Structure](./02-architecture/folder-structure.md) sebelum memulai.
 
 ## 🛠️ Adding New Features
 

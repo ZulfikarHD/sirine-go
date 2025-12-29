@@ -35,7 +35,7 @@ make dev-frontend  # Terminal 2
 # 5. Buka browser: http://localhost:5173
 ```
 
-**📖 Detail lengkap:** Lihat [getting-started/quickstart.md](./getting-started/quickstart.md)
+**📖 Detail lengkap:** Lihat [getting-started/quickstart.md](./01-getting-started/quickstart.md)
 
 ---
 
@@ -47,13 +47,13 @@ Dokumentasi terorganisir dalam folders berdasarkan kategori:
 
 Mulai di sini jika baru pertama kali:
 
-1. **[quickstart.md](./getting-started/quickstart.md)** ⚡  
+1. **[quickstart.md](./01-getting-started/quickstart.md)** ⚡  
    Setup dalam 5 menit - Step-by-step paling simple
 
-2. **[installation.md](./getting-started/installation.md)** 📋  
+2. **[installation.md](./01-getting-started/installation.md)** 📋  
    Setup lengkap dengan penjelasan detail setiap step
 
-3. **[checklist.md](./getting-started/checklist.md)** ✅  
+3. **[checklist.md](./01-getting-started/checklist.md)** ✅  
    Checklist untuk verifikasi setup sudah benar
 
 ---
@@ -62,13 +62,13 @@ Mulai di sini jika baru pertama kali:
 
 Pahami struktur dan design decisions:
 
-4. **[overview.md](./architecture/overview.md)** 🏛️  
+4. **[overview.md](./02-architecture/overview.md)** 🏛️  
    Penjelasan semua package dan kenapa dibutuhkan
 
-5. **[folder-structure.md](./architecture/folder-structure.md)** 📁  
+5. **[folder-structure.md](./02-architecture/folder-structure.md)** 📁  
    Struktur folder dan file organization
 
-6. **[project-summary.md](./architecture/project-summary.md)** 📊  
+6. **[project-summary.md](./02-architecture/project-summary.md)** 📊  
    Overview lengkap project (features, decisions, metrics)
 
 ---
@@ -77,13 +77,13 @@ Pahami struktur dan design decisions:
 
 Build dan test fitur baru:
 
-7. **[customization-guide.md](./development/customization-guide.md)** 🎨  
+7. **[customization-guide.md](./03-development/customization-guide.md)** 🎨  
    Cara menambah model, endpoint, dan component baru
 
-8. **[api-documentation.md](./development/api-documentation.md)** 🔌  
+8. **[api-documentation.md](./03-development/api-documentation.md)** 🔌  
    Complete API reference dengan contoh request/response
 
-9. **[testing.md](./development/testing.md)** 🧪  
+9. **[testing.md](./03-development/testing.md)** 🧪  
    Testing guide (manual & automated testing)
 
 ---
@@ -92,31 +92,31 @@ Build dan test fitur baru:
 
 Panduan mendalam untuk topik spesifik:
 
-10. **[guides/authentication/README.md](./guides/authentication/README.md)** 🔐  
+10. **[guides/authentication/README.md](./05-guides/authentication/README.md)** 🔐  
     Sistem autentikasi, security flows, dan user journeys
 
-11. **[guides/database/management.md](./guides/database/management.md)** 🗄️  
+11. **[guides/database/management.md](./05-guides/database/management.md)** 🗄️  
     Manajemen database, backup, dan maintenance
 
-12. **[guides/database/models.md](./guides/database/models.md)** 📝  
+12. **[guides/database/models.md](./05-guides/database/models.md)** 📝  
     Panduan membuat model baru dengan Registry Pattern
 
-13. **[guides/database/migrations.md](./guides/database/migrations.md)** 🔄  
+13. **[guides/database/migrations.md](./05-guides/database/migrations.md)** 🔄  
     Panduan migrasi dan database seeding
 
-14. **[guides/validation/guide.md](./guides/validation/guide.md)** ✅  
+14. **[guides/validation/guide.md](./05-guides/validation/guide.md)** ✅  
     Server-side validation dengan Gin (Laravel-style)
 
-15. **[guides/security.md](./guides/security.md)** 🛡️  
+15. **[guides/security.md](./05-guides/security.md)** 🛡️  
     Security best practices dan protection mechanisms
 
-16. **[guides/configuration.md](./guides/configuration.md)** ⚙️  
+16. **[guides/configuration.md](./05-guides/configuration.md)** ⚙️  
     Environment variables dan configuration guide
 
-17. **[guides/documentation-maintenance.md](./guides/documentation-maintenance.md)** 📝  
+17. **[guides/documentation-maintenance.md](./05-guides/documentation-maintenance.md)** 📝  
     Panduan maintenance dokumentasi (When & How to update)
 
-18. **[guides/utilities/hash-commands.md](./guides/utilities/hash-commands.md)** 🔧  
+18. **[guides/utilities/hash-commands.md](./05-guides/utilities/hash-commands.md)** 🔧  
     Utility commands untuk hashing dan security
 
 ---
@@ -125,10 +125,10 @@ Panduan mendalam untuk topik spesifik:
 
 Complete API documentation untuk semua endpoints:
 
-19. **[api/README.md](./api/README.md)** 📡  
+19. **[api/README.md](./04-api-reference/README.md)** 📡  
     API hub dengan quick reference dan conventions
 
-20. **[api/user-management.md](./api/user-management.md)** 👥  
+20. **[api/user-management.md](./04-api-reference/user-management.md)** 👥  
     User Management & Profile API (Sprint 2)
 
 ---
@@ -137,10 +137,10 @@ Complete API documentation untuk semua endpoints:
 
 Detailed user flows dan interaction patterns:
 
-21. **[user-journeys/user-management/admin-user-management.md](./user-journeys/user-management/admin-user-management.md)** 👨‍💼  
+21. **[user-journeys/user-management/admin-user-management.md](./07-user-journeys/user-management/admin-user-management.md)** 👨‍💼  
     Admin user management journey dengan iOS-inspired UX
 
-22. **[user-journeys/user-management/user-profile-management.md](./user-journeys/user-management/user-profile-management.md)** 👤  
+22. **[user-journeys/user-management/user-profile-management.md](./07-user-journeys/user-management/user-profile-management.md)** 👤  
     Self-service profile management journey
 
 ---
@@ -149,7 +149,7 @@ Detailed user flows dan interaction patterns:
 
 Comprehensive testing guides dan test scenarios:
 
-23. **[testing/user-management-testing.md](./testing/user-management-testing.md)** ✅  
+23. **[testing/user-management-testing.md](./06-testing/user-management-testing.md)** ✅  
     Complete testing guide untuk User Management & Profile
 
 ---
@@ -158,7 +158,7 @@ Comprehensive testing guides dan test scenarios:
 
 Ready untuk production:
 
-24. **[production-deployment.md](./deployment/production-deployment.md)** 🌐  
+24. **[production-deployment.md](./08-deployment/production-deployment.md)** 🌐  
     Deployment ke production server dengan Nginx + SSL
 
 ---
@@ -167,7 +167,7 @@ Ready untuk production:
 
 Mengalami masalah:
 
-25. **[faq.md](./troubleshooting/faq.md)** 💡  
+25. **[faq.md](./09-troubleshooting/faq.md)** 💡  
     Common questions dan solusi masalah umum
 
 ---
@@ -189,24 +189,67 @@ go version && node --version && yarn --version && mysql --version
 
 ## 🎨 Key Features
 
+### **🔐 Authentication & Security (Sprint 1-3)**
+- JWT-based authentication dengan refresh token
+- Role-based access control (7 roles, 4 departments)
+- Password management (change, forgot, reset)
+- Session tracking dengan IP & User Agent
+- Rate limiting & account lockout
+- Password strength enforcement
+- Bcrypt cost 12 untuk password hashing
+
+### **👥 User Management (Sprint 2)**
+- Admin CRUD users dengan comprehensive features
+- Search & filters (role, department, status)
+- Bulk operations (delete, update status)
+- Auto-generated secure passwords
+- Self-service profile management
+- Activity logging untuk audit trail
+- Pagination support
+
+### **🔔 Notifications & Audit (Sprint 4)**
+- In-app notification system
+- Real-time updates via polling (30s)
+- Notification center dengan filtering
+- Activity logs viewer untuk Admin
+- Before/after change tracking
+- Comprehensive audit trail
+- Advanced filters dan statistics
+
+### **🎮 Gamification (Sprint 5)**
+- Achievement system dengan 6 achievements
+- Points tracking dan level system (Bronze → Platinum)
+- Profile photo upload dengan auto-resize
+- CSV bulk import/export users
+- Haptic feedback (7 patterns)
+- Loading skeletons untuk better UX
+- Animated points counter
+
+### **🎨 Modern UI/UX**
+- Apple-inspired design (Indigo & Fuchsia gradient)
+- Glass effect cards dengan backdrop blur
+- Spring physics animations (Motion-V)
+- iOS-style press feedback
+- Responsive design (mobile-first)
+- Loading states & empty states
+- Staggered list animations
+- Drag & drop file upload
+
+### **🚀 Performance**
+- Vite build tool (10-100x faster than Webpack)
+- GORM ORM (type-safe & optimized)
+- Gin framework (40,000+ req/s)
+- Optimistic updates untuk instant UI feedback
+- Debounced search (300ms)
+- Background goroutines untuk non-blocking operations
+- Asset caching & optimization
+- Image optimization (auto-resize, JPEG 90%)
+
 ### **🌐 100% Offline Capable**
 - Service Worker untuk caching
 - PWA installable (Desktop & Mobile)
 - NetworkFirst caching strategy untuk API
 - Online/Offline status indicator real-time
-
-### **🎨 Modern UI/UX**
-- Smooth animations dengan Motion-v
-- Tailwind CSS (newest version 4.1.18)
-- Responsive design (mobile-first)
-- Loading & error states
-- Professional personality (INFJ)
-
-### **🚀 Performance**
-- Vite build tool (10-100x faster)
-- GORM ORM (type-safe & optimized)
-- Gin framework (40,000+ req/s)
-- Asset caching & optimization
 
 ---
 
@@ -247,7 +290,7 @@ sirine-go/
 └── docs/             # Documentation (you are here!)
 ```
 
-**📖 Detail lengkap:** Lihat [folder-structure.md](./architecture/folder-structure.md)
+**📖 Detail lengkap:** Lihat [folder-structure.md](./02-architecture/folder-structure.md)
 
 ---
 
@@ -257,23 +300,58 @@ sirine-go/
 # Health check
 GET /health
 
-# Authentication
-POST   /api/auth/login    # Login
-POST   /api/auth/logout   # Logout
-GET    /api/auth/me       # Current user
+# Authentication (Sprint 1 & 3)
+POST   /api/auth/login              # Login
+POST   /api/auth/logout             # Logout
+GET    /api/auth/me                 # Current user
+POST   /api/auth/refresh            # Refresh token
+POST   /api/auth/forgot-password    # Request reset link
+POST   /api/auth/reset-password     # Reset dengan token
 
-# User Management (Admin)
-GET    /api/users         # List users
-POST   /api/users         # Create user
-PUT    /api/users/:id     # Update user
-DELETE /api/users/:id     # Delete user
+# User Management - Admin (Sprint 2 & 5)
+GET    /api/users                   # List users dengan filters
+GET    /api/users/search            # Search users
+GET    /api/users/:id               # Get user detail
+POST   /api/users                   # Create user
+PUT    /api/users/:id               # Update user
+DELETE /api/users/:id               # Delete user
+POST   /api/users/bulk-delete       # Bulk delete
+POST   /api/users/bulk-update-status # Bulk update status
+POST   /api/users/import            # Import dari CSV
+GET    /api/users/export            # Export ke CSV
+POST   /api/users/:id/reset-password # Admin force reset
 
-# Profile (Self-Service)
-GET    /api/profile       # Get profile
-PUT    /api/profile       # Update profile
+# Profile - Self Service (Sprint 2, 3, 5)
+GET    /api/profile                 # Get profile
+PUT    /api/profile                 # Update profile
+PUT    /api/profile/password        # Change password
+POST   /api/profile/photo           # Upload photo
+DELETE /api/profile/photo           # Delete photo
+GET    /api/profile/activity        # Get activity logs
+
+# Notifications (Sprint 4)
+GET    /api/notifications           # List notifications
+GET    /api/notifications/unread-count # Badge count
+GET    /api/notifications/recent    # Recent notifications
+PUT    /api/notifications/:id/read  # Mark as read
+PUT    /api/notifications/read-all  # Mark all as read
+DELETE /api/notifications/:id       # Delete notification
+
+# Activity Logs - Admin (Sprint 4)
+GET    /api/admin/activity-logs     # List logs dengan filters
+GET    /api/admin/activity-logs/:id # Log detail
+GET    /api/admin/activity-logs/user/:id # User activity
+GET    /api/admin/activity-logs/stats    # Statistics
+
+# Achievements & Gamification (Sprint 5)
+GET    /api/achievements            # List achievements
+GET    /api/profile/achievements    # User achievements
+GET    /api/profile/stats           # User gamification stats
+POST   /api/admin/achievements/award # Award achievement
+GET    /api/admin/users/:id/achievements # User achievements (Admin)
 ```
 
-**📖 Detail lengkap:** Lihat [api/README.md](./api/README.md)
+**📖 Detail lengkap:** Lihat [development/api-documentation.md](./03-development/api-documentation.md)
 
 ---
 
@@ -296,7 +374,7 @@ sudo lsof -i :5173 && sudo kill -9 <PID>  # Frontend
 make clean && make install
 ```
 
-**📖 Solusi lengkap:** Lihat [faq.md](./troubleshooting/faq.md)
+**📖 Solusi lengkap:** Lihat [faq.md](./09-troubleshooting/faq.md)
 
 ---
 
@@ -386,10 +464,21 @@ Ingin berkontribusi? Silakan baca **[CONTRIBUTING.md](./CONTRIBUTING.md)** untuk
 
 ## 📄 Version & License
 
-- **Version:** 1.1.0 (Sprint 2 Complete)
+- **Version:** 1.5.0 (Sprint 5 Complete)
 - **Last Updated:** 28 Desember 2025
 - **License:** Private & Proprietary
-- **Changelog:** Lihat **[CHANGELOG.md](./CHANGELOG.md)** untuk riwayat perubahan.
+- **Changelog:** Lihat **[CHANGELOG.md](../CHANGELOG.md)** untuk complete changelog Sprint 1-5
+
+### Sprint Status
+
+| Sprint | Status | Features |
+|--------|--------|----------|
+| **Sprint 1** | ✅ Complete | Authentication, JWT, RBAC, Rate Limiting |
+| **Sprint 2** | ✅ Complete | User Management, Profile, Search & Filters |
+| **Sprint 3** | ✅ Complete | Password Management, Forgot/Reset, Force Change |
+| **Sprint 4** | ✅ Complete | Notifications, Activity Logs, Audit Trail |
+| **Sprint 5** | ✅ Complete | Gamification, Photo Upload, CSV Import/Export |
+| **Sprint 6** | 🚧 Next | Testing, Optimization, Production Deployment |
 
 ---
 
@@ -397,10 +486,10 @@ Ingin berkontribusi? Silakan baca **[CONTRIBUTING.md](./CONTRIBUTING.md)** untuk
 
 Pilih path Anda:
 
-- 🚀 **Quick Setup:** [getting-started/quickstart.md](./getting-started/quickstart.md)
-- 📖 **Detail Setup:** [getting-started/installation.md](./getting-started/installation.md)
-- 🏗️ **Understand Architecture:** [architecture/](./architecture/)
-- 🎨 **Build Features:** [development/customization-guide.md](./development/customization-guide.md)
-- 🌐 **Deploy:** [deployment/production-deployment.md](./deployment/production-deployment.md)
+- 🚀 **Quick Setup:** [getting-started/quickstart.md](./01-getting-started/quickstart.md)
+- 📖 **Detail Setup:** [getting-started/installation.md](./01-getting-started/installation.md)
+- 🏗️ **Understand Architecture:** [architecture/](./02-architecture/)
+- 🎨 **Build Features:** [development/customization-guide.md](./03-development/customization-guide.md)
+- 🌐 **Deploy:** [deployment/production-deployment.md](./08-deployment/production-deployment.md)
 
 **Happy Coding! 🎯**

@@ -9,6 +9,26 @@ import router from '../router'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'
 
 /**
+ * Flag untuk prevent multiple simultaneous refresh token attempts
+ */
+let isRefreshing = false
+let failedQueue = []
+
+/**
+ * Process queue untuk pending requests setelah token refresh
+ */
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error)
+    } else {
+      prom.resolve(token)
+    }
+  })
+  failedQueue = []
+}
+
+/**
  * Axios instance dengan auto token injection dan interceptors
  * untuk handling authentication dan error responses
  */
@@ -44,30 +64,67 @@ apiClient.interceptors.response.use(
 
     // Handle 401 Unauthorized (hanya untuk authenticated requests)
     if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true
-
-      // Skip auto-redirect jika ini adalah login request yang gagal
+      // Skip auto-redirect jika ini adalah login/refresh request yang gagal
       const isLoginRequest = originalRequest.url?.includes('/auth/login')
+      const isRefreshRequest = originalRequest.url?.includes('/auth/refresh')
+      
       if (isLoginRequest) {
         // Untuk login request, reject error tanpa redirect
         return Promise.reject(error)
       }
 
+      if (isRefreshRequest) {
+        // Refresh token sendiri yang gagal, logout immediately
+        console.error('API Error: refresh token tidak valid atau expired')
+        isRefreshing = false
+        processQueue(error, null)
+        authStore.clearAuth()
+        if (window.location.pathname !== '/login') {
+          router.push('/login').catch(() => {})
+        }
+        return Promise.reject(error)
+      }
+
+      originalRequest._retry = true
+
+      // Jika sedang refresh, queue request ini
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject })
+        }).then(token => {
+          originalRequest.headers.Authorization = `Bearer ${token}`
+          return apiClient(originalRequest)
+        }).catch(err => {
+          return Promise.reject(err)
+        })
+      }
+
       // Coba refresh token untuk request lainnya
       if (authStore.refreshToken) {
+        isRefreshing = true
+
         try {
           const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
             refresh_token: authStore.refreshToken,
           })
 
           if (response.data.success) {
+            const newToken = response.data.data.token
             authStore.setAuth(response.data.data)
-            originalRequest.headers.Authorization = `Bearer ${response.data.data.token}`
+            originalRequest.headers.Authorization = `Bearer ${newToken}`
+            
+            processQueue(null, newToken)
+            isRefreshing = false
+            
             return apiClient(originalRequest)
           }
         } catch (refreshError) {
-          // Refresh token gagal, logout user tanpa full page reload
+          // Refresh token gagal, logout user
+          console.error('API Error: gagal refresh token -', refreshError.response?.data?.message || 'Token expired')
+          isRefreshing = false
+          processQueue(refreshError, null)
           authStore.clearAuth()
+          
           // Use router untuk avoid full page reload
           if (window.location.pathname !== '/login') {
             router.push('/login').catch(() => {})
@@ -75,7 +132,8 @@ apiClient.interceptors.response.use(
           return Promise.reject(refreshError)
         }
       } else {
-        // Tidak ada refresh token, redirect ke login tanpa full page reload
+        // Tidak ada refresh token, redirect ke login
+        console.warn('API Error: tidak ada refresh token, redirect ke login')
         authStore.clearAuth()
         if (window.location.pathname !== '/login') {
           router.push('/login').catch(() => {})

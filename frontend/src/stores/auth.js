@@ -57,6 +57,34 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   /**
+   * Validate JWT token format dan struktur
+   * untuk memastikan token valid sebelum digunakan
+   */
+  const isValidTokenFormat = (token) => {
+    if (!token || typeof token !== 'string') return false
+    
+    // JWT format: header.payload.signature
+    const parts = token.split('.')
+    if (parts.length !== 3) return false
+    
+    try {
+      // Decode payload untuk check expiry
+      const payload = JSON.parse(atob(parts[1]))
+      
+      // Check jika token sudah expired
+      if (payload.exp && payload.exp * 1000 < Date.now()) {
+        console.warn('Token sudah expired')
+        return false
+      }
+      
+      return true
+    } catch (e) {
+      console.error('Token format tidak valid:', e)
+      return false
+    }
+  }
+
+  /**
    * Restore authentication dari localStorage
    * untuk persistent login setelah page reload
    */
@@ -66,6 +94,13 @@ export const useAuthStore = defineStore('auth', () => {
     const storedUser = localStorage.getItem('user_data')
 
     if (storedToken && storedUser) {
+      // Validate token format sebelum restore
+      if (!isValidTokenFormat(storedToken)) {
+        console.warn('Stored token tidak valid atau expired, clearing auth')
+        clearAuth()
+        return
+      }
+
       token.value = storedToken
       refreshToken.value = storedRefreshToken
       try {
@@ -74,6 +109,10 @@ export const useAuthStore = defineStore('auth', () => {
         console.error('Error parsing stored user data:', e)
         clearAuth()
       }
+    } else if (storedToken || storedRefreshToken || storedUser) {
+      // Jika ada incomplete auth data, clear semua
+      console.warn('Incomplete auth data detected, clearing all')
+      clearAuth()
     }
   }
 
@@ -164,5 +203,6 @@ export const useAuthStore = defineStore('auth', () => {
     hasDepartment,
     fetchCurrentUser,
     updateUserField,
+    isValidTokenFormat,
   }
 })

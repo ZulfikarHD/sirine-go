@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useApi } from '@/composables/useApi'
+import { useAuthStore } from './auth'
 
 /**
  * Notification Store merupakan Pinia store untuk state management notifikasi
@@ -8,6 +9,7 @@ import { useApi } from '@/composables/useApi'
  */
 export const useNotificationStore = defineStore('notification', () => {
   const api = useApi()
+  const authStore = useAuthStore()
 
   // State
   const notifications = ref([])
@@ -27,6 +29,11 @@ export const useNotificationStore = defineStore('notification', () => {
    * dengan optional filter unread_only untuk performance
    */
   const fetchNotifications = async (unreadOnly = false) => {
+    // Skip jika user belum authenticated
+    if (!authStore.isAuthenticated) {
+      return []
+    }
+
     try {
       isLoading.value = true
       const params = unreadOnly ? '?unread_only=true' : ''
@@ -37,6 +44,12 @@ export const useNotificationStore = defineStore('notification', () => {
         return response.data
       }
     } catch (error) {
+      // Jangan throw error untuk 401, hanya log
+      if (error.response?.status === 401) {
+        console.warn('Notification fetch gagal: user tidak authenticated')
+        stopPolling()
+        return []
+      }
       console.error('Error fetching notifications:', error)
       throw error
     } finally {
@@ -49,6 +62,11 @@ export const useNotificationStore = defineStore('notification', () => {
    * untuk badge display di notification bell
    */
   const fetchUnreadCount = async () => {
+    // Skip jika user belum authenticated
+    if (!authStore.isAuthenticated) {
+      return 0
+    }
+
     try {
       const response = await api.get('/notifications/unread-count')
       if (response.success) {
@@ -56,8 +74,15 @@ export const useNotificationStore = defineStore('notification', () => {
         return response.data.count
       }
     } catch (error) {
+      // Jangan throw error untuk 401, hanya log dan stop polling
+      if (error.response?.status === 401) {
+        console.warn('Fetch unread count gagal: user tidak authenticated')
+        stopPolling()
+        return 0
+      }
       console.error('Error fetching unread count:', error)
-      throw error
+      // Jangan throw error, return 0 saja
+      return 0
     }
   }
 
@@ -66,14 +91,24 @@ export const useNotificationStore = defineStore('notification', () => {
    * untuk quick preview di notification bell dropdown
    */
   const getRecentNotifications = async (limit = 5) => {
+    // Skip jika user belum authenticated
+    if (!authStore.isAuthenticated) {
+      return []
+    }
+
     try {
       const response = await api.get(`/notifications/recent?limit=${limit}`)
       if (response.success) {
         return response.data || []
       }
     } catch (error) {
+      // Jangan throw error untuk 401
+      if (error.response?.status === 401) {
+        console.warn('Fetch recent notifications gagal: user tidak authenticated')
+        return []
+      }
       console.error('Error fetching recent notifications:', error)
-      throw error
+      return []
     }
   }
 
@@ -174,6 +209,12 @@ export const useNotificationStore = defineStore('notification', () => {
    * dengan interval 30 detik (configurable)
    */
   const startPolling = (intervalMs = 30000) => {
+    // Jangan mulai polling jika user belum authenticated
+    if (!authStore.isAuthenticated) {
+      console.warn('Polling tidak dimulai: user belum authenticated')
+      return
+    }
+
     if (pollingInterval.value) {
       stopPolling()
     }
@@ -183,7 +224,12 @@ export const useNotificationStore = defineStore('notification', () => {
 
     // Setup polling interval
     pollingInterval.value = setInterval(() => {
-      fetchUnreadCount()
+      // Cek auth sebelum fetch untuk safety
+      if (authStore.isAuthenticated) {
+        fetchUnreadCount()
+      } else {
+        stopPolling()
+      }
     }, intervalMs)
   }
 

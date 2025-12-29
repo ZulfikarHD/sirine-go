@@ -111,79 +111,206 @@ Setelah kedua server berjalan:
 
 Dokumentasi lengkap tersedia di folder **`docs/`**:
 
-### **Sprint 1 - Authentication:**
-- 🔐 [**AUTHENTICATION.md**](docs/features/AUTHENTICATION.md) - Complete auth system documentation
-- 📖 [**SPRINT1_IMPLEMENTATION.md**](SPRINT1_IMPLEMENTATION.md) - Implementation details & testing guide
-- 📋 [**Sprint Plan**](.cursor/plans/sprint_plan_-_authentication_fa6ccc79.plan.md) - 6-week sprint roadmap
+### **📋 Sprint Documentation:**
+- 📝 [**CHANGELOG.md**](CHANGELOG.md) - Complete changelog dengan all Sprint 1-5 changes
+- 📊 [**temp/SPRINT1_SUMMARY.md**](temp/SPRINT1_SUMMARY.md) - Sprint 1: Authentication System
+- 📊 [**temp/SPRINT2_SUMMARY.md**](temp/SPRINT2_SUMMARY.md) - Sprint 2: User Management & Profile
+- 📊 [**temp/SPRINT3_SUMMARY.md**](temp/SPRINT3_SUMMARY.md) - Sprint 3: Password Management & Security
+- 📊 [**temp/SPRINT4_SUMMARY.md**](temp/SPRINT4_SUMMARY.md) - Sprint 4: Notifications & Audit
+- 📊 [**temp/SPRINT5_SUMMARY.md**](temp/SPRINT5_SUMMARY.md) - Sprint 5: Enhancements & Gamification
 
-### **Getting Started:**
-- 📘 [**SETUP_GUIDE.md**](docs/SETUP_GUIDE.md) - Panduan setup lengkap & troubleshooting
-- ✅ [**CHECKLIST.md**](docs/CHECKLIST.md) - Verification checklist
+### **🚀 Getting Started:**
+- 📘 [**docs/getting-started/quickstart.md**](docs/getting-started/quickstart.md) - Setup dalam 5 menit
+- 📋 [**docs/getting-started/installation.md**](docs/getting-started/installation.md) - Detail installation guide
+- ✅ [**docs/getting-started/checklist.md**](docs/getting-started/checklist.md) - Verification checklist
 
-### **Development:**
-- 🛠️ [**DEVELOPMENT_GUIDE.md**](docs/DEVELOPMENT_GUIDE.md) - Development mode setup & troubleshooting
-- 📗 [**API_DOCUMENTATION.md**](docs/API_DOCUMENTATION.md) - Complete API reference
-- 🏗️ [**ARCHITECTURE_EXPLAINED.md**](docs/ARCHITECTURE_EXPLAINED.md) - Package explanations & why needed
-- 📁 [**FOLDER_STRUCTURE.md**](docs/FOLDER_STRUCTURE.md) - Project structure guide
+### **🏗️ Architecture:**
+- 🏛️ [**docs/architecture/overview.md**](docs/architecture/overview.md) - Architecture overview
+- 📁 [**docs/architecture/folder-structure.md**](docs/architecture/folder-structure.md) - Project structure
+- 📊 [**docs/architecture/project-summary.md**](docs/architecture/project-summary.md) - Project statistics
 
-### **Deployment:**
-- 🚀 [**DEPLOYMENT.md**](docs/DEPLOYMENT.md) - Production deployment guide
-- 📊 [**PROJECT_SUMMARY.md**](docs/PROJECT_SUMMARY.md) - Project overview & statistics
+### **🛠️ Development:**
+- 🎨 [**docs/development/customization-guide.md**](docs/development/customization-guide.md) - Add new features
+- 📗 [**docs/development/api-documentation.md**](docs/development/api-documentation.md) - Complete API reference
+- 🧪 [**docs/development/testing.md**](docs/development/testing.md) - Testing guide
+- 📝 [**docs/development/development-workflow.md**](docs/development/development-workflow.md) - Development workflow
+
+### **📖 Guides:**
+- 🔐 [**docs/guides/authentication/**](docs/guides/authentication/) - Authentication & security flows
+- 🗄️ [**docs/guides/database/**](docs/guides/database/) - Database management, models, migrations
+- ⚙️ [**docs/guides/configuration.md**](docs/guides/configuration.md) - Environment configuration
+- 🛡️ [**docs/guides/security.md**](docs/guides/security.md) - Security best practices
+- ✅ [**docs/guides/validation/**](docs/guides/validation/) - Validation guide
+- 📝 [**docs/guides/documentation-maintenance.md**](docs/guides/documentation-maintenance.md) - How to maintain docs
+
+### **🔌 API Reference:**
+- 📡 [**docs/api/README.md**](docs/api/README.md) - API hub & conventions
+- 👥 [**docs/api/user-management.md**](docs/api/user-management.md) - User Management API
+
+### **🧪 Testing:**
+- ✅ [**docs/testing/user-management-testing.md**](docs/testing/user-management-testing.md) - User management test scenarios
+- 📋 [**temp/SPRINT4_TESTING_GUIDE.md**](temp/SPRINT4_TESTING_GUIDE.md) - Sprint 4 testing guide
+
+### **🚀 Deployment:**
+- 🌐 [**docs/deployment/production-deployment.md**](docs/deployment/production-deployment.md) - Production deployment
+- ❓ [**docs/troubleshooting/faq.md**](docs/troubleshooting/faq.md) - FAQ & troubleshooting
 
 ---
 
 ## 🎯 Key Features
 
-### **Authentication & Security (Sprint 1):**
+### **Authentication & Security (Sprint 1 ✅):**
 - ✅ JWT-based authentication (15 min expiry)
 - ✅ Refresh token mechanism (30 days)
-- ✅ Role-based access control (7 roles)
+- ✅ Role-based access control (7 roles, 4 departments, 3 shifts)
 - ✅ Rate limiting (5 attempts → 15 min lockout)
 - ✅ Bcrypt password hashing (cost 12)
 - ✅ Session tracking dengan IP & user agent
 - ✅ Activity logging untuk audit trail
 - ✅ Auto token refresh on expiry
 
+### **User Management (Sprint 2 ✅):**
+- ✅ Admin CRUD users dengan comprehensive management
+- ✅ Search & filter users (by role, department, status, name/NIP)
+- ✅ Bulk operations (delete, update status)
+- ✅ Auto-generated secure passwords (12 chars dengan copy button)
+- ✅ Self-service profile view & edit
+- ✅ Role badges dengan color coding
+- ✅ Pagination support (20 users per page)
+- ✅ Soft delete untuk data retention
+
+### **Password Management (Sprint 3 ✅):**
+- ✅ Change password (self-service)
+- ✅ Forgot password flow dengan email
+- ✅ Reset password via secure token
+- ✅ Force password change untuk first-time login
+- ✅ Password strength indicator dengan real-time validation
+- ✅ Session expiration handling
+- ✅ Password policy enforcement (min 8 chars, complexity rules)
+- ✅ Session revocation setelah password change
+
+### **Notifications & Audit (Sprint 4 ✅):**
+- ✅ In-app notification system dengan real-time updates
+- ✅ Notification bell dengan badge count
+- ✅ Notification center dengan tab filtering
+- ✅ Mark as read (single & bulk)
+- ✅ Activity logs viewer untuk Admin/Manager
+- ✅ Comprehensive audit trail dengan before/after changes
+- ✅ Advanced filters (action, entity type, date range, user)
+- ✅ Activity statistics dan analytics
+- ✅ 30-second polling untuk real-time updates
+
+### **Gamification & Enhancements (Sprint 5 ✅):**
+- ✅ Achievement system dengan 6 initial achievements
+- ✅ Points tracking dan level system (Bronze → Silver → Gold → Platinum)
+- ✅ Achievement badges dengan unlock animations
+- ✅ Profile photo upload dengan auto-resize (200x200px)
+- ✅ CSV bulk import/export users
+- ✅ Haptic feedback untuk mobile (multiple patterns)
+- ✅ Loading skeletons untuk better UX
+- ✅ Animated points counter dengan progress bar
+- ✅ Image optimization (JPEG quality 90%)
+
 ### **Backend Features:**
 - ✅ RESTful API dengan Go + Gin Framework
 - ✅ Service Pattern untuk clean architecture
 - ✅ GORM untuk type-safe database operations
-- ✅ Auto migration
+- ✅ Auto migration dengan seed data
 - ✅ CORS middleware
 - ✅ Environment-based configuration
 - ✅ Error messages dalam Bahasa Indonesia
+- ✅ Background goroutines untuk non-blocking operations
+- ✅ Transaction support untuk atomic updates
+- ✅ File upload dengan validation dan optimization
 
 ### **Frontend Features:**
 - ✅ Modern UI dengan Tailwind CSS 4 + iOS design
 - ✅ Glass effect cards dengan backdrop blur
-- ✅ Spring physics animations (Motion-v)
-- ✅ Haptic feedback untuk mobile
+- ✅ Spring physics animations (Motion-V, bukan CSS)
+- ✅ Haptic feedback untuk mobile (7 patterns)
 - ✅ Responsive design (mobile-first)
-- ✅ Pinia state management
+- ✅ Pinia state management dengan persistent storage
 - ✅ Vue Router dengan navigation guards
 - ✅ Auto token injection & refresh
 - ✅ Form validation dengan real-time feedback
-- ✅ Loading & error states
+- ✅ Loading skeletons & empty states
 - ✅ Indigo & Fuchsia gradient theme
+- ✅ Optimistic updates untuk instant UI feedback
+- ✅ Staggered animations (0.05s delay per item)
+- ✅ Drag & drop file upload
 
 ---
 
 ## 🌐 API Endpoints
 
-### Authentication (Sprint 1) ✅
+### Authentication (Sprint 1 ✅)
 ```
-POST   /api/auth/login      # Login dengan NIP & password
-POST   /api/auth/logout     # Logout dan revoke session
-GET    /api/auth/me         # Get current user info
-POST   /api/auth/refresh    # Refresh JWT token
+POST   /api/auth/login              # Login dengan NIP & password
+POST   /api/auth/logout             # Logout dan revoke session
+GET    /api/auth/me                 # Get current user info
+POST   /api/auth/refresh            # Refresh JWT token
+POST   /api/auth/forgot-password    # Request reset password link
+POST   /api/auth/reset-password     # Reset password dengan token
+```
+
+### User Management - Admin (Sprint 2 ✅)
+```
+GET    /api/users                    # List users dengan filters
+GET    /api/users/search             # Search users by NIP/name
+GET    /api/users/:id                # Get user detail
+POST   /api/users                    # Create user (Admin)
+PUT    /api/users/:id                # Update user (Admin)
+DELETE /api/users/:id                # Delete user (Admin)
+POST   /api/users/bulk-delete        # Bulk delete users
+POST   /api/users/bulk-update-status # Bulk update status
+POST   /api/users/import             # Import users dari CSV
+GET    /api/users/export             # Export users ke CSV
+POST   /api/users/:id/reset-password # Admin force reset password
+```
+
+### Profile Management (Sprint 2 & 3 ✅)
+```
+GET    /api/profile                  # Get own profile
+PUT    /api/profile                  # Update own profile
+PUT    /api/profile/password         # Change own password
+POST   /api/profile/photo            # Upload profile photo
+DELETE /api/profile/photo            # Delete profile photo
+GET    /api/profile/activity         # Get own activity logs
+```
+
+### Notifications (Sprint 4 ✅)
+```
+GET    /api/notifications            # List user notifications
+GET    /api/notifications/unread-count # Get unread badge count
+GET    /api/notifications/recent     # Get recent notifications
+PUT    /api/notifications/:id/read   # Mark as read
+PUT    /api/notifications/read-all   # Mark all as read
+DELETE /api/notifications/:id        # Delete notification
+```
+
+### Activity Logs - Admin (Sprint 4 ✅)
+```
+GET    /api/admin/activity-logs      # List logs dengan filters
+GET    /api/admin/activity-logs/:id  # Get log detail
+GET    /api/admin/activity-logs/user/:id # Get user activity
+GET    /api/admin/activity-logs/stats    # Get activity statistics
+```
+
+### Achievements & Gamification (Sprint 5 ✅)
+```
+GET    /api/achievements             # List all achievements
+GET    /api/profile/achievements     # Get user achievements
+GET    /api/profile/stats            # Get user gamification stats
+POST   /api/admin/achievements/award # Award achievement (Admin)
+GET    /api/admin/users/:id/achievements # Get user achievements
 ```
 
 ### Health Check
 ```
-GET    /health              # Server health status
+GET    /health                       # Server health status
 ```
 
-**Full API documentation:** [docs/features/AUTHENTICATION.md](docs/features/AUTHENTICATION.md)
+**Full API documentation:** [docs/development/api-documentation.md](docs/development/api-documentation.md)
 
 ---
 
@@ -363,21 +490,55 @@ This project is private and proprietary.
 
 ## ✅ Status
 
-**Version:** 1.0.1 - Sprint 1 Complete  
-**Status:** ✅ Authentication System Production Ready  
-**Last Updated:** 27 Desember 2025  
-**Latest:** 🎨 Tailwind CSS v4 configuration fixed
+**Version:** 1.5.0 - Sprint 5 Complete  
+**Status:** ✅ Production Ready dengan Gamification System  
+**Last Updated:** 28 Desember 2025  
+**Latest:** 🎮 Gamification system, CSV import/export, photo upload
 
-### Sprint 1: Foundation & Core Authentication ✅
-- ✅ JWT-based login/logout
-- ✅ Role-based access control (RBAC)
+### Sprint Progress
+
+#### ✅ Sprint 1: Foundation & Core Authentication (Complete)
+- ✅ JWT-based login/logout dengan refresh token
+- ✅ Role-based access control (7 roles, 4 departments, 3 shifts)
 - ✅ Session management dengan token tracking
 - ✅ Rate limiting & account lockout
 - ✅ iOS-inspired UI dengan glass effect
 - ✅ Haptic feedback & spring animations
 - ✅ Activity logging untuk audit trail
 
-**Next**: Sprint 2 - User Management & Profile
+#### ✅ Sprint 2: User Management & Profile (Complete)
+- ✅ Admin CRUD users dengan search & filters
+- ✅ Bulk operations (delete, update status)
+- ✅ Auto-generated secure passwords
+- ✅ Self-service profile management
+- ✅ Pagination dengan 20 users per page
+- ✅ Activity logging via middleware
+
+#### ✅ Sprint 3: Password Management & Security (Complete)
+- ✅ Change password flow (self-service)
+- ✅ Forgot password dengan email
+- ✅ Reset password via secure token
+- ✅ Force password change untuk first-time login
+- ✅ Password strength indicator
+- ✅ Session revocation setelah password change
+
+#### ✅ Sprint 4: Notifications & Audit (Complete)
+- ✅ In-app notification system
+- ✅ Real-time updates via 30s polling
+- ✅ Notification center dengan filtering
+- ✅ Activity logs viewer untuk Admin
+- ✅ Before/after change tracking
+- ✅ Comprehensive audit trail
+
+#### ✅ Sprint 5: Enhancements & Gamification (Complete)
+- ✅ Achievement system dengan 6 achievements
+- ✅ Points tracking dan level system
+- ✅ Profile photo upload dengan auto-resize
+- ✅ CSV bulk import/export users
+- ✅ Haptic feedback patterns (7 types)
+- ✅ Loading skeletons untuk better UX
+
+**Next**: Sprint 6 - Testing, Optimization & Production Deployment
 
 ---
 
