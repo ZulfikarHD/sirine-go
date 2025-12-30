@@ -179,6 +179,14 @@ const props = defineProps({
     required: true
   },
   /**
+   * Initial tinta actual data (untuk restore data saat navigate back)
+   * Format: [{ color: string, quantity: number, checked: boolean }]
+   */
+  initialTintaActual: {
+    type: Array,
+    default: () => []
+  },
+  /**
    * Loading state
    */
   loading: {
@@ -194,6 +202,7 @@ const tintaItems = ref([])
 
 /**
  * Initialize tinta items dari requirements prop
+ * dengan restore data dari initialTintaActual jika ada
  */
 const initializeTintaItems = () => {
   tintaItems.value = props.requirements.map(req => {
@@ -201,19 +210,24 @@ const initializeTintaItems = () => {
     const color = typeof req === 'string' ? req : req.color || req
     const requirement = typeof req === 'object' ? req.requirement : null
     
+    // Check if ada data existing dari initialTintaActual
+    const existingData = props.initialTintaActual.find(
+      item => item.color === color
+    )
+    
     return {
       color,
       requirement,
-      checked: false,
-      quantity: null
+      checked: existingData ? true : false,
+      quantity: existingData ? existingData.quantity : null
     }
   })
 }
 
-// Initialize on mount
-watch(() => props.requirements, () => {
+// Initialize on mount dan saat props berubah
+watch(() => [props.requirements, props.initialTintaActual], () => {
   initializeTintaItems()
-}, { immediate: true })
+}, { immediate: true, deep: true })
 
 // Computed: Checked count
 const checkedCount = computed(() => {

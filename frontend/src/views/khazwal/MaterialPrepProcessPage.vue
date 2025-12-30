@@ -97,14 +97,49 @@
             </p>
           </div>
 
-          <!-- Barcode Scanner -->
-          <BarcodeScanner
-            :expected-code="materialPrep.sap_plat_code"
-            :auto-start="false"
-            :show-manual-input="true"
-            @scan-success="handlePlatConfirmed"
-            @scan-error="handleScanError"
-          />
+          <!-- Plat Already Confirmed Notice -->
+          <Motion
+            v-if="materialPrep.plat_retrieved_at"
+            v-bind="entranceAnimations.fadeScale"
+            class="mb-6 p-4 bg-green-50 border-2 border-green-200 rounded-xl"
+          >
+            <div class="flex items-start gap-3">
+              <CheckCircle class="w-6 h-6 text-green-600 flex-shrink-0" />
+              <div class="flex-1">
+                <p class="text-sm font-semibold text-green-900 mb-1">
+                  Plat Sudah Dikonfirmasi
+                </p>
+                <p class="text-sm text-green-700">
+                  Dikonfirmasi pada: {{ formatDateTime(materialPrep.plat_retrieved_at) }}
+                </p>
+                <p v-if="materialPrep.plat_scanned_code" class="text-xs text-green-600 mt-1 font-mono">
+                  Kode: {{ materialPrep.plat_scanned_code }}
+                </p>
+              </div>
+            </div>
+          </Motion>
+
+          <!-- Barcode Scanner (disabled if already confirmed) -->
+          <div v-if="!materialPrep.plat_retrieved_at">
+            <BarcodeScanner
+              :expected-code="materialPrep.sap_plat_code"
+              :auto-start="false"
+              :show-manual-input="true"
+              @scan-success="handlePlatConfirmed"
+              @scan-error="handleScanError"
+            />
+          </div>
+          <div v-else class="text-center p-6 bg-gray-50 rounded-xl">
+            <p class="text-gray-600 mb-4">
+              Plat sudah dikonfirmasi. Klik "Lanjutkan" untuk melanjutkan ke step berikutnya.
+            </p>
+            <button
+              @click="nextStep"
+              class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-fuchsia-600 text-white font-semibold rounded-xl hover:shadow-lg active-scale"
+            >
+              Lanjutkan ke Input Kertas
+            </button>
+          </div>
         </div>
 
         <!-- Step 2: Input Kertas -->
@@ -120,6 +155,8 @@
 
           <KertasInputForm
             :target-quantity="materialPrep.kertas_blanko_quantity"
+            :initial-actual-qty="materialPrep.kertas_blanko_actual"
+            :initial-variance-reason="materialPrep.kertas_blanko_variance_reason || ''"
             :loading="stepLoading"
             @submit="handleKertasSubmit"
           />
@@ -136,8 +173,32 @@
             </p>
           </div>
 
+          <!-- Empty State untuk Tinta Requirements -->
+          <Motion
+            v-if="tintaRequirements.length === 0"
+            v-bind="entranceAnimations.fadeScale"
+            class="p-8 text-center bg-yellow-50 border-2 border-yellow-200 rounded-xl mb-6"
+          >
+            <AlertTriangle class="w-12 h-12 text-yellow-600 mx-auto mb-4" />
+            <h3 class="text-lg font-bold text-yellow-900 mb-2">
+              Data Tinta Tidak Tersedia
+            </h3>
+            <p class="text-yellow-700 mb-4">
+              Tidak ada data requirements tinta untuk PO ini. Pastikan data OBC Master sudah lengkap.
+            </p>
+            <button
+              @click="fetchDetail"
+              class="px-6 py-3 bg-yellow-600 text-white font-semibold rounded-xl hover:bg-yellow-700 active-scale"
+            >
+              <RefreshCw class="w-4 h-4 inline-block mr-2" />
+              Muat Ulang Data
+            </button>
+          </Motion>
+
           <TintaChecklist
+            v-else
             :requirements="tintaRequirements"
+            :initial-tinta-actual="parsedTintaActual"
             :loading="stepLoading"
             @submit="handleTintaSubmit"
           />
@@ -453,7 +514,7 @@ const processSteps = ref([
   {
     id: 'review',
     title: 'Review',
-    description: 'Review & finalize (Sprint 5)',
+    description: 'Review & finalize',
     status: 'pending'
   }
 ])
@@ -466,17 +527,92 @@ const materialPrep = computed(() => {
 })
 
 /**
- * Computed: Tinta requirements list
+ * Computed: Determine highest accessible step berdasarkan backend state
+ * Return nilai adalah step index tertinggi yang bisa diakses user
+ * untuk allow navigation ke step yang sudah pernah dikerjakan atau step berikutnya
+ */
+const highestAccessibleStep = computed(() => {
+  if (!materialPrep.value) return 0
+  
+  const prep = materialPrep.value
+  
+  // Check completion state dan return highest accessible step index
+  if (prep.tinta_actual && (Array.isArray(prep.tinta_actual) ? prep.tinta_actual.length > 0 : true)) {
+    return 3 // Tinta done, bisa akses review (step 3)
+  } else if (prep.kertas_blanko_actual !== null && prep.kertas_blanko_actual !== undefined) {
+    return 2 // Kertas done, bisa akses tinta (step 2)
+  } else if (prep.plat_retrieved_at) {
+    return 1 // Plat done, bisa akses kertas (step 1)
+  } else {
+    return 0 // Belum ada yang done, hanya bisa akses plat (step 0)
+  }
+})
+
+/**
+ * Computed: Tinta requirements list dengan multiple fallback strategies
+ * untuk handle berbagai format data dari backend
+ * 
+ * Format dari backend bisa berupa:
+ * - Object: {"cyan": 2, "magenta": 2, "yellow": 2, "black": 3}
+ * - Array: [{color: "cyan", requirement: 2}, ...]
+ * - String: JSON string dari salah satu format di atas
  */
 const tintaRequirements = computed(() => {
-  if (!materialPrep.value?.tinta_requirements) return []
+  if (!materialPrep.value?.tinta_requirements) {
+    console.warn('Tinta requirements tidak tersedia dari backend')
+    return []
+  }
   
   try {
     const tinta = materialPrep.value.tinta_requirements
-    if (Array.isArray(tinta)) return tinta
-    if (typeof tinta === 'object') return Object.values(tinta)
+    
+    // Handle array format - sudah siap digunakan
+    if (Array.isArray(tinta)) {
+      return tinta.length > 0 ? tinta : []
+    }
+    
+    // Handle string format (JSON string)
+    if (typeof tinta === 'string') {
+      try {
+        const parsed = JSON.parse(tinta)
+        
+        // Jika hasil parse adalah array
+        if (Array.isArray(parsed)) {
+          return parsed
+        }
+        
+        // Jika hasil parse adalah object, convert ke array
+        if (typeof parsed === 'object' && parsed !== null) {
+          return Object.entries(parsed).map(([color, requirement]) => ({
+            color,
+            requirement
+          }))
+        }
+      } catch (parseError) {
+        console.error('Gagal parse tinta requirements string:', parseError)
+        return []
+      }
+    }
+    
+    // Handle object format {"color": quantity}
+    // Convert ke array format yang dibutuhkan TintaChecklist
+    if (typeof tinta === 'object' && tinta !== null) {
+      const entries = Object.entries(tinta)
+      if (entries.length === 0) {
+        return []
+      }
+      
+      // Convert object ke array format [{color, requirement}]
+      return entries.map(([color, requirement]) => ({
+        color,
+        requirement: typeof requirement === 'number' ? requirement : parseFloat(requirement) || 0
+      }))
+    }
+    
+    console.warn('Format tinta requirements tidak dikenali:', typeof tinta, tinta)
     return []
   } catch (e) {
+    console.error('Error processing tinta requirements:', e)
     return []
   }
 })
@@ -536,6 +672,35 @@ const formatDuration = (minutes) => {
 }
 
 /**
+ * Restore step progress berdasarkan material prep state dari backend
+ * untuk memastikan user bisa melanjutkan dari step terakhir
+ */
+const restoreStepProgress = () => {
+  if (!materialPrep.value) {
+    currentStep.value = 0
+    return
+  }
+
+  // Set current step ke highest accessible step
+  const highest = highestAccessibleStep.value
+  currentStep.value = highest
+  
+  // Update all step statuses based on completion
+  processSteps.value.forEach((step, index) => {
+    if (index < highest) {
+      // Steps sebelum current = completed (bisa di-navigate)
+      step.status = 'completed'
+    } else if (index === highest) {
+      // Current active step
+      step.status = 'active'
+    } else {
+      // Steps yang belum bisa diakses
+      step.status = 'pending'
+    }
+  })
+}
+
+/**
  * Fetch PO detail dari API
  */
 const fetchDetail = async () => {
@@ -552,6 +717,9 @@ const fetchDetail = async () => {
       // Validate status
       if (poDetail.value.current_status !== 'MATERIAL_PREP_IN_PROGRESS') {
         error.value = 'PO tidak dalam status yang valid untuk proses persiapan'
+      } else {
+        // Restore step progress berdasarkan state
+        restoreStepProgress()
       }
     } else {
       error.value = response.message || 'Gagal memuat detail PO'
@@ -565,31 +733,66 @@ const fetchDetail = async () => {
 }
 
 /**
- * Navigate to specific step (untuk back navigation)
+ * Navigate to specific step dengan validation
+ * User bisa navigate ke any step yang sudah accessible (completed atau current)
  */
 const navigateToStep = (stepIndex) => {
+  const maxAccessible = highestAccessibleStep.value
+  
+  // Validate: hanya bisa navigate ke step yang accessible
+  if (stepIndex > maxAccessible) {
+    console.warn(`Tidak bisa navigate ke step ${stepIndex}, maksimal accessible: ${maxAccessible}`)
+    return
+  }
+  
+  // Update current step
   currentStep.value = stepIndex
   
-  // Update step status
+  // Update step statuses: semua step sampai maxAccessible bisa di-navigate
   processSteps.value.forEach((step, index) => {
-    if (index < stepIndex) {
-      step.status = 'completed'
-    } else if (index === stepIndex) {
+    if (index === stepIndex) {
+      // Currently selected step = active
       step.status = 'active'
+    } else if (index < maxAccessible) {
+      // Steps before max accessible = completed (clickable)
+      step.status = 'completed'
+    } else if (index === maxAccessible && index !== stepIndex) {
+      // Max accessible step (jika bukan current) = completed (clickable)
+      step.status = 'completed'
     } else {
+      // Future steps = pending (not clickable)
       step.status = 'pending'
     }
   })
+  
+  // Haptic feedback
+  if ('vibrate' in navigator) {
+    navigator.vibrate(10)
+  }
 }
 
 /**
- * Move to next step
+ * Move to next step (dipanggil setelah berhasil complete current step)
+ * Note: fetchDetail() harus dipanggil sebelum ini untuk update backend state
  */
 const nextStep = () => {
-  if (currentStep.value < processSteps.value.length - 1) {
-    processSteps.value[currentStep.value].status = 'completed'
-    currentStep.value++
-    processSteps.value[currentStep.value].status = 'active'
+  const maxAccessible = highestAccessibleStep.value
+  const nextStepIndex = currentStep.value + 1
+  
+  // Hanya move ke next step jika belum di step terakhir
+  if (nextStepIndex < processSteps.value.length && nextStepIndex <= maxAccessible) {
+    currentStep.value = nextStepIndex
+    
+    // Update statuses using same logic as navigateToStep
+    processSteps.value.forEach((step, index) => {
+      if (index === nextStepIndex) {
+        step.status = 'active'
+      } else if (index < maxAccessible || (index === maxAccessible && index !== nextStepIndex)) {
+        step.status = 'completed'
+      } else {
+        step.status = 'pending'
+      }
+    })
   }
 }
 
@@ -603,6 +806,9 @@ const handlePlatConfirmed = async (platCode) => {
     const response = await khazwalApi.confirmPlat(materialPrep.value.id, platCode)
 
     if (response.success) {
+      // Refresh detail untuk update state
+      await fetchDetail()
+      
       await alertDialog.success('Plat Berhasil Dikonfirmasi!', {
         title: 'Berhasil',
         detail: `Kode plat ${platCode} telah terverifikasi.`,
@@ -650,6 +856,9 @@ const handleKertasSubmit = async (data) => {
     )
 
     if (response.success) {
+      // Refresh detail untuk update state
+      await fetchDetail()
+      
       await alertDialog.success('Kertas Blanko Berhasil Diupdate!', {
         title: 'Berhasil',
         detail: `Jumlah actual: ${data.actualQty} lembar`,
@@ -683,6 +892,9 @@ const handleTintaSubmit = async (tintaActual) => {
     const response = await khazwalApi.updateTinta(materialPrep.value.id, tintaActual)
 
     if (response.success) {
+      // Refresh detail untuk update state
+      await fetchDetail()
+      
       await alertDialog.success('Tinta Berhasil Diupdate!', {
         title: 'Berhasil',
         detail: `${tintaActual.length} warna tinta telah dicatat.`,

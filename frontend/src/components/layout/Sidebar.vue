@@ -200,13 +200,38 @@ const formatRole = (role) => {
 }
 
 /**
- * Check active route dengan support nested routes
+ * Check active route dengan smart matching
+ * Mencegah double-active pada sibling routes dengan level yang sama
  */
 const isActive = (path) => {
+  const currentPath = route.path
+  
+  // Exact match untuk dashboard
   if (path === '/dashboard') {
-    return route.path === '/dashboard'
+    return currentPath === '/dashboard'
   }
-  return route.path === path || route.path.startsWith(path + '/')
+  
+  // Special handling untuk Khazwal Material Prep routes
+  if (path === '/khazwal/material-prep') {
+    // Active jika di queue page atau detail/process pages
+    // Tapi TIDAK active jika di history atau monitoring
+    return currentPath === '/khazwal/material-prep' || 
+           (currentPath.startsWith('/khazwal/material-prep/') && 
+            !currentPath.startsWith('/khazwal/material-prep/history'))
+  }
+  
+  if (path === '/khazwal/material-prep/history') {
+    // Exact match untuk history
+    return currentPath === '/khazwal/material-prep/history'
+  }
+  
+  if (path === '/khazwal/monitoring') {
+    // Exact match untuk monitoring
+    return currentPath === '/khazwal/monitoring'
+  }
+  
+  // For other routes, support nested children
+  return currentPath === path || currentPath.startsWith(path + '/')
 }
 
 /**

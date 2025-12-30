@@ -150,8 +150,9 @@
 <script setup>
 /**
  * KertasInputForm Component
- * Form untuk input kertas blanko actual dengan real-time variance calculation
- * dan conditional reason input untuk variance > 5%
+ * Form untuk input kertas blanko actual dengan real-time variance calculation,
+ * conditional reason input untuk variance > 5%, dan support untuk restore data
+ * saat navigate back ke step ini
  */
 import { ref, computed, watch } from 'vue'
 import { Motion } from 'motion-v'
@@ -176,6 +177,20 @@ const props = defineProps({
     required: true
   },
   /**
+   * Initial actual quantity (untuk restore data saat navigate back)
+   */
+  initialActualQty: {
+    type: Number,
+    default: null
+  },
+  /**
+   * Initial variance reason (untuk restore data saat navigate back)
+   */
+  initialVarianceReason: {
+    type: String,
+    default: ''
+  },
+  /**
    * Loading state
    */
   loading: {
@@ -186,9 +201,22 @@ const props = defineProps({
 
 const emit = defineEmits(['submit'])
 
-// State
-const actualQty = ref(null)
-const varianceReason = ref('')
+// State - Initialize dengan data existing jika ada
+const actualQty = ref(props.initialActualQty)
+const varianceReason = ref(props.initialVarianceReason)
+
+// Watch for prop changes untuk handle navigation back
+watch(() => props.initialActualQty, (newVal) => {
+  if (newVal !== null && newVal !== actualQty.value) {
+    actualQty.value = newVal
+  }
+}, { immediate: true })
+
+watch(() => props.initialVarianceReason, (newVal) => {
+  if (newVal && newVal !== varianceReason.value) {
+    varianceReason.value = newVal
+  }
+}, { immediate: true })
 
 // Computed: Variance calculation
 const variance = computed(() => {
