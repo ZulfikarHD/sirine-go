@@ -172,7 +172,7 @@ func (h *KhazwalHandler) StartPrep(c *gin.Context) {
 	}
 
 	// Get user ID dari context (dari auth middleware)
-	userIDInterface, exists := c.Get("userID")
+	userIDInterface, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
@@ -252,7 +252,7 @@ func (h *KhazwalHandler) ConfirmPlat(c *gin.Context) {
 	}
 
 	// Get user ID dari context
-	userIDInterface, exists := c.Get("userID")
+	userIDInterface, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
@@ -331,7 +331,7 @@ func (h *KhazwalHandler) UpdateKertas(c *gin.Context) {
 	}
 
 	// Get user ID dari context
-	userIDInterface, exists := c.Get("userID")
+	userIDInterface, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
@@ -410,7 +410,7 @@ func (h *KhazwalHandler) UpdateTinta(c *gin.Context) {
 	}
 
 	// Get user ID dari context
-	userIDInterface, exists := c.Get("userID")
+	userIDInterface, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
@@ -489,7 +489,7 @@ func (h *KhazwalHandler) Finalize(c *gin.Context) {
 	}
 
 	// Get user ID dari context
-	userIDInterface, exists := c.Get("userID")
+	userIDInterface, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,

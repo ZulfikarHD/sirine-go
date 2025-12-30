@@ -3,7 +3,6 @@ package models
 import (
 	"time"
 
-	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -43,15 +42,20 @@ const (
 )
 
 // ProductionOrder merupakan model untuk entitas Production Order
-// yang mencakup informasi PO dari SAP dan tracking status
+// yang mencakup informasi PO dari SAP dan tracking status.
+// Data spesifikasi OBC sekarang di-reference dari OBCMaster, dengan denormalisasi beberapa field untuk performance
 type ProductionOrder struct {
 	ID                        uint64         `gorm:"primaryKey;autoIncrement" json:"id"`
 	PONumber                  int64          `gorm:"uniqueIndex;not null" json:"po_number" binding:"required"`
-	OBCNumber                 string         `gorm:"type:varchar(9);uniqueIndex;not null" json:"obc_number" binding:"required,len=9"`
-	SAPCustomerCode           string         `gorm:"type:varchar(50);not null" json:"sap_customer_code" binding:"required"`
-	SAPProductCode            string         `gorm:"type:varchar(50);not null" json:"sap_product_code" binding:"required"`
-	ProductName               string         `gorm:"type:varchar(255);not null" json:"product_name" binding:"required"`
-	ProductSpecifications     datatypes.JSON `gorm:"type:json" json:"product_specifications"`
+	OBCMasterID               uint64         `gorm:"index;not null" json:"obc_master_id" binding:"required"`
+	
+	// Denormalized fields dari OBCMaster untuk performance
+	OBCNumber                 string         `gorm:"type:varchar(20);index" json:"obc_number"`
+	ProductName               string         `gorm:"type:varchar(255)" json:"product_name"`
+	SAPCustomerCode           string         `gorm:"type:varchar(50)" json:"sap_customer_code"`
+	SAPProductCode            string         `gorm:"type:varchar(50)" json:"sap_product_code"`
+	ProductSpecifications     interface{}    `gorm:"type:json" json:"product_specifications"`
+	
 	QuantityOrdered           int            `gorm:"not null" json:"quantity_ordered" binding:"required,min=1"`
 	QuantityTargetLembarBesar int            `gorm:"not null" json:"quantity_target_lembar_besar" binding:"required,min=1"`
 	EstimatedRims             int            `gorm:"not null" json:"estimated_rims" binding:"required,min=1"`
@@ -67,6 +71,7 @@ type ProductionOrder struct {
 	DeletedAt                 gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// Relationships
+	OBCMaster           *OBCMaster                  `gorm:"foreignKey:OBCMasterID" json:"obc_master,omitempty"`
 	KhazwalMaterialPrep *KhazwalMaterialPreparation `gorm:"foreignKey:ProductionOrderID" json:"khazwal_material_prep,omitempty"`
 	StageTracking       []POStageTracking           `gorm:"foreignKey:ProductionOrderID" json:"stage_tracking,omitempty"`
 }

@@ -172,6 +172,30 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 			profileActivity.GET("/activity", activityLogHandler.GetMyActivity)
 		}
 
+		// OBC Master routes (Admin/PPIC only)
+		obcService := services.NewOBCImportService(db)
+		obcHandler := handlers.NewOBCHandler(obcService)
+
+		obc := api.Group("/obc")
+		obc.Use(middleware.AuthMiddleware(db, cfg))
+		obc.Use(middleware.RequireRole("ADMIN", "PPIC"))
+		obc.Use(middleware.ActivityLogger(db))
+		{
+			obc.POST("/import", obcHandler.Import)
+			obc.GET("", obcHandler.List)
+			obc.GET("/:id", obcHandler.Detail)
+			obc.POST("/:id/generate-po", obcHandler.GeneratePO)
+		}
+
+		// OBC Master read-only routes (untuk Manager & Supervisor)
+		obcReadOnly := api.Group("/obc")
+		obcReadOnly.Use(middleware.AuthMiddleware(db, cfg))
+		obcReadOnly.Use(middleware.RequireRole("ADMIN", "PPIC", "MANAGER", "SUPERVISOR_KHAZWAL"))
+		{
+			obcReadOnly.GET("/list", obcHandler.List)
+			obcReadOnly.GET("/detail/:id", obcHandler.Detail)
+		}
+
 		// Khazwal Material Preparation routes
 		khazwalService := services.NewKhazwalService(db)
 		khazwalHandler := handlers.NewKhazwalHandler(khazwalService)

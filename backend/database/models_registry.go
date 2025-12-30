@@ -27,7 +27,8 @@ func NewModelsRegistry() *ModelsRegistry {
 	registry.Register(&models.ActivityLog{}, "activity_logs")
 	registry.Register(&models.Notification{}, "notifications")
 
-	// Production Order & Khazwal models
+	// OBC Master & Production Order models (OBCMaster HARUS sebelum ProductionOrder untuk foreign key)
+	registry.Register(&models.OBCMaster{}, "obc_masters")
 	registry.Register(&models.ProductionOrder{}, "production_orders")
 	registry.Register(&models.POStageTracking{}, "po_stage_trackings")
 	registry.Register(&models.KhazwalMaterialPreparation{}, "khazwal_material_preparations")
