@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"strings"
 	"sirine-go/backend/config"
 	"sirine-go/backend/database"
 
@@ -209,7 +210,7 @@ func main() {
 
 	// 6. Verify data
 	fmt.Println("📊 DATA SUMMARY")
-	fmt.Println("-" * 80)
+	fmt.Println(strings.Repeat("-", 80))
 	
 	var obcCount int64
 	var poCount int64
@@ -245,7 +246,7 @@ func main() {
 	}
 
 	fmt.Println()
-	fmt.Println("=" * 80)
+	fmt.Println(strings.Repeat("=", 80))
 	fmt.Println("✅ SCHEMA VERIFICATION COMPLETED")
-	fmt.Println("=" * 80)
+	fmt.Println(strings.Repeat("=", 80))
 }

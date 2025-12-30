@@ -9,6 +9,8 @@ Dokumentasi lengkap implementasi fitur per sprint untuk aplikasi Sirine Go.
 - [Sprint 3: Password Management](#sprint-3-password-management)
 - [Sprint 4: Notifications & Audit](#sprint-4-notifications--audit)
 - [Sprint 5: Enhancements & Gamification](#sprint-5-enhancements--gamification)
+- [Sprint Khazwal: Material Preparation](#sprint-khazwal-material-preparation)
+- [Sprint OBC Master: Excel Import & PO Generation](#sprint-obc-master-excel-import--po-generation)
 
 ---
 
@@ -89,6 +91,38 @@ Dokumentasi lengkap implementasi fitur per sprint untuk aplikasi Sirine Go.
 
 ---
 
+### Sprint Khazwal: Material Preparation
+**Version:** 1.6.0  
+**Date:** 29 Desember 2024  
+**Status:** ✅ Completed
+
+**Highlights:**
+- Multi-step material prep workflow
+- Barcode scanner integration
+- Variance calculation & validation
+- Photo upload untuk evidence
+- Supervisor monitoring dashboard
+
+[📖 Details →](./sprint-khazwal-material-prep.md)
+
+---
+
+### Sprint OBC Master: Excel Import & PO Generation
+**Version:** 1.7.0  
+**Date:** 30 Desember 2024  
+**Status:** ✅ Completed
+
+**Highlights:**
+- Excel import dari SAP (39 fields)
+- Auto PO generation dengan buffer 6%
+- Intelligent PO splitting (max 40k)
+- PPIC role & authorization
+- Complete API dengan 4 endpoints
+
+[📖 Details →](./sprint-obc-master.md)
+
+---
+
 ## 📊 Sprint Statistics
 
 | Sprint | Features | Endpoints | Components | Services | Duration |
@@ -98,7 +132,9 @@ Dokumentasi lengkap implementasi fitur per sprint untuk aplikasi Sirine Go.
 | Sprint 3 | 5 | 4 | 4 | 1 | 1 week |
 | Sprint 4 | 4 | 13 | 3 | 2 | 1 week |
 | Sprint 5 | 7 | 9 | 5 | 2 | 1 week |
-| **Total** | **26** | **41** | **20** | **7** | **5 weeks** |
+| **Total** | **35** | **51** | **28** | **11** | **7 weeks** |
+|| Sprint Khazwal | 5 | 6 | 8 | 2 | 1 week |
+|| Sprint OBC Master | 4 | 4 | 0 | 2 | 1 sprint |
 
 ---
 
@@ -113,6 +149,8 @@ Dokumentasi lengkap implementasi fitur per sprint untuk aplikasi Sirine Go.
 - ✅ Gamification (Achievements, Points, Levels)
 - ✅ Profile Management (Edit, Photo upload)
 - ✅ Bulk Operations (CSV Import/Export)
+- ✅ Khazwal Material Preparation (Workflow, Scanner, Monitoring)
+- ✅ OBC Master Management (Excel Import, PO Generation)
 
 ### 🚧 In Progress / Planned
 - 📅 Sprint 6: Performance Optimization
@@ -198,10 +236,12 @@ Dokumentasi lengkap implementasi fitur per sprint untuk aplikasi Sirine Go.
 - ✅ **Sprint 3:** Security hardening with password policies
 - ✅ **Sprint 4:** Real-time notifications & audit logging
 - ✅ **Sprint 5:** Gamification & bulk operations
+- ✅ **Sprint Khazwal:** Material preparation workflow system
+- ✅ **Sprint OBC Master:** SAP integration & PO auto-generation
 - 🎯 **Next:** Performance optimization & production readiness
 
 ---
 
-**Last Updated:** 29 Desember 2025  
-**Current Sprint:** Sprint 5 (Completed)  
+**Last Updated:** 30 Desember 2024  
+**Current Sprint:** Sprint OBC Master (Completed)  
 **Next Sprint:** Sprint 6 (Planned)

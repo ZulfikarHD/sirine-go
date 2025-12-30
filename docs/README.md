@@ -41,6 +41,25 @@ make dev-frontend  # Terminal 2
 
 ## 🆕 Recent Updates
 
+### Sprint OBC Master: Excel Import & PO Generation (2024-12-30)
+
+**Status**: ✅ Complete
+
+**Quick Links:**
+- 📋 **[sprint-obc-master.md](./10-sprints/sprint-obc-master.md)** - Complete sprint summary
+- 📡 **[obc-master.md](./04-api-reference/obc-master.md)** - API documentation
+- 🧪 **[obc-import-testing.md](./06-testing/obc-import-testing.md)** - Testing guide
+
+**What's Done:**
+- ✅ OBC Master model dengan 39 fields
+- ✅ Excel import dari SAP dengan upsert logic
+- ✅ Auto PO generation dengan buffer 6%
+- ✅ 4 REST API endpoints (import, list, detail, generate)
+- ✅ PPIC role & authorization
+- ✅ Complete documentation & test data
+
+---
+
 ### Sprint 6: Testing, Optimization & Deployment (2025-01-29)
 
 **Status**: 🟡 In Progress - Testing Phase
@@ -163,6 +182,9 @@ Complete API documentation untuk semua endpoints:
 21. **[api/khazwal.md](./04-api-reference/khazwal.md)** 📦  
     Khazwal Material Preparation API (Sprint Khazwal)
 
+22. **[api/obc-master.md](./04-api-reference/obc-master.md)** 📋  
+    OBC Master Excel Import & PO Generation API (Sprint OBC Master)
+
 ---
 
 ### 🗺️ **User Journeys** → `user-journeys/`
@@ -189,6 +211,9 @@ Comprehensive testing guides dan test scenarios:
 
 25. **[testing/khazwal-testing.md](./06-testing/khazwal-testing.md)** 📦  
     Complete testing guide untuk Khazwal Material Preparation
+
+26. **[testing/obc-import-testing.md](./06-testing/obc-import-testing.md)** 📋  
+    Complete testing guide untuk OBC Master Excel Import
 
 ---
 
@@ -272,6 +297,16 @@ go version && node --version && yarn --version && mysql --version
 - Automatic notification ke Unit Cetak
 - Supervisor monitoring dashboard
 - History tracking dengan date filters
+
+### **📋 OBC Master & PO Generation (Sprint OBC Master)**
+- Excel import dari SAP export (39 fields)
+- Auto-generate Production Orders dengan buffer 6%
+- Intelligent PO splitting (max 40k per PO)
+- Upsert logic untuk update existing data
+- List & filter dengan composite indexes
+- PPIC role untuk access control
+- Relationship tracking ke Production Orders
+- Complete audit trail
 
 ### **🎨 Modern UI/UX**
 - Apple-inspired design (Indigo & Fuchsia gradient)
@@ -412,6 +447,12 @@ GET    /api/khazwal/monitoring                  # Supervisor monitoring
 # Cetak Queue (Sprint Khazwal)
 GET    /api/cetak/queue             # Queue PO siap cetak
 GET    /api/cetak/queue/:id         # Detail PO untuk cetak
+
+# OBC Master (Sprint OBC Master)
+POST   /api/obc/import              # Import Excel dari SAP
+GET    /api/obc                     # List OBC dengan filters
+GET    /api/obc/:id                 # Detail OBC + Production Orders
+POST   /api/obc/:id/generate-po     # Generate POs manually
 ```
 
 **📖 Detail lengkap:** Lihat [development/api-documentation.md](./03-development/api-documentation.md)
@@ -527,8 +568,8 @@ Ingin berkontribusi? Silakan baca **[CONTRIBUTING.md](./CONTRIBUTING.md)** untuk
 
 ## 📄 Version & License
 
-- **Version:** 1.6.0 (Sprint Khazwal Complete)
-- **Last Updated:** 29 Desember 2025
+- **Version:** 1.7.0 (Sprint OBC Master Complete)
+- **Last Updated:** 30 Desember 2024
 - **License:** Private & Proprietary
 - **Changelog:** Lihat **[CHANGELOG.md](../CHANGELOG.md)** untuk complete changelog Sprint 1-5
 
