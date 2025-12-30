@@ -21,15 +21,27 @@ const (
 type KhazwalMaterialPreparation struct {
 	ID                         uint64             `gorm:"primaryKey;autoIncrement" json:"id"`
 	ProductionOrderID          uint64             `gorm:"uniqueIndex;not null" json:"production_order_id" binding:"required"`
-	SAPPlatCode                string             `gorm:"type:varchar(50);not null" json:"sap_plat_code" binding:"required"`
-	KertasBlankoQuantity       int                `gorm:"not null" json:"kertas_blanko_quantity" binding:"required,min=1"`
-	TintaRequirements          datatypes.JSON     `gorm:"type:json;not null" json:"tinta_requirements" binding:"required"`
-	PlatRetrievedAt            *time.Time         `gorm:"type:timestamp null" json:"plat_retrieved_at"`
-	KertasBlankoActual         *int               `gorm:"type:int null" json:"kertas_blanko_actual"`
-	KertasBlankoVariance       *int               `gorm:"type:int null" json:"kertas_blanko_variance"`
-	KertasBlankoVarianceReason string             `gorm:"type:varchar(500)" json:"kertas_blanko_variance_reason"`
-	TintaActual                datatypes.JSON     `gorm:"type:json" json:"tinta_actual"`
-	MaterialPhotos             datatypes.JSON     `gorm:"type:json" json:"material_photos"`
+	SAPPlatCode                      string             `gorm:"type:varchar(50);not null" json:"sap_plat_code" binding:"required"`
+	KertasBlankoQuantity             int                `gorm:"not null" json:"kertas_blanko_quantity" binding:"required,min=1"`
+	TintaRequirements                datatypes.JSON     `gorm:"type:json;not null" json:"tinta_requirements" binding:"required"`
+	
+	// Plat Confirmation
+	PlatRetrievedAt                  *time.Time         `gorm:"type:timestamp null" json:"plat_retrieved_at"`
+	PlatScannedCode                  *string            `gorm:"type:varchar(50)" json:"plat_scanned_code"`
+	PlatMatch                        bool               `gorm:"default:false" json:"plat_match"`
+	
+	// Kertas Blanko Actual
+	KertasBlankoActual               *int               `gorm:"type:int null" json:"kertas_blanko_actual"`
+	KertasBlankoVariance             *int               `gorm:"type:int null" json:"kertas_blanko_variance"`
+	KertasBlankoVariancePercentage   *float64           `gorm:"type:decimal(5,2)" json:"kertas_blanko_variance_percentage"`
+	KertasBlankoVarianceReason       string             `gorm:"type:varchar(500)" json:"kertas_blanko_variance_reason"`
+	
+	// Tinta Actual
+	TintaActual                      datatypes.JSON     `gorm:"type:json" json:"tinta_actual"`
+	TintaLowStockFlags               datatypes.JSON     `gorm:"type:json" json:"tinta_low_stock_flags"`
+	
+	// Photo Evidence
+	MaterialPhotos                   datatypes.JSON     `gorm:"type:json" json:"material_photos"`
 	Status                     MaterialPrepStatus `gorm:"type:enum('PENDING','IN_PROGRESS','COMPLETED');default:'PENDING'" json:"status"`
 	StartedAt                  *time.Time         `gorm:"type:timestamp null" json:"started_at"`
 	CompletedAt                *time.Time         `gorm:"type:timestamp null" json:"completed_at"`

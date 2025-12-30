@@ -52,7 +52,7 @@ export const useKhazwalApi = () => {
 
   /**
    * Mengkonfirmasi pengambilan plat dengan barcode scan
-   * @param {number} id - Production Order ID
+   * @param {number} id - Material Prep ID (bukan PO ID)
    * @param {string} platCode - SAP Plat Code dari barcode scan
    * @returns {Promise<Object>} Updated material prep data
    */
@@ -64,7 +64,7 @@ export const useKhazwalApi = () => {
 
   /**
    * Update kertas blanko actual quantity dengan variance calculation
-   * @param {number} id - Production Order ID
+   * @param {number} id - Material Prep ID (bukan PO ID)
    * @param {number} actualQty - Actual quantity yang diambil
    * @param {string} varianceReason - Alasan jika ada variance
    * @returns {Promise<Object>} Updated material prep data
@@ -79,7 +79,7 @@ export const useKhazwalApi = () => {
 
   /**
    * Update informasi tinta yang digunakan dengan checklist
-   * @param {number} id - Production Order ID
+   * @param {number} id - Material Prep ID (bukan PO ID)
    * @param {Array} tintaActual - Array tinta yang sudah dicek
    * @returns {Promise<Object>} Updated material prep data
    */

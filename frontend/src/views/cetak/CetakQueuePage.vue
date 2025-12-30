@@ -1,6 +1,23 @@
 <template>
   <AppLayout>
-    <div class="min-h-screen pb-20">
+    <div 
+      class="min-h-screen pb-20"
+      @touchstart="handleTouchStart"
+      @touchmove="handleTouchMove"
+      @touchend="handleTouchEnd"
+    >
+      <!-- Pull to Refresh Indicator -->
+      <Motion
+        v-if="pulling"
+        :initial="{ opacity: 0, y: -20 }"
+        :animate="{ opacity: 1, y: 0 }"
+        class="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full 
+               bg-indigo-600 text-white text-sm font-medium shadow-lg flex items-center gap-2"
+      >
+        <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': pullDistance > 80 }" />
+        {{ pullDistance > 80 ? 'Lepas untuk refresh...' : 'Tarik untuk refresh...' }}
+      </Motion>
+
       <!-- Header Section -->
       <Motion v-bind="entranceAnimations.fadeUp" class="mb-6">
         <div class="flex items-center justify-between mb-4">
@@ -97,17 +114,19 @@
       <!-- Empty State -->
       <Motion
         v-if="!loading && queueItems.length === 0"
-        v-bind="entranceAnimations.fadeUp"
-        class="flex flex-col items-center justify-center py-20"
+        v-bind="entranceAnimations.fadeScale"
+        class="glass-card rounded-2xl p-12 text-center max-w-md mx-auto mt-12"
       >
-        <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-100 to-fuchsia-100 
-                    flex items-center justify-center mb-4">
-          <ClipboardList class="w-10 h-10 text-indigo-500" />
-        </div>
-        <h3 class="text-lg font-semibold text-gray-900 mb-2">
-          Tidak Ada Antrian
+        <Motion v-bind="{ initial: { scale: 0 }, animate: { scale: 1 }, transition: { type: 'spring', stiffness: 500, damping: 40 } }">
+          <div class="inline-flex items-center justify-center w-20 h-20 rounded-full 
+                      bg-gradient-to-br from-indigo-100 to-fuchsia-100 mb-4">
+            <ClipboardList class="w-10 h-10 text-indigo-600" />
+          </div>
+        </Motion>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">
+          {{ emptyTitle }}
         </h3>
-        <p class="text-gray-500 text-center max-w-xs">
+        <p class="text-gray-500 max-w-sm mx-auto">
           {{ emptyMessage }}
         </p>
       </Motion>
@@ -302,7 +321,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { Motion } from 'motion-v'
 import { entranceAnimations } from '@/composables/useMotion'
-import { useCetakApi } from '@/composables/useCetakApi'
+import { useCetakStore } from '@/stores/cetak'
 import { useAlertDialog } from '@/composables/useModal'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import BaseModal from '@/components/common/BaseModal.vue'
@@ -322,15 +341,17 @@ import {
   Image
 } from 'lucide-vue-next'
 
-const cetakApi = useCetakApi()
+const cetakStore = useCetakStore()
 const alertDialog = useAlertDialog()
 
-// State
-const loading = ref(false)
-const queueItems = ref([])
-const totalItems = ref(0)
+// State from store
+const loading = computed(() => cetakStore.queueLoading)
+const queueItems = computed(() => cetakStore.queue)
+const totalItems = computed(() => cetakStore.queuePagination.total)
+const totalPages = computed(() => cetakStore.queuePagination.total_pages)
+
+// Local state
 const currentPage = ref(1)
-const totalPages = ref(0)
 const perPage = ref(12)
 
 // Search & Filter
@@ -342,12 +363,18 @@ let searchTimeout = null
 // Detail Modal
 const showDetailModal = ref(false)
 const selectedItem = ref(null)
-const detailLoading = ref(false)
-const detailData = ref(null)
+const detailLoading = computed(() => cetakStore.detailLoading)
+const detailData = computed(() => cetakStore.currentDetail)
 
 // Photo Viewer
 const showPhotoViewer = ref(false)
 const currentPhotoIndex = ref(0)
+
+// Pull to Refresh
+const pulling = ref(false)
+const pullDistance = ref(0)
+const touchStartY = ref(0)
+const touchStartTime = ref(0)
 
 // Priority options
 const priorityOptions = [
@@ -391,13 +418,23 @@ const visiblePages = computed(() => {
 })
 
 /**
+ * Computed untuk empty state title
+ */
+const emptyTitle = computed(() => {
+  if (searchQuery.value || selectedPriority.value) {
+    return 'Tidak Ditemukan'
+  }
+  return 'Antrian Kosong'
+})
+
+/**
  * Computed untuk empty state message
  */
 const emptyMessage = computed(() => {
   if (searchQuery.value || selectedPriority.value) {
-    return 'Tidak ada PO yang sesuai dengan filter. Coba ubah kriteria pencarian.'
+    return 'Tidak ada PO yang sesuai dengan filter atau pencarian Anda. Coba ubah kriteria untuk melihat hasil lain.'
   }
-  return 'Belum ada PO yang siap untuk dicetak. PO akan muncul setelah material preparation selesai.'
+  return 'Belum ada PO yang siap untuk dicetak. Antrian akan muncul otomatis setelah tim Khazanah Awal menyelesaikan persiapan material.'
 })
 
 /**
@@ -408,30 +445,21 @@ const detailPhotos = computed(() => {
 })
 
 /**
- * Fetch queue data dari API
+ * Fetch queue data menggunakan store
  */
 const fetchQueue = async () => {
-  loading.value = true
   try {
-    const response = await cetakApi.getQueue({
+    await cetakStore.getCetakQueue({
       search: searchQuery.value,
       priority: selectedPriority.value,
       page: currentPage.value,
       per_page: perPage.value
     })
-
-    if (response.success) {
-      queueItems.value = response.data.items
-      totalItems.value = response.data.total
-      totalPages.value = response.data.total_pages
-    }
   } catch (error) {
     console.error('Error fetching queue:', error)
     alertDialog.error('Gagal memuat antrian cetak', {
       detail: error.response?.data?.message || 'Silakan coba lagi'
     })
-  } finally {
-    loading.value = false
   }
 }
 
@@ -491,21 +519,14 @@ const goToPage = (page) => {
 const handleCardClick = async (item) => {
   selectedItem.value = item
   showDetailModal.value = true
-  detailLoading.value = true
-  detailData.value = null
 
   try {
-    const response = await cetakApi.getDetail(item.po_id)
-    if (response.success) {
-      detailData.value = response.data
-    }
+    await cetakStore.getCetakDetail(item.po_id)
   } catch (error) {
     console.error('Error fetching detail:', error)
     alertDialog.error('Gagal memuat detail', {
       detail: error.response?.data?.message || 'Silakan coba lagi'
     })
-  } finally {
-    detailLoading.value = false
   }
 }
 
@@ -542,6 +563,55 @@ const handleClickOutside = (e) => {
   }
 }
 
+/**
+ * Pull to Refresh handlers untuk mobile
+ */
+const handleTouchStart = (e) => {
+  // Hanya aktifkan jika scroll berada di top
+  if (window.scrollY === 0 && !loading.value) {
+    touchStartY.value = e.touches[0].clientY
+    touchStartTime.value = Date.now()
+  }
+}
+
+const handleTouchMove = (e) => {
+  if (touchStartY.value > 0 && window.scrollY === 0) {
+    const currentY = e.touches[0].clientY
+    const distance = currentY - touchStartY.value
+    
+    // Hanya pull down (positive distance)
+    if (distance > 0 && distance < 120) {
+      pullDistance.value = distance
+      pulling.value = true
+      
+      // Prevent default scroll behavior saat pulling
+      if (distance > 10) {
+        e.preventDefault()
+      }
+    }
+  }
+}
+
+const handleTouchEnd = async () => {
+  if (pulling.value) {
+    // Trigger refresh jika pull distance cukup jauh
+    if (pullDistance.value > 80) {
+      // Haptic feedback
+      if ('vibrate' in navigator) {
+        navigator.vibrate(20)
+      }
+      
+      await refreshQueue()
+    }
+    
+    // Reset pull state
+    pulling.value = false
+    pullDistance.value = 0
+    touchStartY.value = 0
+    touchStartTime.value = 0
+  }
+}
+
 onMounted(() => {
   fetchQueue()
   document.addEventListener('click', handleClickOutside)
@@ -550,5 +620,7 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
   if (searchTimeout) clearTimeout(searchTimeout)
+  // Clear detail saat leave page
+  cetakStore.clearDetail()
 })
 </script>

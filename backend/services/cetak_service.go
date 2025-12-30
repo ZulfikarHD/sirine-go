@@ -30,25 +30,39 @@ type CetakQueueFilters struct {
 	PerPage  int    `form:"per_page"`
 }
 
+// OBCMasterInfo merupakan struct untuk OBC Master information di response
+type OBCMasterInfo struct {
+	ID                  uint64 `json:"id"`
+	OBCNumber           string `json:"obc_number"`
+	Material            string `json:"material"`
+	MaterialDescription string `json:"material_description"`
+	Seri                string `json:"seri"`
+	Warna               string `json:"warna"`
+	FactoryCode         string `json:"factory_code"`
+	PlatNumber          string `json:"plat_number"`
+	Personalization     string `json:"personalization"`
+}
+
 // CetakQueueItem merupakan struct untuk response item queue cetak
 // yang mencakup informasi PO dan material readiness
 type CetakQueueItem struct {
-	POID            uint64    `json:"po_id"`
-	PONumber        int64     `json:"po_number"`
-	OBCNumber       string    `json:"obc_number"`
-	ProductName     string    `json:"product_name"`
-	Priority        string    `json:"priority"`
-	PriorityScore   int       `json:"priority_score"`
-	Quantity        int       `json:"quantity"`
-	DueDate         time.Time `json:"due_date"`
-	DaysUntilDue    int       `json:"days_until_due"`
-	IsPastDue       bool      `json:"is_past_due"`
-	MaterialReadyAt time.Time `json:"material_ready_at"`
-	PreparedByID    uint64    `json:"prepared_by_id"`
-	PreparedByName  string    `json:"prepared_by_name"`
-	MaterialPhotos  []string  `json:"material_photos"`
-	Notes           string    `json:"notes"`
-	PrepID          uint64    `json:"prep_id"`
+	POID            uint64          `json:"po_id"`
+	PONumber        int64           `json:"po_number"`
+	OBCNumber       string          `json:"obc_number"`
+	ProductName     string          `json:"product_name"`
+	Priority        string          `json:"priority"`
+	PriorityScore   int             `json:"priority_score"`
+	Quantity        int             `json:"quantity"`
+	DueDate         time.Time       `json:"due_date"`
+	DaysUntilDue    int             `json:"days_until_due"`
+	IsPastDue       bool            `json:"is_past_due"`
+	MaterialReadyAt time.Time       `json:"material_ready_at"`
+	PreparedByID    uint64          `json:"prepared_by_id"`
+	PreparedByName  string          `json:"prepared_by_name"`
+	MaterialPhotos  []string        `json:"material_photos"`
+	Notes           string          `json:"notes"`
+	PrepID          uint64          `json:"prep_id"`
+	OBCMaster       *OBCMasterInfo  `json:"obc_master"`
 }
 
 // CetakQueueResponse merupakan struct untuk paginated queue response
@@ -63,25 +77,26 @@ type CetakQueueResponse struct {
 // CetakDetail merupakan struct untuk detail PO cetak
 // yang mencakup full information termasuk material prep data
 type CetakDetail struct {
-	POID                      uint64         `json:"po_id"`
-	PONumber                  int64          `json:"po_number"`
-	OBCNumber                 string         `json:"obc_number"`
-	SAPCustomerCode           string         `json:"sap_customer_code"`
-	SAPProductCode            string         `json:"sap_product_code"`
-	ProductName               string         `json:"product_name"`
-	ProductSpecifications     interface{}    `json:"product_specifications"`
-	QuantityOrdered           int            `json:"quantity_ordered"`
-	QuantityTargetLembarBesar int            `json:"quantity_target_lembar_besar"`
-	EstimatedRims             int            `json:"estimated_rims"`
-	OrderDate                 time.Time      `json:"order_date"`
-	DueDate                   time.Time      `json:"due_date"`
-	Priority                  string         `json:"priority"`
-	PriorityScore             int            `json:"priority_score"`
-	DaysUntilDue              int            `json:"days_until_due"`
-	IsPastDue                 bool           `json:"is_past_due"`
-	CurrentStatus             string         `json:"current_status"`
-	Notes                     string         `json:"notes"`
-	MaterialPrep              *MaterialPrep  `json:"material_prep"`
+	POID                      uint64          `json:"po_id"`
+	PONumber                  int64           `json:"po_number"`
+	OBCNumber                 string          `json:"obc_number"`
+	SAPCustomerCode           string          `json:"sap_customer_code"`
+	SAPProductCode            string          `json:"sap_product_code"`
+	ProductName               string          `json:"product_name"`
+	ProductSpecifications     interface{}     `json:"product_specifications"`
+	QuantityOrdered           int             `json:"quantity_ordered"`
+	QuantityTargetLembarBesar int             `json:"quantity_target_lembar_besar"`
+	EstimatedRims             int             `json:"estimated_rims"`
+	OrderDate                 time.Time       `json:"order_date"`
+	DueDate                   time.Time       `json:"due_date"`
+	Priority                  string          `json:"priority"`
+	PriorityScore             int             `json:"priority_score"`
+	DaysUntilDue              int             `json:"days_until_due"`
+	IsPastDue                 bool            `json:"is_past_due"`
+	CurrentStatus             string          `json:"current_status"`
+	Notes                     string          `json:"notes"`
+	OBCMaster                 *OBCMasterInfo  `json:"obc_master"`
+	MaterialPrep              *MaterialPrep   `json:"material_prep"`
 }
 
 // MaterialPrep merupakan struct untuk material preparation detail
@@ -168,6 +183,21 @@ func (s *CetakService) GetCetakQueue(filters CetakQueueFilters) (*CetakQueueResp
 			IsPastDue:     po.IsPastDue(),
 		}
 
+		// Add OBC Master info jika ada
+		if po.OBCMaster != nil {
+			item.OBCMaster = &OBCMasterInfo{
+				ID:                  po.OBCMaster.ID,
+				OBCNumber:           po.OBCMaster.OBCNumber,
+				Material:            po.OBCMaster.Material,
+				MaterialDescription: po.OBCMaster.MaterialDescription,
+				Seri:                po.OBCMaster.Seri,
+				Warna:               po.OBCMaster.Warna,
+				FactoryCode:         po.OBCMaster.FactoryCode,
+				PlatNumber:          po.OBCMaster.PlatNumber,
+				Personalization:     po.OBCMaster.Personalization,
+			}
+		}
+
 		// Add material prep info jika ada
 		if po.KhazwalMaterialPrep != nil {
 			prep := po.KhazwalMaterialPrep
@@ -246,6 +276,21 @@ func (s *CetakService) GetCetakDetail(poID uint64) (*CetakDetail, error) {
 		IsPastDue:                 po.IsPastDue(),
 		CurrentStatus:             string(po.CurrentStatus),
 		Notes:                     po.Notes,
+	}
+
+	// Add OBC Master info jika ada
+	if po.OBCMaster != nil {
+		detail.OBCMaster = &OBCMasterInfo{
+			ID:                  po.OBCMaster.ID,
+			OBCNumber:           po.OBCMaster.OBCNumber,
+			Material:            po.OBCMaster.Material,
+			MaterialDescription: po.OBCMaster.MaterialDescription,
+			Seri:                po.OBCMaster.Seri,
+			Warna:               po.OBCMaster.Warna,
+			FactoryCode:         po.OBCMaster.FactoryCode,
+			PlatNumber:          po.OBCMaster.PlatNumber,
+			Personalization:     po.OBCMaster.Personalization,
+		}
 	}
 
 	// Add material prep detail jika ada

@@ -42,9 +42,25 @@
           <p class="text-sm font-medium text-indigo-600 truncate">
             PO #{{ staff.current_po }}
           </p>
+          <p v-if="staff.obc_number" class="text-xs text-gray-600 font-medium truncate mb-1">
+            OBC: {{ staff.obc_number }}
+          </p>
           <p class="text-xs text-gray-500 truncate">
             {{ staff.product_name }}
           </p>
+          
+          <!-- OBC Master Details (jika ada) -->
+          <div v-if="staff.obc_master" class="flex flex-wrap gap-1 mt-1.5">
+            <span v-if="staff.obc_master.material" class="px-1.5 py-0.5 bg-gray-100 rounded text-xs text-gray-700">
+              {{ staff.obc_master.material }}
+            </span>
+            <span v-if="staff.obc_master.seri" class="px-1.5 py-0.5 bg-gray-100 rounded text-xs text-gray-700">
+              {{ staff.obc_master.seri }}
+            </span>
+            <span v-if="staff.obc_master.warna" class="px-1.5 py-0.5 bg-gray-100 rounded text-xs text-gray-700">
+              {{ staff.obc_master.warna }}
+            </span>
+          </div>
         </div>
 
         <!-- Duration / Last Activity -->

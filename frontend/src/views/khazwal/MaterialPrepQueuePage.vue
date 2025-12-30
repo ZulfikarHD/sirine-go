@@ -169,7 +169,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Motion } from 'motion-v'
 import { entranceAnimations, iconAnimations } from '@/composables/useMotion'
-import { useKhazwalApi } from '@/composables/useKhazwalApi'
+import { useKhazwalStore } from '@/stores/khazwal'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import POQueueCard from '@/components/khazwal/POQueueCard.vue'
 import { 
@@ -181,18 +181,13 @@ import {
 } from 'lucide-vue-next'
 
 const router = useRouter()
-const khazwalApi = useKhazwalApi()
+const khazwalStore = useKhazwalStore()
 
-// State management
-const loading = ref(false)
-const error = ref(null)
-const queueItems = ref([])
-const pagination = ref({
-  total: 0,
-  page: 1,
-  per_page: 20,
-  total_pages: 0
-})
+// State from store
+const loading = computed(() => khazwalStore.queueLoading)
+const error = computed(() => khazwalStore.queueError)
+const queueItems = computed(() => khazwalStore.queue)
+const pagination = computed(() => khazwalStore.queuePagination)
 
 // Filter state
 const filters = ref({
@@ -203,34 +198,16 @@ const filters = ref({
 })
 
 /**
- * Fetch queue data dari API dengan current filters
+ * Fetch queue data dari store dengan current filters
  */
 const fetchQueue = async () => {
-  loading.value = true
-  error.value = null
-
   try {
-    const response = await khazwalApi.getQueue({
+    await khazwalStore.getMaterialPrepQueue({
       ...filters.value,
       page: filters.value.page || 1
     })
-
-    if (response.success) {
-      queueItems.value = response.data.items || []
-      pagination.value = {
-        total: response.data.total,
-        page: response.data.page,
-        per_page: response.data.per_page,
-        total_pages: response.data.total_pages
-      }
-    } else {
-      error.value = response.message || 'Gagal memuat queue'
-    }
   } catch (err) {
     console.error('Error fetching queue:', err)
-    error.value = err.response?.data?.message || 'Gagal terhubung ke server'
-  } finally {
-    loading.value = false
   }
 }
 

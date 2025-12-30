@@ -13,8 +13,8 @@
         <h3 class="text-lg font-bold text-gray-900 mb-1 truncate">
           PO #{{ item.po_number }}
         </h3>
-        <p class="text-sm text-gray-600 truncate">
-          OBC: {{ item.obc_number }}
+        <p class="text-sm text-indigo-600 font-semibold truncate">
+          OBC: {{ obcNumber }}
         </p>
       </div>
       
@@ -22,9 +22,30 @@
     </div>
 
     <!-- Product Name -->
-    <p class="text-gray-800 font-medium mb-3 line-clamp-2">
-      {{ item.product_name }}
+    <p class="text-gray-800 font-medium mb-2 line-clamp-2">
+      {{ productName }}
     </p>
+
+    <!-- OBC Master Details (if available) -->
+    <div v-if="obcMaster" class="mb-3 p-2 bg-gray-50 rounded-lg">
+      <div class="flex flex-wrap gap-2 text-xs">
+        <span v-if="obcMaster.material" class="px-2 py-0.5 bg-white rounded-md text-gray-700 border border-gray-200">
+          Material: {{ obcMaster.material }}
+        </span>
+        <span v-if="obcMaster.seri" class="px-2 py-0.5 bg-white rounded-md text-gray-700 border border-gray-200">
+          Seri: {{ obcMaster.seri }}
+        </span>
+        <span v-if="obcMaster.warna" class="px-2 py-0.5 bg-white rounded-md text-gray-700 border border-gray-200">
+          Warna: {{ obcMaster.warna }}
+        </span>
+        <span v-if="obcMaster.personalization && obcMaster.personalization !== '-'" class="px-2 py-0.5 bg-purple-50 rounded-md text-purple-700 border border-purple-200">
+          {{ obcMaster.personalization }}
+        </span>
+        <span v-if="obcMaster.plat_number" class="px-2 py-0.5 bg-indigo-50 rounded-md text-indigo-700 border border-indigo-200">
+          Plat: {{ obcMaster.plat_number }}
+        </span>
+      </div>
+    </div>
 
     <!-- Info Grid -->
     <div class="grid grid-cols-2 gap-3 mb-3">
@@ -132,6 +153,27 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['click'])
+
+/**
+ * OBC Master data dari relationship (jika ada)
+ */
+const obcMaster = computed(() => {
+  return props.item.obc_master || null
+})
+
+/**
+ * Product name dengan fallback dari OBC Master atau denormalized field
+ */
+const productName = computed(() => {
+  return obcMaster.value?.material_description || props.item.product_name || 'N/A'
+})
+
+/**
+ * OBC Number dengan fallback dari OBC Master atau denormalized field
+ */
+const obcNumber = computed(() => {
+  return obcMaster.value?.obc_number || props.item.obc_number || 'N/A'
+})
 
 /**
  * Handle card click untuk view detail

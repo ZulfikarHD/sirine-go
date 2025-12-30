@@ -75,6 +75,21 @@ func (h *CetakHandler) GetQueue(c *gin.Context) {
 			dto.MaterialReadyAt = item.MaterialReadyAt.Format("2006-01-02 15:04:05")
 		}
 
+		// Add OBC Master info jika ada
+		if item.OBCMaster != nil {
+			dto.OBCMaster = &OBCMasterInfoDTO{
+				ID:                  item.OBCMaster.ID,
+				OBCNumber:           item.OBCMaster.OBCNumber,
+				Material:            item.OBCMaster.Material,
+				MaterialDescription: item.OBCMaster.MaterialDescription,
+				Seri:                item.OBCMaster.Seri,
+				Warna:               item.OBCMaster.Warna,
+				FactoryCode:         item.OBCMaster.FactoryCode,
+				PlatNumber:          item.OBCMaster.PlatNumber,
+				Personalization:     item.OBCMaster.Personalization,
+			}
+		}
+
 		items = append(items, dto)
 	}
 
@@ -157,6 +172,21 @@ func (h *CetakHandler) GetDetail(c *gin.Context) {
 		Notes:                     detail.Notes,
 	}
 
+	// Add OBC Master info jika ada
+	if detail.OBCMaster != nil {
+		dto.OBCMaster = &OBCMasterInfoDTO{
+			ID:                  detail.OBCMaster.ID,
+			OBCNumber:           detail.OBCMaster.OBCNumber,
+			Material:            detail.OBCMaster.Material,
+			MaterialDescription: detail.OBCMaster.MaterialDescription,
+			Seri:                detail.OBCMaster.Seri,
+			Warna:               detail.OBCMaster.Warna,
+			FactoryCode:         detail.OBCMaster.FactoryCode,
+			PlatNumber:          detail.OBCMaster.PlatNumber,
+			Personalization:     detail.OBCMaster.Personalization,
+		}
+	}
+
 	// Transform material prep jika ada
 	if detail.MaterialPrep != nil {
 		prep := detail.MaterialPrep
@@ -198,47 +228,62 @@ func (h *CetakHandler) GetDetail(c *gin.Context) {
 
 // DTOs untuk API responses
 
+// OBCMasterInfoDTO merupakan DTO untuk OBC Master information
+type OBCMasterInfoDTO struct {
+	ID                  uint64 `json:"id"`
+	OBCNumber           string `json:"obc_number"`
+	Material            string `json:"material"`
+	MaterialDescription string `json:"material_description"`
+	Seri                string `json:"seri"`
+	Warna               string `json:"warna"`
+	FactoryCode         string `json:"factory_code"`
+	PlatNumber          string `json:"plat_number"`
+	Personalization     string `json:"personalization"`
+}
+
 // CetakQueueItemDTO merupakan DTO untuk queue list item response
 type CetakQueueItemDTO struct {
-	POID            uint64   `json:"po_id"`
-	PONumber        int64    `json:"po_number"`
-	OBCNumber       string   `json:"obc_number"`
-	ProductName     string   `json:"product_name"`
-	Priority        string   `json:"priority"`
-	PriorityScore   int      `json:"priority_score"`
-	Quantity        int      `json:"quantity"`
-	DueDate         string   `json:"due_date"`
-	DaysUntilDue    int      `json:"days_until_due"`
-	IsPastDue       bool     `json:"is_past_due"`
-	MaterialReadyAt string   `json:"material_ready_at,omitempty"`
-	PreparedByID    uint64   `json:"prepared_by_id,omitempty"`
-	PreparedByName  string   `json:"prepared_by_name,omitempty"`
-	MaterialPhotos  []string `json:"material_photos,omitempty"`
-	Notes           string   `json:"notes,omitempty"`
-	PrepID          uint64   `json:"prep_id,omitempty"`
+	POID            uint64             `json:"po_id"`
+	PONumber        int64              `json:"po_number"`
+	OBCNumber       string             `json:"obc_number"`
+	ProductName     string             `json:"product_name"`
+	Priority        string             `json:"priority"`
+	PriorityScore   int                `json:"priority_score"`
+	Quantity        int                `json:"quantity"`
+	DueDate         string             `json:"due_date"`
+	DaysUntilDue    int                `json:"days_until_due"`
+	IsPastDue       bool               `json:"is_past_due"`
+	MaterialReadyAt string             `json:"material_ready_at,omitempty"`
+	PreparedByID    uint64             `json:"prepared_by_id,omitempty"`
+	PreparedByName  string             `json:"prepared_by_name,omitempty"`
+	MaterialPhotos  []string           `json:"material_photos,omitempty"`
+	Notes           string             `json:"notes,omitempty"`
+	PrepID          uint64             `json:"prep_id,omitempty"`
+	OBCMaster       *OBCMasterInfoDTO  `json:"obc_master,omitempty"`
 }
 
 // CetakDetailDTO merupakan DTO untuk detail PO response
 type CetakDetailDTO struct {
-	POID                      uint64           `json:"po_id"`
-	PONumber                  int64            `json:"po_number"`
-	OBCNumber                 string           `json:"obc_number"`
-	SAPCustomerCode           string           `json:"sap_customer_code"`
-	SAPProductCode            string           `json:"sap_product_code"`
-	ProductName               string           `json:"product_name"`
-	ProductSpecifications     interface{}      `json:"product_specifications"`
-	QuantityOrdered           int              `json:"quantity_ordered"`
-	QuantityTargetLembarBesar int              `json:"quantity_target_lembar_besar"`
-	EstimatedRims             int              `json:"estimated_rims"`
-	OrderDate                 string           `json:"order_date"`
-	DueDate                   string           `json:"due_date"`
-	Priority                  string           `json:"priority"`
-	PriorityScore             int              `json:"priority_score"`
-	DaysUntilDue              int              `json:"days_until_due"`
-	IsPastDue                 bool             `json:"is_past_due"`
-	CurrentStatus             string           `json:"current_status"`
-	Notes                     string           `json:"notes"`
-	MaterialPrep              *MaterialPrepDTO `json:"material_prep,omitempty"`
+	POID                      uint64             `json:"po_id"`
+	PONumber                  int64              `json:"po_number"`
+	OBCNumber                 string             `json:"obc_number"`
+	SAPCustomerCode           string             `json:"sap_customer_code"`
+	SAPProductCode            string             `json:"sap_product_code"`
+	ProductName               string             `json:"product_name"`
+	ProductSpecifications     interface{}        `json:"product_specifications"`
+	QuantityOrdered           int                `json:"quantity_ordered"`
+	QuantityTargetLembarBesar int                `json:"quantity_target_lembar_besar"`
+	EstimatedRims             int                `json:"estimated_rims"`
+	OrderDate                 string             `json:"order_date"`
+	DueDate                   string             `json:"due_date"`
+	Priority                  string             `json:"priority"`
+	PriorityScore             int                `json:"priority_score"`
+	DaysUntilDue              int                `json:"days_until_due"`
+	IsPastDue                 bool               `json:"is_past_due"`
+	CurrentStatus             string             `json:"current_status"`
+	Notes                     string             `json:"notes"`
+	OBCMaster                 *OBCMasterInfoDTO  `json:"obc_master,omitempty"`
+	MaterialPrep              *MaterialPrepDTO   `json:"material_prep,omitempty"`
 }
 
 // MaterialPrepDTO merupakan DTO untuk material preparation detail

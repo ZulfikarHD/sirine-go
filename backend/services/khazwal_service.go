@@ -203,7 +203,7 @@ func (s *KhazwalService) StartMaterialPrep(poID uint64, userID uint64) (*models.
 
 // ConfirmPlatRetrieval mengkonfirmasi pengambilan plat dengan barcode validation
 // untuk memastikan plat yang diambil sesuai dengan yang ditentukan di SAP
-func (s *KhazwalService) ConfirmPlatRetrieval(prepID uint64, platCode string, userID uint64) error {
+func (s *KhazwalService) ConfirmPlatRetrieval(prepID uint64, scannedCode string, userID uint64) error {
 	// Start transaction untuk ensure data consistency
 	tx := s.db.Begin()
 	defer func() {
@@ -212,10 +212,10 @@ func (s *KhazwalService) ConfirmPlatRetrieval(prepID uint64, platCode string, us
 		}
 	}()
 
-	// Get material prep dengan lock
+	// Get material prep dengan lock dan preload OBCMaster untuk validation
 	var prep models.KhazwalMaterialPreparation
 	if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
-		Preload("ProductionOrder").
+		Preload("ProductionOrder.OBCMaster").
 		First(&prep, prepID).Error; err != nil {
 		tx.Rollback()
 		return err
@@ -227,29 +227,44 @@ func (s *KhazwalService) ConfirmPlatRetrieval(prepID uint64, platCode string, us
 		return gorm.ErrInvalidData
 	}
 
-	// Validasi: plat code harus match dengan SAP plat code
-	if prep.SAPPlatCode != platCode {
+	// Validasi: OBCMaster harus ada
+	if prep.ProductionOrder == nil || prep.ProductionOrder.OBCMaster == nil {
 		tx.Rollback()
 		return gorm.ErrInvalidData
 	}
 
-	// Update plat retrieved timestamp
+	// Compare scanned code dengan expected plat number dari OBCMaster
+	expectedPlat := prep.ProductionOrder.OBCMaster.PlatNumber
+	isMatch := (scannedCode == expectedPlat)
+
+	// Update plat retrieved timestamp dan match status
 	now := time.Now()
-	if err := tx.Model(&prep).Updates(map[string]interface{}{
+	updates := map[string]interface{}{
 		"plat_retrieved_at": now,
+		"plat_scanned_code": scannedCode,
+		"plat_match":        isMatch,
 		"updated_at":        now,
-	}).Error; err != nil {
+	}
+
+	if err := tx.Model(&prep).Updates(updates).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
 
 	// Create POStageTracking record untuk audit trail
+	notes := "Plat di-scan: " + scannedCode
+	if isMatch {
+		notes += " (match dengan expected)"
+	} else {
+		notes += " (tidak match! Expected: " + expectedPlat + ")"
+	}
+	
 	tracking := models.POStageTracking{
 		ProductionOrderID: prep.ProductionOrderID,
 		Stage:             models.StageKhazwalMaterialPrep,
 		Status:            models.StatusMaterialPrepInProgress,
 		HandledBy:         &userID,
-		Notes:             "Plat berhasil dikonfirmasi: " + platCode,
+		Notes:             notes,
 	}
 	if err := tx.Create(&tracking).Error; err != nil {
 		tx.Rollback()
@@ -259,6 +274,11 @@ func (s *KhazwalService) ConfirmPlatRetrieval(prepID uint64, platCode string, us
 	// Commit transaction
 	if err := tx.Commit().Error; err != nil {
 		return err
+	}
+
+	// Jika tidak match, return error
+	if !isMatch {
+		return gorm.ErrInvalidData
 	}
 
 	return nil
@@ -290,7 +310,7 @@ func (s *KhazwalService) UpdateKertasBlanko(prepID uint64, actualQty int, varian
 		return gorm.ErrInvalidData
 	}
 
-	// Calculate variance
+	// Calculate variance dan variance percentage
 	variance := actualQty - prep.KertasBlankoQuantity
 	variancePercentage := 0.0
 	if prep.KertasBlankoQuantity > 0 {
@@ -298,21 +318,30 @@ func (s *KhazwalService) UpdateKertasBlanko(prepID uint64, actualQty int, varian
 	}
 
 	// Validasi: jika variance > 5%, reason harus diisi
-	if variancePercentage > 5.0 || variancePercentage < -5.0 {
+	absVariancePercentage := variancePercentage
+	if absVariancePercentage < 0 {
+		absVariancePercentage = -absVariancePercentage
+	}
+	if absVariancePercentage > 5.0 {
 		if varianceReason == "" {
 			tx.Rollback()
 			return gorm.ErrInvalidData
 		}
 	}
 
-	// Update kertas blanko actual dan variance
+	// Update kertas blanko actual, variance, dan variance percentage
 	now := time.Now()
-	if err := tx.Model(&prep).Updates(map[string]interface{}{
-		"kertas_blanko_actual":          actualQty,
-		"kertas_blanko_variance":        variance,
-		"kertas_blanko_variance_reason": varianceReason,
-		"updated_at":                    now,
-	}).Error; err != nil {
+	updates := map[string]interface{}{
+		"kertas_blanko_actual":             actualQty,
+		"kertas_blanko_variance":           variance,
+		"kertas_blanko_variance_percentage": variancePercentage,
+		"updated_at":                       now,
+	}
+	if varianceReason != "" {
+		updates["kertas_blanko_variance_reason"] = varianceReason
+	}
+
+	if err := tx.Model(&prep).Updates(updates).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -343,7 +372,8 @@ func (s *KhazwalService) UpdateKertasBlanko(prepID uint64, actualQty int, varian
 }
 
 // UpdateTinta mengupdate informasi tinta yang digunakan dengan checklist validation
-// untuk memastikan semua warna tinta tersedia sesuai requirements
+// untuk memastikan semua warna tinta tersedia sesuai requirements, serta melakukan
+// pengecekan low stock warning untuk inventory management
 func (s *KhazwalService) UpdateTinta(prepID uint64, tintaActual interface{}, userID uint64) error {
 	// Start transaction untuk ensure data consistency
 	tx := s.db.Begin()
@@ -375,23 +405,37 @@ func (s *KhazwalService) UpdateTinta(prepID uint64, tintaActual interface{}, use
 		return err
 	}
 
-	// Update tinta actual
+	// Check for low stock warnings (TODO: integrate dengan SAP inventory API)
+	lowStockFlags := s.checkLowStockTinta(tintaActual)
+	lowStockJSON, err := json.Marshal(lowStockFlags)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// Update tinta actual dan low stock flags
 	now := time.Now()
 	if err := tx.Model(&prep).Updates(map[string]interface{}{
-		"tinta_actual": tintaJSON,
-		"updated_at":   now,
+		"tinta_actual":          tintaJSON,
+		"tinta_low_stock_flags": lowStockJSON,
+		"updated_at":            now,
 	}).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
 
 	// Create POStageTracking record untuk audit trail
+	notes := "Tinta berhasil diupdate"
+	if len(lowStockFlags) > 0 {
+		notes += " (dengan low stock warning)"
+	}
+	
 	tracking := models.POStageTracking{
 		ProductionOrderID: prep.ProductionOrderID,
 		Stage:             models.StageKhazwalMaterialPrep,
 		Status:            models.StatusMaterialPrepInProgress,
 		HandledBy:         &userID,
-		Notes:             "Tinta berhasil diupdate",
+		Notes:             notes,
 	}
 	if err := tx.Create(&tracking).Error; err != nil {
 		tx.Rollback()
@@ -404,6 +448,48 @@ func (s *KhazwalService) UpdateTinta(prepID uint64, tintaActual interface{}, use
 	}
 
 	return nil
+}
+
+// checkLowStockTinta memeriksa low stock warnings untuk tinta
+// dengan threshold < 10kg untuk early warning inventory management
+// TODO: Integrate dengan SAP inventory API untuk real-time stock check
+func (s *KhazwalService) checkLowStockTinta(tintaActual interface{}) map[string]interface{} {
+	lowStockFlags := make(map[string]interface{})
+	
+	// Parse tintaActual untuk extract color information
+	tintaMap, ok := tintaActual.(map[string]interface{})
+	if !ok {
+		return lowStockFlags
+	}
+	
+	// Check each color untuk low stock (placeholder logic)
+	// Real implementation harus query SAP inventory API
+	colors, ok := tintaMap["colors"].([]interface{})
+	if !ok {
+		return lowStockFlags
+	}
+	
+	lowStockColors := make([]string, 0)
+	for _, colorData := range colors {
+		colorInfo, ok := colorData.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		
+		// Placeholder: check stock_after field (jika ada)
+		stockAfter, ok := colorInfo["stock_after"].(float64)
+		if ok && stockAfter < 10.0 {
+			colorName, _ := colorInfo["color"].(string)
+			lowStockColors = append(lowStockColors, colorName)
+		}
+	}
+	
+	if len(lowStockColors) > 0 {
+		lowStockFlags["low_stock_colors"] = lowStockColors
+		lowStockFlags["warning"] = "Beberapa warna tinta memiliki stock rendah"
+	}
+	
+	return lowStockFlags
 }
 
 // FinalizeResult merupakan struct untuk response finalize material preparation

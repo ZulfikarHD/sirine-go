@@ -3,7 +3,32 @@
 **Epic ID:** KHAZWAL-EPIC-01  
 **Source:** `Sirine-Reqs/Backlog/01_Khazwal/Epic_01_Material_Preparation.md`  
 **Created:** 29 December 2025  
+**Updated:** 30 December 2025 - Phase 6 Integration  
 **Developer:** Zulfikar Hidayatullah
+
+---
+
+## 🔔 IMPORTANT UPDATE: Phase 6 OBC Master Integration
+
+**Phase 6 (Implementation) telah diupdate** berdasarkan OBC Master architecture yang telah diimplementasi (Phases 1-3). 
+
+**📋 Lihat dokumentasi lengkap:**
+- **[Phase 6 Full Plan](./01_Material_Preparation_Phase6.md)** - Complete implementation dengan OBC Master integration
+- **[Integration Summary](./INTEGRATION_SUMMARY.md)** - Quick reference untuk key changes
+- **[Before/After Comparison](./BEFORE_AFTER_COMPARISON.md)** - Visual comparison perubahan
+
+**Key Changes:**
+- ✅ ProductionOrder sekarang memiliki `obc_master_id` FK (bukan lagi direct OBC fields)
+- ✅ Semua queries harus preload `OBCMaster` relationship
+- ✅ Access pattern berubah: `po.obc_number` → `po.obc_master.obc_number`
+- ✅ 39 OBC fields sekarang tersedia via relationship (vs 5 old fields)
+- ✅ Frontend components harus handle `obc_master` nested object
+
+**Prerequisites sebelum Phase 6:**
+- ⏳ OBC Master Phase 4 (database migration) harus selesai
+- ⏳ OBC Master Phase 5 (service layer fixes) harus selesai
+
+**Phases 1-5 di bawah ini tetap relevan untuk understanding dan planning, namun Phase 6 implementation mengacu ke dokumen terpisah di atas.**
 
 ---
 

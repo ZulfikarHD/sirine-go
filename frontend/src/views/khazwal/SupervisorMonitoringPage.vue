@@ -100,7 +100,7 @@
           Aktivitas Staff
         </h2>
 
-        <div v-if="staffActive.length > 0" class="grid gap-4 md:grid-cols-2">
+        <div v-if="staffActive && staffActive.length > 0" class="grid gap-4 md:grid-cols-2">
           <StaffActivityCard
             v-for="(staff, index) in staffActive"
             :key="staff.user_id"
@@ -109,10 +109,24 @@
           />
         </div>
 
-        <div v-else class="glass-card rounded-2xl p-8 text-center">
-          <UserX class="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p class="text-gray-500">Tidak ada staff yang sedang aktif</p>
-        </div>
+        <Motion
+          v-else
+          v-bind="entranceAnimations.fadeScale"
+          class="glass-card rounded-2xl p-12 text-center"
+        >
+          <Motion v-bind="{ initial: { scale: 0 }, animate: { scale: 1 }, transition: { type: 'spring', stiffness: 500, damping: 40 } }">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full 
+                        bg-gradient-to-br from-blue-100 to-indigo-100 mb-4">
+              <UserX class="w-10 h-10 text-indigo-600" />
+            </div>
+          </Motion>
+          <h3 class="text-lg font-bold text-gray-900 mb-2">
+            Belum Ada Aktivitas
+          </h3>
+          <p class="text-gray-500 max-w-xs mx-auto">
+            Tidak ada staff yang sedang memproses material. Aktivitas akan muncul di sini ketika staff mulai bekerja.
+          </p>
+        </Motion>
       </Motion>
 
       <!-- Recent Completions Section -->
@@ -126,7 +140,7 @@
           Penyelesaian Terbaru
         </h2>
 
-        <div v-if="recentCompletions.length > 0" class="space-y-3">
+        <div v-if="recentCompletions && recentCompletions.length > 0" class="space-y-3">
           <Motion
             v-for="(item, index) in recentCompletions"
             :key="item.prep_id"
@@ -166,10 +180,24 @@
           </Motion>
         </div>
 
-        <div v-else class="glass-card rounded-2xl p-8 text-center">
-          <Clock class="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p class="text-gray-500">Belum ada penyelesaian hari ini</p>
-        </div>
+        <Motion
+          v-else
+          v-bind="entranceAnimations.fadeScale"
+          class="glass-card rounded-2xl p-12 text-center"
+        >
+          <Motion v-bind="{ initial: { scale: 0 }, animate: { scale: 1 }, transition: { type: 'spring', stiffness: 500, damping: 40 } }">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full 
+                        bg-gradient-to-br from-emerald-100 to-green-100 mb-4">
+              <Clock class="w-10 h-10 text-emerald-600" />
+            </div>
+          </Motion>
+          <h3 class="text-lg font-bold text-gray-900 mb-2">
+            Belum Ada Penyelesaian
+          </h3>
+          <p class="text-gray-500 max-w-xs mx-auto">
+            Belum ada material preparation yang diselesaikan hari ini. Riwayat penyelesaian akan muncul di sini.
+          </p>
+        </Motion>
       </Motion>
 
       <!-- Auto Refresh Indicator -->
@@ -197,7 +225,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { Motion } from 'motion-v'
 import { entranceAnimations } from '@/composables/useMotion'
-import { useKhazwalApi } from '@/composables/useKhazwalApi'
+import { useKhazwalStore } from '@/stores/khazwal'
 import { useAlertDialog } from '@/composables/useModal'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import StaffActivityCard from '@/components/khazwal/StaffActivityCard.vue'
@@ -212,14 +240,14 @@ import {
   History
 } from 'lucide-vue-next'
 
-const khazwalApi = useKhazwalApi()
+const khazwalStore = useKhazwalStore()
 const alertDialog = useAlertDialog()
 
-// State
-const loading = ref(false)
-const stats = ref({})
-const staffActive = ref([])
-const recentCompletions = ref([])
+// State from store
+const loading = computed(() => khazwalStore.monitoringLoading)
+const stats = computed(() => khazwalStore.monitoringStats || {})
+const staffActive = computed(() => khazwalStore.monitoringStats?.staff_active || [])
+const recentCompletions = computed(() => khazwalStore.monitoringStats?.recent_completions || [])
 
 // Auto Refresh
 const autoRefreshEnabled = ref(true)
@@ -229,23 +257,11 @@ let refreshIntervalId = null
 let countdownIntervalId = null
 
 /**
- * Fetch monitoring data dari API
+ * Fetch monitoring data menggunakan store
  */
 const fetchMonitoringData = async () => {
-  loading.value = true
   try {
-    const response = await khazwalApi.getMonitoring()
-
-    if (response.success) {
-      stats.value = {
-        total_in_queue: response.data.total_in_queue,
-        total_in_progress: response.data.total_in_progress,
-        total_completed_today: response.data.total_completed_today,
-        average_duration_mins: response.data.average_duration_mins
-      }
-      staffActive.value = response.data.staff_active || []
-      recentCompletions.value = response.data.recent_completions || []
-    }
+    await khazwalStore.getMonitoringStats()
   } catch (error) {
     console.error('Error fetching monitoring data:', error)
     // Jangan tampilkan error untuk auto-refresh failure
@@ -254,8 +270,6 @@ const fetchMonitoringData = async () => {
         detail: error.response?.data?.message || 'Silakan coba lagi'
       })
     }
-  } finally {
-    loading.value = false
   }
 }
 
