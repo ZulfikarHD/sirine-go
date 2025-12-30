@@ -2,12 +2,22 @@ package services
 
 import (
 	"encoding/json"
+	"fmt"
 	"sirine-go/backend/models"
 	"time"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
+
+// PlatNumberMissingError merupakan custom error untuk kasus plat number kosong di OBCMaster
+type PlatNumberMissingError struct {
+	OBCNumber string
+}
+
+func (e *PlatNumberMissingError) Error() string {
+	return fmt.Sprintf("Nomor plat tidak ditemukan di OBC Master %s. Silakan hubungi admin untuk melengkapi data.", e.OBCNumber)
+}
 
 // KhazwalService merupakan service untuk Khazwal Material Preparation operations
 // yang mencakup queue management, material prep workflow, dan tracking
@@ -235,6 +245,16 @@ func (s *KhazwalService) ConfirmPlatRetrieval(prepID uint64, scannedCode string,
 
 	// Compare scanned code dengan expected plat number dari OBCMaster
 	expectedPlat := prep.ProductionOrder.OBCMaster.PlatNumber
+	
+	// Validasi: Expected plat number harus ada di OBCMaster
+	if expectedPlat == "" {
+		tx.Rollback()
+		// Return custom error untuk membedakan dari mismatch
+		return &PlatNumberMissingError{
+			OBCNumber: prep.ProductionOrder.OBCNumber,
+		}
+	}
+	
 	isMatch := (scannedCode == expectedPlat)
 
 	// Update plat retrieved timestamp dan match status

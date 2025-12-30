@@ -193,9 +193,6 @@ export const useKhazwalStore = defineStore('khazwal', {
      * @returns {Promise<Object>} Response dari server
      */
     async confirmPlat(prepId, scannedCode) {
-      // #region agent log
-      fetch('http://localhost:7244/ingest/3bd65f98-f429-4576-8d2e-028ff9926ba8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'khazwal.js:198',message:'confirmPlat request',data:{prepId:prepId,scannedCode:scannedCode,url:`/khazwal/material-prep/${prepId}/confirm-plat`,payload:{plat_code:scannedCode}},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,B'})}).catch(()=>{});
-      // #endregion
       try {
         const response = await apiClient.post(`/khazwal/material-prep/${prepId}/confirm-plat`, {
           plat_code: scannedCode

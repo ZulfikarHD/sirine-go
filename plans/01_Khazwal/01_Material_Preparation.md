@@ -643,20 +643,33 @@ CREATE INDEX idx_khazwal_prep_po ON khazwal_material_preparations(production_ord
 
 **Deliverable:** Complete workflow end-to-end
 
-### Sprint 6: Consumer Side & Polish (Week 6)
+### Sprint 6: Consumer Side & Polish (Week 6) ✅ COMPLETED
 
-| Task | Priority | Effort | Assignee |
-|------|----------|--------|----------|
-| Create basic Cetak queue API | P1 | 3h | Backend |
-| Create supervisor monitoring API | P2 | 3h | Backend |
-| Create `CetakQueuePage.vue` | P1 | 4h | Frontend |
-| Add Cetak menu & routes | P1 | 2h | Frontend |
-| Supervisor monitoring view | P2 | 4h | Frontend |
-| Empty states design | P2 | 2h | Frontend |
-| Pull-to-refresh mobile | P2 | 2h | Frontend |
-| E2E testing | P1 | 4h | QA |
+| Task | Priority | Effort | Status | Notes |
+|------|----------|--------|--------|-------|
+| Create basic Cetak queue API | P1 | 3h | ✅ Done | Enhanced dengan OBC Master integration |
+| Create supervisor monitoring API | P2 | 3h | ✅ Done | Menggunakan existing endpoint |
+| Create `CetakQueuePage.vue` | P1 | 4h | ✅ Done | With Cetak store integration |
+| Add Cetak menu & routes | P1 | 2h | ✅ Done | Routes configured |
+| Supervisor monitoring view | P2 | 4h | ✅ Done | With Khazwal store + OBC context |
+| Empty states design | P2 | 2h | ✅ Done | Enhanced dengan animations |
+| Pull-to-refresh mobile | P2 | 2h | ✅ Done | Touch gesture implemented |
+| E2E testing | P1 | 4h | 📝 Planned | For next phase |
 
-**Deliverable:** Complete feature with consumer views
+**Deliverable:** ✅ Complete feature with consumer views
+
+**Implementation Summary:**
+- Backend: OBC Master fields added to Cetak DTOs
+- Frontend: Cetak Pinia store created for state management
+- UI: CetakQueueCard enhanced with OBC Master display (Material, Seri, Warna, Personalization)
+- UX: Pull-to-refresh for mobile with haptic feedback
+- Monitoring: Enhanced StaffActivityCard with OBC context
+- Empty States: Improved dengan Motion-V animations
+
+**Documentation:**
+- [Sprint 6 Completion Summary](./SPRINT6_COMPLETION_SUMMARY.md)
+
+**Date Completed:** December 30, 2025
 
 ---
 

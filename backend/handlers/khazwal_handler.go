@@ -281,6 +281,15 @@ func (h *KhazwalHandler) ConfirmPlat(c *gin.Context) {
 			return
 		}
 
+		// Check for PlatNumberMissingError (data issue)
+		if platErr, ok := err.(*services.PlatNumberMissingError); ok {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"message": platErr.Error(),
+			})
+			return
+		}
+
 		if err == gorm.ErrInvalidData {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"success": false,

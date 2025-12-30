@@ -598,10 +598,6 @@ const nextStep = () => {
  */
 const handlePlatConfirmed = async (platCode) => {
   stepLoading.value = true
-  
-  // #region agent log
-  fetch('http://localhost:7244/ingest/3bd65f98-f429-4576-8d2e-028ff9926ba8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'MaterialPrepProcessPage.vue:603',message:'handlePlatConfirmed called',data:{materialPrepId:materialPrep.value?.id,platCode:platCode,materialPrepStatus:materialPrep.value?.status,sapPlatCode:materialPrep.value?.sap_plat_code},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,B,E'})}).catch(()=>{});
-  // #endregion
 
   try {
     const response = await khazwalApi.confirmPlat(materialPrep.value.id, platCode)
