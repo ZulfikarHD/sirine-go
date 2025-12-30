@@ -35,7 +35,7 @@ describe('Auth Store', () => {
         refresh_token: 'test-refresh-token',
         user: {
           id: 1,
-          nip: '99999',
+          nip: 'admin',
           full_name: 'Test User',
           role: 'ADMIN',
         },
@@ -54,7 +54,7 @@ describe('Auth Store', () => {
       const authData = {
         token: 'test-token',
         refresh_token: 'test-refresh-token',
-        user: { id: 1, nip: '99999' },
+        user: { id: 1, nip: 'admin' },
       }
 
       store.setAuth(authData)
@@ -96,7 +96,7 @@ describe('Auth Store', () => {
 
   describe('restoreAuth', () => {
     it('harus restore auth dari localStorage', () => {
-      const mockUser = { id: 1, nip: '99999', full_name: 'Test' }
+      const mockUser = { id: 1, nip: 'admin', full_name: 'Test' }
       localStorage.getItem = vi.fn((key) => {
         if (key === 'auth_token') return 'stored-token'
         if (key === 'refresh_token') return 'stored-refresh'

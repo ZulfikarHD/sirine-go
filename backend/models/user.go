@@ -12,6 +12,7 @@ type UserRole string
 const (
 	RoleAdmin          UserRole = "ADMIN"
 	RoleManager        UserRole = "MANAGER"
+	RolePPIC           UserRole = "PPIC"
 	RoleStaffKhazwal   UserRole = "STAFF_KHAZWAL"
 	RoleOperatorCetak  UserRole = "OPERATOR_CETAK"
 	RoleQCInspector    UserRole = "QC_INSPECTOR"
@@ -23,6 +24,7 @@ const (
 type Department string
 
 const (
+	DeptPPIC        Department = "PPIC"
 	DeptKhazwal     Department = "KHAZWAL"
 	DeptCetak       Department = "CETAK"
 	DeptVerifikasi  Department = "VERIFIKASI"
@@ -56,8 +58,8 @@ type User struct {
 	Email               string         `gorm:"type:varchar(255);uniqueIndex;not null" json:"email" binding:"required,email"`
 	Phone               string         `gorm:"type:varchar(20)" json:"phone"`
 	PasswordHash        string         `gorm:"type:varchar(255);not null" json:"-"` // Hidden dari JSON response
-	Role                UserRole       `gorm:"type:enum('ADMIN','MANAGER','STAFF_KHAZWAL','OPERATOR_CETAK','QC_INSPECTOR','VERIFIKATOR','STAFF_KHAZKHIR');not null" json:"role" binding:"required"`
-	Department          Department     `gorm:"type:enum('KHAZWAL','CETAK','VERIFIKASI','KHAZKHIR');not null" json:"department" binding:"required"`
+	Role                UserRole       `gorm:"type:enum('ADMIN','MANAGER','PPIC','STAFF_KHAZWAL','OPERATOR_CETAK','QC_INSPECTOR','VERIFIKATOR','STAFF_KHAZKHIR');not null" json:"role" binding:"required"`
+	Department          Department     `gorm:"type:enum('PPIC','KHAZWAL','CETAK','VERIFIKASI','KHAZKHIR');not null" json:"department" binding:"required"`
 	Shift               Shift          `gorm:"type:enum('PAGI','SIANG','MALAM');default:'PAGI'" json:"shift"`
 	ProfilePhotoURL     string         `gorm:"type:varchar(500)" json:"profile_photo_url"`
 	TotalPoints         int            `gorm:"default:0" json:"total_points"`

@@ -45,7 +45,7 @@ func (h *AchievementHandler) GetAllAchievements(c *gin.Context) {
 // GET /api/profile/achievements
 func (h *AchievementHandler) GetUserAchievements(c *gin.Context) {
 	// Get user ID dari context (dari auth middleware)
-	userID, exists := c.Get("userID")
+	userID, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
@@ -75,7 +75,7 @@ func (h *AchievementHandler) GetUserAchievements(c *gin.Context) {
 // GET /api/profile/stats
 func (h *AchievementHandler) GetUserStats(c *gin.Context) {
 	// Get user ID dari context
-	userID, exists := c.Get("userID")
+	userID, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,

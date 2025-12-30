@@ -159,7 +159,7 @@ mysql -u sirine_user -p sirine_go
 -- Insert admin user (password: Admin@123)
 INSERT INTO users (nip, full_name, email, phone, password_hash, role, department, status, must_change_password) 
 VALUES (
-    '99999', 
+    'admin', 
     'Administrator', 
     'admin@sirine-go.com',
     '08123456789',

@@ -21,8 +21,8 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) NOT NULL UNIQUE,
     phone VARCHAR(20),
     password_hash VARCHAR(255) NOT NULL,
-    role ENUM('ADMIN', 'MANAGER', 'STAFF_KHAZWAL', 'OPERATOR_CETAK', 'QC_INSPECTOR', 'VERIFIKATOR', 'STAFF_KHAZKHIR') NOT NULL,
-    department ENUM('KHAZWAL', 'CETAK', 'VERIFIKASI', 'KHAZKHIR') NOT NULL,
+    role ENUM('ADMIN', 'MANAGER', 'PPIC', 'STAFF_KHAZWAL', 'OPERATOR_CETAK', 'QC_INSPECTOR', 'VERIFIKATOR', 'STAFF_KHAZKHIR') NOT NULL,
+    department ENUM('PPIC', 'KHAZWAL', 'CETAK', 'VERIFIKASI', 'KHAZKHIR') NOT NULL,
     shift ENUM('PAGI', 'SIANG', 'MALAM') DEFAULT 'PAGI',
     profile_photo_url VARCHAR(500),
     total_points INT DEFAULT 0 COMMENT 'Total gamification points',
@@ -146,7 +146,7 @@ CREATE TABLE IF NOT EXISTS user_achievements (
 -- NIP: 99999
 INSERT INTO users (nip, full_name, email, phone, password_hash, role, department, must_change_password, status) 
 VALUES (
-    '99999', 
+    'admin', 
     'Administrator', 
     'admin@sirine.local', 
     '081234567890',

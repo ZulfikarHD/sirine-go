@@ -712,7 +712,7 @@ describe('UserList.vue', () => {
 describe('User Management Integration', () => {
   it('complete CRUD flow', async () => {
     // 1. Login as admin
-    await login('99999', 'admin123')
+    await login('admin', 'admin123')
     
     // 2. Navigate to user management
     await navigateTo('/admin/users')
@@ -801,7 +801,7 @@ test.describe('User Management E2E', () => {
   test.beforeEach(async ({ page }) => {
     // Login as admin
     await page.goto('http://localhost:5173/login')
-    await page.fill('[name="nip"]', '99999')
+    await page.fill('[name="nip"]', 'admin')
     await page.fill('[name="password"]', 'admin123')
     await page.click('button[type="submit"]')
     await page.waitForURL('**/dashboard')

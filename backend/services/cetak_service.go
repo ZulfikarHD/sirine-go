@@ -118,6 +118,7 @@ func (s *CetakService) GetCetakQueue(filters CetakQueueFilters) (*CetakQueueResp
 	// Query builder dengan filter status READY_FOR_CETAK
 	query := s.db.Model(&models.ProductionOrder{}).
 		Where("current_status = ?", models.StatusReadyForCetak).
+		Preload("OBCMaster").
 		Preload("KhazwalMaterialPrep.PreparedByUser")
 
 	// Apply priority filter jika ada
@@ -215,6 +216,7 @@ func (s *CetakService) GetCetakDetail(poID uint64) (*CetakDetail, error) {
 
 	// Query dengan full relations preload
 	if err := s.db.
+		Preload("OBCMaster").
 		Preload("KhazwalMaterialPrep.PreparedByUser").
 		First(&po, poID).Error; err != nil {
 		return nil, err

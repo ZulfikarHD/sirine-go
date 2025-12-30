@@ -150,6 +150,15 @@ func TestCompleteLoginFlow(t *testing.T) {
 
 	token := loginResp.Data.Token
 
+	// Verify session expiry mengikuti refresh token expiry (30 days) untuk normal login
+	var session models.UserSession
+	tf.db.Where("user_id = ?", user.ID).Order("created_at DESC").First(&session)
+	expectedExpiry := time.Now().Add(tf.cfg.RefreshTokenExpiry)
+	if session.ExpiresAt.Before(expectedExpiry.Add(-1 * time.Hour)) {
+		t.Errorf("Session expiry harus mengikuti RefreshTokenExpiry (30 days) untuk normal login, got: %v, expected around: %v", 
+			session.ExpiresAt, expectedExpiry)
+	}
+
 	// Step 2: Access protected endpoint dengan token
 	req2 := httptest.NewRequest("GET", "/api/auth/me", nil)
 	req2.Header.Set("Authorization", "Bearer "+token)
@@ -360,13 +369,14 @@ func TestLoginWithRememberMe(t *testing.T) {
 		t.Fatalf("Login dengan remember_me gagal: status code = %d", w.Code)
 	}
 
-	// Verify session expiry lebih lama
+	// Verify session expiry lebih lama untuk remember_me (3x RefreshTokenExpiry = 90 days)
 	var session models.UserSession
 	tf.db.Where("user_id = ?", user.ID).Order("created_at DESC").First(&session)
 
-	expectedExpiry := time.Now().Add(tf.cfg.RefreshTokenExpiry)
+	expectedExpiry := time.Now().Add(tf.cfg.RefreshTokenExpiry * 3)
 	if session.ExpiresAt.Before(expectedExpiry.Add(-1 * time.Hour)) {
-		t.Error("Session expiry terlalu pendek untuk remember_me")
+		t.Errorf("Session expiry harus 3x RefreshTokenExpiry (90 days) untuk remember_me, got: %v, expected around: %v",
+			session.ExpiresAt, expectedExpiry)
 	}
 }
 

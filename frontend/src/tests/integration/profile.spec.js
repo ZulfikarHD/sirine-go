@@ -115,7 +115,7 @@ describe('Profile Management Integration Tests', () => {
 
     it('user tidak dapat update NIP, role, atau department', async () => {
       const attemptedUpdate = {
-        nip: '99999', // Should be ignored
+        nip: 'admin', // Should be ignored
         role: 'MANAGER', // Should be ignored
         department: 'CETAK', // Should be ignored
         full_name: 'Updated Name',

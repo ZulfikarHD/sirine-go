@@ -41,6 +41,7 @@ func (s *KhazwalService) GetMaterialPrepQueue(filters QueueFilters) (*QueueRespo
 			string(models.StatusWaitingMaterialPrep),
 			string(models.StatusMaterialPrepInProgress),
 		}).
+		Preload("OBCMaster").
 		Preload("KhazwalMaterialPrep")
 
 	// Apply priority filter jika ada
@@ -106,6 +107,7 @@ func (s *KhazwalService) GetMaterialPrepDetail(id uint64) (*models.ProductionOrd
 	
 	// Query dengan full relations preload
 	if err := s.db.
+		Preload("OBCMaster").
 		Preload("KhazwalMaterialPrep.PreparedByUser").
 		Preload("StageTracking", func(db *gorm.DB) *gorm.DB {
 			return db.Order("created_at DESC")
@@ -189,6 +191,7 @@ func (s *KhazwalService) StartMaterialPrep(poID uint64, userID uint64) (*models.
 
 	// Reload PO dengan updated data dan relations
 	if err := s.db.
+		Preload("OBCMaster").
 		Preload("KhazwalMaterialPrep.PreparedByUser").
 		Preload("StageTracking").
 		First(&po, poID).Error; err != nil {

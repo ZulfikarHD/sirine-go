@@ -132,9 +132,9 @@ Dokumentasi lengkap implementasi fitur per sprint untuk aplikasi Sirine Go.
 | Sprint 3 | 5 | 4 | 4 | 1 | 1 week |
 | Sprint 4 | 4 | 13 | 3 | 2 | 1 week |
 | Sprint 5 | 7 | 9 | 5 | 2 | 1 week |
+| Sprint Khazwal | 5 | 6 | 8 | 2 | 1 week |
+| Sprint OBC Master | 4 | 4 | 0 | 2 | 1 sprint |
 | **Total** | **35** | **51** | **28** | **11** | **7 weeks** |
-|| Sprint Khazwal | 5 | 6 | 8 | 2 | 1 week |
-|| Sprint OBC Master | 4 | 4 | 0 | 2 | 1 sprint |
 
 ---
 

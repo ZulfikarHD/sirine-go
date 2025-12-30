@@ -297,7 +297,7 @@ curl -X POST http://localhost:8080/api/auth/refresh \
 **Login:**
 ```javascript
 const response = await axios.post('/api/auth/login', {
-  nip: '99999',
+  nip: 'admin',
   password: 'Admin@123'
 })
 

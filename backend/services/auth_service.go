@@ -125,12 +125,16 @@ func (s *AuthService) Login(req LoginRequest, ipAddress, userAgent string) (*Log
 		return nil, err
 	}
 
-	// Calculate expiry based on RememberMe
+	// Session expiry harus selalu mengikuti refresh token expiry (30 hari)
+	// untuk memastikan refresh token mechanism berfungsi dengan baik.
+	// RememberMe dapat digunakan untuk extend expiry lebih lama jika diperlukan.
 	var expiresAt time.Time
 	if req.RememberMe {
-		expiresAt = time.Now().Add(s.config.RefreshTokenExpiry)
+		// Extend session untuk remember me (misalnya 90 hari)
+		expiresAt = time.Now().Add(s.config.RefreshTokenExpiry * 3)
 	} else {
-		expiresAt = time.Now().Add(s.config.JWTExpiry)
+		// Default session expiry mengikuti refresh token (30 hari)
+		expiresAt = time.Now().Add(s.config.RefreshTokenExpiry)
 	}
 
 	// Save session to database
@@ -268,30 +272,70 @@ func (s *AuthService) ValidateToken(tokenString string) (*models.User, *JWTClaim
 
 // RefreshAuthToken me-refresh JWT token menggunakan refresh token
 func (s *AuthService) RefreshAuthToken(refreshToken string) (*LoginResponse, error) {
-	// Validate refresh token
-	user, _, err := s.ValidateToken(refreshToken)
+	// Parse and validate refresh token JWT structure
+	token, err := jwt.ParseWithClaims(refreshToken, &JWTClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(s.config.JWTSecret), nil
+	})
+
 	if err != nil {
 		return nil, errors.New("refresh token tidak valid")
 	}
 
+	claims, ok := token.Claims.(*JWTClaims)
+	if !ok || !token.Valid {
+		return nil, errors.New("refresh token tidak valid")
+	}
+
+	// Verify this is a refresh token by checking issuer
+	if claims.Issuer != "sirine-go-refresh" {
+		return nil, errors.New("refresh token tidak valid")
+	}
+
+	// Check jika refresh token sudah revoked dengan menggunakan refresh_token_hash
+	refreshTokenHash := hashToken(refreshToken)
+	var session models.UserSession
+	if err := s.db.Where("refresh_token_hash = ?", refreshTokenHash).First(&session).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, errors.New("refresh token tidak valid")
+		}
+		return nil, err
+	}
+
+	if !session.IsValid() {
+		return nil, errors.New("refresh token expired atau sudah di-revoke")
+	}
+
+	// Get user data
+	var user models.User
+	if err := s.db.First(&user, claims.UserID).Error; err != nil {
+		return nil, errors.New("user tidak ditemukan")
+	}
+
+	if !user.IsActive() {
+		return nil, errors.New("user tidak aktif")
+	}
+
 	// Generate new tokens
-	newToken, err := s.GenerateJWT(user)
+	newToken, err := s.GenerateJWT(&user)
 	if err != nil {
 		return nil, err
 	}
 
-	newRefreshToken, err := s.GenerateRefreshToken(user)
+	newRefreshToken, err := s.GenerateRefreshToken(&user)
 	if err != nil {
 		return nil, err
 	}
 
-	// Update session
-	oldTokenHash := hashToken(refreshToken)
+	// Update session dengan token dan refresh token baru
+	// Session expiry tetap mengikuti refresh token expiry (30 hari)
 	newTokenHash := hashToken(newToken)
 	newRefreshTokenHash := hashToken(newRefreshToken)
 
 	s.db.Model(&models.UserSession{}).
-		Where("token_hash = ?", oldTokenHash).
+		Where("refresh_token_hash = ?", refreshTokenHash).
 		Updates(map[string]interface{}{
 			"token_hash":         newTokenHash,
 			"refresh_token_hash": newRefreshTokenHash,

@@ -17,115 +17,174 @@ Dokumen ini merupakan panduan komprehensif untuk membuat dan mengelola dokumenta
 
 | # | File | Location | Status |
 |---|------|----------|--------|
-| 1 | **Feature Doc** | `docs/features/{role}/{CODE}-feature.md` | WAJIB |
-| 2 | **Test Plan** | `docs/testing/{CODE}-test-plan.md` | WAJIB |
-| 3 | **API Doc** | `docs/api/{resource}.md` | WAJIB (jika ada API) |
-| 4 | **User Journeys** | `docs/guides/{feature}-user-journeys.md` | WAJIB (jika complex) |
+| 1 | **API Doc** | `docs/04-api-reference/{resource}.md` | WAJIB (jika ada API) |
+| 2 | **Test Plan** | `docs/06-testing/{feature}-testing.md` | WAJIB |
+| 3 | **User Journeys** | `docs/07-user-journeys/{feature}/` | WAJIB (jika complex) |
+| 4 | **Sprint Doc** | `docs/10-sprints/sprint-{feature}.md` | WAJIB (untuk fitur baru) |
 
 ### ✅ MANDATORY Checklist Sebelum Commit Documentation
 
 ```
-[ ] Feature doc dibuat (≤300 lines)
-[ ] Test plan dibuat dengan QA checklist lengkap
-[ ] API doc dibuat dengan routes & examples
-[ ] User journeys dibuat di guides/ (BUKAN di feature doc)
-[ ] Semua README.md terkait di-update dengan referensi ke file baru
+[ ] API doc dibuat di docs/04-api-reference/ dengan routes & examples
+[ ] Test plan dibuat di docs/06-testing/ dengan QA checklist lengkap
+[ ] User journeys dibuat di docs/07-user-journeys/{feature}/
+[ ] Sprint doc dibuat di docs/10-sprints/ dengan implementation summary
+[ ] docs/README.md di-update dengan referensi ke file baru
 [ ] Cross-references antar dokumen sudah benar
 ```
 
-### ✅ MANDATORY BUT ❌ DO NOT Include dalam Feature Doc
+### ✅ MANDATORY BUT ❌ DO NOT Include dalam Sprint Doc
 
-| Content | ❌ JANGAN di Feature Doc | ✅ TARUH di |
+| Content | ❌ JANGAN di Sprint Doc | ✅ TARUH di |
 |---------|--------------------------|-------------|
-| User journey diagrams | ❌ | `docs/user-journeys/{feature}-user-journeys.md` |
-| Full Manual and System QA test cases | ❌ | `docs/testing/{CODE}-test-plan.md` |
-| Full API routes list | ❌ | `docs/api/{resource}.md` |
-| Step-by-step manual tests | ❌ | `docs/testing/{CODE}-test-plan.md` |
+| User journey diagrams | ❌ | `docs/07-user-journeys/{feature}/` |
+| Full Manual and System QA test cases | ❌ | `docs/06-testing/{feature}-testing.md` |
+| Full API routes list dengan examples | ❌ | `docs/04-api-reference/{resource}.md` |
+| Step-by-step manual tests | ❌ | `docs/06-testing/{feature}-testing.md` |
 
-### 📏 Size Limits untuk Feature Doc
+### 📏 Size Limits untuk Sprint Doc
 
 | Metric | Maximum | Jika Exceeded |
 |--------|---------|---------------|
-| Total lines | **≤300 lines** | Split ke file lain |
-| User Stories | **≤15 stories** | Group by phase |
-| Routes table | **≤20 routes** | Summary only, detail di `docs/api/` |
-| Edge Cases | **≤15 cases** | Prioritize critical ones |
-| Manual Testing | **≤10 checkboxes** | Full plan di `docs/testing/` |
+| Total lines | **≤500 lines** | Split ke file lain |
+| Routes table | **≤20 routes** | Summary only, detail di `docs/04-api-reference/` |
+| File list | **≤50 files** | Group by category |
+| Test cases summary | **≤20 items** | Full plan di `docs/06-testing/` |
 
-### 📂 Complete File Structure Example
+### 📂 Complete File Structure - Sirine Go Project
 
 ```
 docs/
-├── features/
-│   └── owner/
-│       └── OE17-marketing-strategy.md   # ≤300 lines, lean reference
+├── 01-getting-started/          # Quick start, installation, checklist
+│   ├── quickstart.md
+│   ├── installation.md
+│   └── checklist.md
 │
-├── api/
-│   └── marketing.md                     # Full route documentation
+├── 02-architecture/             # System overview, folder structure
+│   ├── overview.md
+│   └── folder-structure.md
 │
-├── testing/
-│   └── OE17-marketing-test-plan.md      # Full QA checklist
+├── 03-development/              # Development guides
+│   ├── backend/
+│   └── frontend/
 │
-└── guides/
-    └── marketing-user-journeys.md       # User journey diagrams
+├── 04-api-reference/            # Full API documentation per resource
+│   ├── README.md
+│   ├── authentication.md
+│   ├── user-management.md
+│   └── khazwal.md               # Example: Khazwal Material Prep API
+│
+├── 05-guides/                   # How-to guides
+│   ├── authentication/
+│   ├── database/
+│   └── validation/
+│
+├── 06-testing/                  # Test plans per feature
+│   ├── README.md
+│   ├── user-management-testing.md
+│   └── khazwal-testing.md       # Example: Khazwal testing guide
+│
+├── 07-user-journeys/            # User journey diagrams per feature
+│   ├── authentication/
+│   ├── user-management/
+│   └── khazwal/                 # Example: Khazwal user journeys
+│       └── material-prep-flow.md
+│
+├── 08-deployment/               # Production deployment guides
+│
+├── 09-troubleshooting/          # FAQ and common issues
+│
+├── 10-sprints/                  # Sprint documentation
+│   ├── README.md
+│   ├── sprint-01-authentication.md
+│   ├── sprint-02-user-management.md
+│   └── sprint-khazwal-material-prep.md  # Example
+│
+├── 11-appendix/                 # Glossary, resources
+│
+└── README.md                    # Documentation hub
 ```
 
 ### 🔗 Cross-Reference Template
 
-Setiap feature doc **WAJIB** memiliki section `Related Documentation`:
+Setiap doc **WAJIB** memiliki section `Related Documentation`:
 
 ```markdown
 ## Related Documentation
 
-- **API Documentation:** [Feature API](../../api/{resource}.md)
-- **Test Plan:** [{CODE} Test Plan](../../testing/{CODE}-test-plan.md)
-- **User Journeys:** [Feature User Journeys](../../guides/{feature}-user-journeys.md)
+- **API Reference:** [Feature API](../04-api-reference/{resource}.md)
+- **Testing Guide:** [Feature Testing](../06-testing/{feature}-testing.md)
+- **User Journeys:** [Feature User Journeys](../07-user-journeys/{feature}/)
+- **Sprint Documentation:** [Sprint Feature](../10-sprints/sprint-{feature}.md)
 ```
 
 ---
 
-## 📁 Recommended Folder Structure
+## 📁 Recommended Folder Structure (Sirine Go)
 
 ```
-my-project/
+sirine-go/
 │
 ├── 📄 README.md                    # Project overview & quick start
-├── 📄 CONTRIBUTING.md              # How to contribute (optional for solo)
-├── 📄 CHANGELOG.md                 # Version history (optional)
+├── 📄 CHANGELOG.md                 # Version history
+├── 📄 documentation_guide.md       # This guide
 │
 ├── 📁 docs/                        # All documentation lives here
 │   │
-│   ├── 📁 architecture/            # System design & patterns
-│   │   ├── ARCHITECTURE.md         # System overview & layers
-│   │   ├── DATA_FLOW.md            # How data moves through system
-│   │   ├── DATABASE.md             # Database design & conventions
-│   │   └── EVENTS.md               # Event-driven docs (if applicable)
+│   ├── 📁 01-getting-started/      # Setup & installation
+│   │   ├── quickstart.md           # 5-minute setup
+│   │   ├── installation.md         # Detailed setup
+│   │   └── checklist.md            # Verification checklist
 │   │
-│   ├── 📁 adr/                     # Architecture Decision Records
-│   │   ├── README.md               # ADR index & template
-│   │   ├── 001-tech-stack.md
-│   │   ├── 002-authentication.md
-│   │   └── ...
+│   ├── 📁 02-architecture/         # System design
+│   │   ├── overview.md             # Architecture overview
+│   │   └── folder-structure.md     # Project structure
 │   │
-│   ├── 📁 api/                     # API documentation
-│   │   ├── README.md               # API overview & conventions
-│   │   ├── authentication.md
-│   │   ├── users.md
-│   │   └── ...
+│   ├── 📁 03-development/          # Development guides
+│   │   ├── backend/                # Go/Gin development
+│   │   └── frontend/               # Vue 3 development
 │   │
-│   ├── 📁 features/                # Feature-specific docs
-│   │   ├── user-management.md
-│   │   ├── order-processing.md
-│   │   └── ...
+│   ├── 📁 04-api-reference/        # API documentation
+│   │   ├── README.md               # API overview
+│   │   ├── authentication.md       # Auth endpoints
+│   │   ├── user-management.md      # User endpoints
+│   │   └── {resource}.md           # Per-resource API docs
 │   │
-│   └── 📁 guides/                  # How-to guides
-│       ├── local-setup.md
-│       ├── deployment.md
-│       ├── debugging.md
-│       └── ...
+│   ├── 📁 05-guides/               # How-to guides
+│   │   ├── authentication/         # Auth guides
+│   │   ├── database/               # DB management
+│   │   └── validation/             # Validation guides
+│   │
+│   ├── 📁 06-testing/              # Test plans
+│   │   ├── README.md               # Testing overview
+│   │   └── {feature}-testing.md    # Per-feature test plans
+│   │
+│   ├── 📁 07-user-journeys/        # User flow documentation
+│   │   └── {feature}/              # Per-feature journeys
+│   │       └── {flow}.md           # Specific flow
+│   │
+│   ├── 📁 08-deployment/           # Deployment guides
+│   │
+│   ├── 📁 09-troubleshooting/      # FAQ & issues
+│   │
+│   ├── 📁 10-sprints/              # Sprint documentation
+│   │   └── sprint-{feature}.md     # Per-feature sprint summary
+│   │
+│   ├── 📁 11-appendix/             # Resources & glossary
+│   │
+│   └── README.md                   # Documentation hub
 │
-└── 📁 src/                         # Source code with inline docs
-    └── ... (code with JSDoc/docstrings)
+├── 📁 backend/                     # Go backend
+│   ├── models/                     # Database models
+│   ├── handlers/                   # HTTP handlers
+│   ├── services/                   # Business logic
+│   └── routes/                     # API routes
+│
+└── 📁 frontend/                    # Vue 3 frontend
+    └── src/
+        ├── views/                  # Page components
+        ├── components/             # Reusable components
+        └── composables/            # Composition API utilities
 ```
 
 ---
@@ -134,16 +193,15 @@ my-project/
 
 ### Quick Reference: Apa yang Perlu Didokumentasikan?
 
-| Document | Wajib? | Kapan Dibuat? | Kapan Diupdate? |
-|----------|--------|---------------|-----------------|
-| README.md | ✅ WAJIB | Awal project | Setiap ada perubahan setup/tech stack |
-| ARCHITECTURE.md | ✅ WAJIB | Setelah struktur project jelas | Hanya jika ada perubahan pattern |
-| DATA_FLOW.md | ⚡ Recommended | Setelah ada 3+ layers | Jika flow berubah signifikan |
-| DATABASE.md | ⚡ Recommended | Setelah schema stabil | Setiap ada migrasi besar |
-| ADRs | ⚡ Recommended | Setiap keputusan arsitektur | Tidak diupdate (immutable) |
-| API Docs | ✅ WAJIB (jika ada API) | Per endpoint/resource | Setiap API berubah |
-| Feature Docs | 💡 Optional | Untuk fitur kompleks | Setiap fitur dimodifikasi |
-| Inline Comments | ✅ WAJIB | Saat coding | Saat logic berubah |
+| Document | Wajib? | Location | Kapan Dibuat? | Kapan Diupdate? |
+|----------|--------|----------|---------------|-----------------|
+| docs/README.md | ✅ WAJIB | `docs/` | Awal project | Setiap feature baru |
+| API Reference | ✅ WAJIB | `docs/04-api-reference/` | Per endpoint/resource | Setiap API berubah |
+| Testing Guide | ✅ WAJIB | `docs/06-testing/` | Per feature | Setiap test case berubah |
+| User Journeys | ⚡ Recommended | `docs/07-user-journeys/` | Untuk fitur kompleks | Jika flow berubah |
+| Sprint Doc | ✅ WAJIB | `docs/10-sprints/` | Per sprint/feature | Setelah sprint selesai |
+| Architecture | ⚡ Recommended | `docs/02-architecture/` | Setelah struktur jelas | Jika pattern berubah |
+| Inline Comments | ✅ WAJIB | In code | Saat coding | Saat logic berubah |
 
 ---
 
@@ -835,7 +893,105 @@ Membuat [resource] baru.
 
 ---
 
-## 7. Feature Documentation
+## 7. Sprint Documentation
+
+### ❓ Do I Need This?
+> **SELALU YA** untuk setiap feature baru yang di-implement.
+> Sprint doc adalah summary dari implementasi yang mencakup files created, endpoints, dan features.
+
+### 🎯 Purpose
+- Summary implementasi per sprint/feature
+- Reference untuk files yang dibuat/dimodifikasi
+- Quick overview endpoints dan features
+- Link ke dokumentasi detail lainnya
+
+### 📝 Template
+
+```markdown
+# 📦 Sprint [Name]: [Feature Name]
+
+**Version:** 1.0.0  
+**Date:** [Date]  
+**Duration:** [X] Sprints  
+**Status:** ✅ Completed
+
+## 📋 Sprint Goals
+
+[Brief description of what was implemented]
+
+---
+
+## ✨ Features Implemented
+
+### [Sub-feature 1]
+- Feature description
+- Key functionality
+
+### [Sub-feature 2]
+- Feature description
+- Key functionality
+
+---
+
+## 📁 File Structure
+
+### Backend Files
+
+\`\`\`
+backend/
+├── models/
+│   └── {model}.go           ✨ NEW
+├── handlers/
+│   └── {handler}.go         ✨ NEW
+├── services/
+│   └── {service}.go         ✨ NEW
+└── routes/
+    └── routes.go            ✏️ UPDATED
+\`\`\`
+
+### Frontend Files
+
+\`\`\`
+frontend/src/
+├── views/{feature}/
+│   └── {Page}.vue           ✨ NEW
+├── components/{feature}/
+│   └── {Component}.vue      ✨ NEW
+└── composables/
+    └── use{Feature}Api.js   ✨ NEW
+\`\`\`
+
+---
+
+## 🔌 API Endpoints Summary
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/{resource}` | List resources |
+| POST | `/api/{resource}` | Create resource |
+| ... | ... | ... |
+
+---
+
+## 🔗 Related Documentation
+
+- **API Reference:** [{Resource} API](../04-api-reference/{resource}.md)
+- **Testing Guide:** [{Feature} Testing](../06-testing/{feature}-testing.md)
+- **User Journeys:** [{Feature} User Journeys](../07-user-journeys/{feature}/)
+
+---
+
+*Last Updated: [Date]*
+\`\`\`
+
+### 🔄 When to Create?
+- [ ] Setelah sprint/feature selesai di-implement
+- [ ] Sebelum merge ke main branch
+- [ ] Sebagai bagian dari PR documentation
+
+---
+
+## 8. Feature Documentation (Optional)
 
 ### ❓ Do I Need This?
 > **YA, jika:**
@@ -990,17 +1146,17 @@ Tambahkan jika relevant:
 > **CRITICAL:** Feature documentation harus LEAN dan FOCUSED. 
 > Jangan jadikan feature doc sebagai "dump everything here" file.
 
-#### ❌ NEVER Include These in Feature Docs:
+#### ❌ NEVER Include These in Sprint/Feature Docs:
 
 | Content | Why NOT Here | Where It Should Go |
 |---------|--------------|-------------------|
-| **User Journeys / Flow Diagrams** | Terlalu verbose, bukan technical reference | `docs/guides/{feature}-user-journeys.md` |
-| **Full QA Test Plan** | Bukan dokumentasi fitur, ini test artifact | `docs/testing/{feature}-test-plan.md` |
-| **Detailed API Documentation** | Feature doc = summary only | `docs/api/{resource}.md` |
-| **Step-by-step Manual Test Cases** | Test artifact, bukan feature spec | `docs/testing/{feature}-test-plan.md` |
-| **Full Database Schema** | Duplicated, hard to maintain | Reference `DATABASE.md` |
-| **Complete TypeScript Interfaces** | Hard to sync with code | `docs/api/types.md` atau inline di code |
-| **Changelog History** | Grows infinitely | `CHANGELOG.md` atau git history |
+| **User Journeys / Flow Diagrams** | Terlalu verbose, bukan technical reference | `docs/07-user-journeys/{feature}/` |
+| **Full QA Test Plan** | Bukan dokumentasi fitur, ini test artifact | `docs/06-testing/{feature}-testing.md` |
+| **Detailed API Documentation** | Feature doc = summary only | `docs/04-api-reference/{resource}.md` |
+| **Step-by-step Manual Test Cases** | Test artifact, bukan feature spec | `docs/06-testing/{feature}-testing.md` |
+| **Full Database Schema** | Duplicated, hard to maintain | `docs/02-architecture/` atau inline di models |
+| **Complete TypeScript Interfaces** | Hard to sync with code | `docs/04-api-reference/` atau inline di code |
+| **Changelog History** | Grows infinitely | `docs/CHANGELOG.md` atau git history |
 
 #### 📏 Size Guidelines
 
@@ -1030,7 +1186,7 @@ Tambahkan jika relevant:
 **✅ GOOD: Reference ke Guide**
 ```markdown
 ## Related Documentation
-- **User Journeys**: Lihat [Equipment User Journeys](../guides/equipment-user-journeys.md)
+- **User Journeys**: Lihat [Khazwal User Journeys](../07-user-journeys/khazwal/material-prep-flow.md)
 ```
 
 ---
@@ -1091,36 +1247,36 @@ Tambahkan jika relevant:
 
 ### 📂 Correct File Structure for Complex Features
 
-Untuk fitur kompleks seperti Equipment Management yang span multiple sprints:
+Untuk fitur kompleks seperti Khazwal Material Preparation yang span multiple sprints:
 
 ```
 docs/
-├── features/
-│   └── owner/
-│       └── OE15-equipment-management.md   # ≤300 lines, lean reference
+├── 04-api-reference/
+│   └── khazwal.md                         # Full API documentation
 │
-├── api/
-│   └── equipment.md                       # Full route documentation
-│   └── equipment-rentals.md               # Rental-specific API
+├── 06-testing/
+│   └── khazwal-testing.md                 # Full QA checklist
 │
-├── testing/
-│   └── OE15-equipment-test-plan.md        # Full QA checklist
+├── 07-user-journeys/
+│   └── khazwal/
+│       └── material-prep-flow.md          # User journey diagrams
 │
-└── guides/
-    └── equipment-user-journeys.md         # User journey diagrams
+└── 10-sprints/
+    └── sprint-khazwal-material-prep.md    # Sprint summary
 ```
 
-### ✅ Feature Doc Checklist (Before Committing)
+### ✅ Documentation Checklist (Before Committing)
 
 Sebelum commit feature documentation, verify:
 
-- [ ] Total lines ≤ 300?
-- [ ] User stories ≤ 15?
-- [ ] Routes hanya summary (bukan full list)?
-- [ ] Manual testing hanya brief checklist?
-- [ ] Tidak ada user journey diagrams?
-- [ ] Tidak ada step-by-step test cases?
-- [ ] Reference ke docs lain sudah benar?
+- [ ] API doc dibuat di `docs/04-api-reference/`?
+- [ ] Testing guide dibuat di `docs/06-testing/`?
+- [ ] User journeys dibuat di `docs/07-user-journeys/{feature}/`?
+- [ ] Sprint doc dibuat di `docs/10-sprints/`?
+- [ ] `docs/README.md` di-update dengan links baru?
+- [ ] Cross-references antar dokumen sudah benar?
+- [ ] Routes di sprint doc hanya summary (full detail di API doc)?
+- [ ] Test cases di sprint doc hanya summary (full detail di testing guide)?
 
 ---
 
@@ -1303,4 +1459,7 @@ flowchart TD
 Dokumen ini dibuat sebagai panduan internal untuk memastikan konsistensi 
 dokumentasi dalam project development.
 
-Last Updated: 2025-12-17
+**Developer:** Zulfikar Hidayatullah  
+**Project:** Sirine Go
+
+Last Updated: 2025-12-29
