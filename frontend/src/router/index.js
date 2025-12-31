@@ -177,6 +177,26 @@ const routes = [
     }
   },
   {
+    path: '/khazwal/counting',
+    name: 'counting-queue',
+    component: () => import('../views/khazwal/counting/CountingQueuePage.vue'),
+    meta: { 
+      requiresAuth: true,
+      roles: ['STAFF_KHAZWAL', 'ADMIN', 'MANAGER'],
+      title: 'Penghitungan'
+    }
+  },
+  {
+    path: '/khazwal/counting/:poId',
+    name: 'counting-work',
+    component: () => import('../views/khazwal/counting/CountingWorkPage.vue'),
+    meta: { 
+      requiresAuth: true,
+      roles: ['STAFF_KHAZWAL', 'ADMIN', 'MANAGER'],
+      title: 'Proses Penghitungan'
+    }
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('../views/NotFound.vue'),

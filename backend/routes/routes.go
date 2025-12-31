@@ -4,6 +4,7 @@ import (
 	"sirine-go/backend/config"
 	"sirine-go/backend/database"
 	"sirine-go/backend/handlers"
+	"sirine-go/backend/internal/counting"
 	"sirine-go/backend/middleware"
 	"sirine-go/backend/services"
 
@@ -220,6 +221,24 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 			khazwal.GET("/material-prep/history", khazwalHandler.GetHistory)
 		}
 
+		// Khazwal Counting routes (Epic 2 Penghitungan)
+		countingHandler := counting.NewCountingHandler(db)
+		
+		counting := api.Group("/khazwal/counting")
+		counting.Use(middleware.AuthMiddleware(db, cfg))
+		counting.Use(middleware.RequireRole("STAFF_KHAZWAL", "ADMIN", "MANAGER"))
+		counting.Use(middleware.ActivityLogger(db))
+		{
+			// Counting Queue & Detail
+			counting.GET("/queue", countingHandler.GetCountingQueue)
+			counting.GET("/:id", countingHandler.GetCountingDetail)
+			
+			// Counting Workflow Actions
+			counting.POST("/:po_id/start", countingHandler.StartCounting)
+			counting.PATCH("/:id/result", countingHandler.UpdateCountingResult)
+			counting.POST("/:id/finalize", countingHandler.FinalizeCounting)
+		}
+
 		// Khazwal Monitoring routes (Supervisor only) - Sprint 5
 		khazwalMonitoring := api.Group("/khazwal")
 		khazwalMonitoring.Use(middleware.AuthMiddleware(db, cfg))
@@ -228,18 +247,33 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 			khazwalMonitoring.GET("/monitoring", khazwalHandler.GetMonitoring)
 		}
 
-		// Cetak routes (Sprint 5)
-		cetakService := services.NewCetakService(db)
-		cetakHandler := handlers.NewCetakHandler(cetakService)
+	// Cetak routes (Sprint 5)
+	cetakService := services.NewCetakService(db)
+	cetakHandler := handlers.NewCetakHandler(cetakService)
 
-		cetak := api.Group("/cetak")
-		cetak.Use(middleware.AuthMiddleware(db, cfg))
-		cetak.Use(middleware.RequireRole("OPERATOR_CETAK", "SUPERVISOR_CETAK", "ADMIN", "MANAGER"))
-		cetak.Use(middleware.ActivityLogger(db))
-		{
-			cetak.GET("/queue", cetakHandler.GetQueue)
-			cetak.GET("/queue/:id", cetakHandler.GetDetail)
-		}
+	cetak := api.Group("/cetak")
+	cetak.Use(middleware.AuthMiddleware(db, cfg))
+	cetak.Use(middleware.RequireRole("OPERATOR_CETAK", "SUPERVISOR_CETAK", "ADMIN", "MANAGER"))
+	cetak.Use(middleware.ActivityLogger(db))
+	{
+		cetak.GET("/queue", cetakHandler.GetQueue)
+		cetak.GET("/queue/:id", cetakHandler.GetDetail)
+	}
+
+	// Khazwal Counting routes (Epic 2)
+	countingHandler := counting.NewCountingHandler(db)
+
+	khazwalCounting := api.Group("/khazwal/counting")
+	khazwalCounting.Use(middleware.AuthMiddleware(db, cfg))
+	khazwalCounting.Use(middleware.RequireRole("STAFF_KHAZWAL", "ADMIN", "MANAGER"))
+	khazwalCounting.Use(middleware.ActivityLogger(db))
+	{
+		khazwalCounting.GET("/queue", countingHandler.GetCountingQueue)
+		khazwalCounting.GET("/:id", countingHandler.GetCountingDetail)
+		khazwalCounting.POST("/:po_id/start", countingHandler.StartCounting)
+		khazwalCounting.PATCH("/:id/result", countingHandler.UpdateCountingResult)
+		khazwalCounting.POST("/:id/finalize", countingHandler.FinalizeCounting)
+	}
 
 		// Example routes (protected) - Commented out for Sprint 1
 		// Will be re-enabled when needed

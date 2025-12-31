@@ -151,7 +151,8 @@ import {
   Package,
   History,
   Activity,
-  Printer
+  Printer,
+  Calculator
 } from 'lucide-vue-next'
 
 defineProps({
@@ -220,6 +221,11 @@ const isActive = (path) => {
             !currentPath.startsWith('/khazwal/material-prep/history'))
   }
   
+  if (path === '/khazwal/counting') {
+    // Active untuk counting queue dan work pages
+    return currentPath === '/khazwal/counting' || currentPath.startsWith('/khazwal/counting/')
+  }
+  
   if (path === '/khazwal/material-prep/history') {
     // Exact match untuk history
     return currentPath === '/khazwal/material-prep/history'
@@ -264,6 +270,7 @@ const navigationGroups = computed(() => {
   if (isKhazwal || isKhazwalSupervisor || isAdmin) {
     const khazwalItems = [
       { name: 'Persiapan Material', href: '/khazwal/material-prep', icon: Package },
+      { name: 'Penghitungan', href: '/khazwal/counting', icon: Calculator },
       { name: 'Riwayat', href: '/khazwal/material-prep/history', icon: History },
     ]
     
