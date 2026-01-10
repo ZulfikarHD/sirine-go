@@ -217,6 +217,26 @@ const routes = [
     }
   },
   {
+    path: '/khazwal/cutting/result/:id',
+    name: 'cutting-result',
+    component: () => import('../views/khazwal/cutting/CuttingResultPage.vue'),
+    meta: { 
+      requiresAuth: true,
+      roles: ['STAFF_KHAZWAL', 'ADMIN', 'MANAGER'],
+      title: 'Input Hasil Pemotongan'
+    }
+  },
+  {
+    path: '/verifikasi',
+    name: 'verifikasi-queue',
+    component: () => import('../views/verifikasi/VerificationQueuePage.vue'),
+    meta: { 
+      requiresAuth: true,
+      roles: ['QC_INSPECTOR', 'SUPERVISOR_VERIFIKASI', 'ADMIN', 'MANAGER'],
+      title: 'Antrian Verifikasi'
+    }
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('../views/NotFound.vue'),

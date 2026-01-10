@@ -153,7 +153,8 @@ import {
   Activity,
   Printer,
   Calculator,
-  Scissors
+  Scissors,
+  CheckCircle
 } from 'lucide-vue-next'
 
 defineProps({
@@ -232,6 +233,11 @@ const isActive = (path) => {
     return currentPath === '/khazwal/cutting' || currentPath.startsWith('/khazwal/cutting/')
   }
   
+  if (path === '/verifikasi') {
+    // Active untuk verifikasi queue dan detail pages
+    return currentPath === '/verifikasi' || currentPath.startsWith('/verifikasi/')
+  }
+  
   if (path === '/khazwal/material-prep/history') {
     // Exact match untuk history
     return currentPath === '/khazwal/material-prep/history'
@@ -254,6 +260,7 @@ const navigationGroups = computed(() => {
   const isKhazwal = user.value?.role === 'STAFF_KHAZWAL'
   const isKhazwalSupervisor = user.value?.role === 'SUPERVISOR_KHAZWAL'
   const isCetak = user.value?.role === 'OPERATOR_CETAK' || user.value?.role === 'SUPERVISOR_CETAK'
+  const isVerifikasi = user.value?.role === 'QC_INSPECTOR' || user.value?.role === 'SUPERVISOR_VERIFIKASI'
   
   const groups = [
     {
@@ -298,6 +305,16 @@ const navigationGroups = computed(() => {
       title: 'Unit Cetak',
       items: [
         { name: 'Antrian Cetak', href: '/cetak/queue', icon: Printer },
+      ]
+    })
+  }
+
+  // Verifikasi - visible untuk QC_INSPECTOR, SUPERVISOR_VERIFIKASI, ADMIN, MANAGER
+  if (isVerifikasi || isAdmin) {
+    groups.push({
+      title: 'Verifikasi',
+      items: [
+        { name: 'Antrian Verifikasi', href: '/verifikasi', icon: CheckCircle },
       ]
     })
   }
