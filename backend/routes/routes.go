@@ -5,6 +5,7 @@ import (
 	"sirine-go/backend/database"
 	"sirine-go/backend/handlers"
 	"sirine-go/backend/internal/counting"
+	"sirine-go/backend/internal/cutting"
 	"sirine-go/backend/middleware"
 	"sirine-go/backend/services"
 
@@ -221,23 +222,43 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 			khazwal.GET("/material-prep/history", khazwalHandler.GetHistory)
 		}
 
-		// Khazwal Counting routes (Epic 2 Penghitungan)
-		countingHandler := counting.NewCountingHandler(db)
+	// Khazwal Counting routes (Epic 2 Penghitungan)
+	countingHandler := counting.NewCountingHandler(db)
+	
+	countingGroup := api.Group("/khazwal/counting")
+	countingGroup.Use(middleware.AuthMiddleware(db, cfg))
+	countingGroup.Use(middleware.RequireRole("STAFF_KHAZWAL", "ADMIN", "MANAGER"))
+	countingGroup.Use(middleware.ActivityLogger(db))
+	{
+		// Counting Queue & Detail
+		countingGroup.GET("/queue", countingHandler.GetCountingQueue)
+		countingGroup.GET("/:id", countingHandler.GetCountingDetail)
 		
-		counting := api.Group("/khazwal/counting")
-		counting.Use(middleware.AuthMiddleware(db, cfg))
-		counting.Use(middleware.RequireRole("STAFF_KHAZWAL", "ADMIN", "MANAGER"))
-		counting.Use(middleware.ActivityLogger(db))
-		{
-			// Counting Queue & Detail
-			counting.GET("/queue", countingHandler.GetCountingQueue)
-			counting.GET("/:id", countingHandler.GetCountingDetail)
-			
-			// Counting Workflow Actions
-			counting.POST("/:po_id/start", countingHandler.StartCounting)
-			counting.PATCH("/:id/result", countingHandler.UpdateCountingResult)
-			counting.POST("/:id/finalize", countingHandler.FinalizeCounting)
-		}
+		// Counting Workflow Actions
+		countingGroup.POST("/po/:po_id/start", countingHandler.StartCounting)
+		countingGroup.PATCH("/:id/result", countingHandler.UpdateCountingResult)
+		countingGroup.POST("/:id/finalize", countingHandler.FinalizeCounting)
+	}
+
+	// Khazwal Cutting routes (Epic 3 Pemotongan)
+	cuttingRepo := cutting.NewRepository(db)
+	cuttingService := cutting.NewService(cuttingRepo)
+	cuttingHandler := cutting.NewHandler(cuttingService)
+	
+	cuttingGroup := api.Group("/khazwal/cutting")
+	cuttingGroup.Use(middleware.AuthMiddleware(db, cfg))
+	cuttingGroup.Use(middleware.RequireRole("STAFF_KHAZWAL", "ADMIN", "MANAGER"))
+	cuttingGroup.Use(middleware.ActivityLogger(db))
+	{
+		// Cutting Queue & Detail
+		cuttingGroup.GET("/queue", cuttingHandler.GetCuttingQueue)
+		cuttingGroup.GET("/:id", cuttingHandler.GetCuttingDetail)
+		
+		// Cutting Workflow Actions
+		cuttingGroup.POST("/po/:po_id/start", cuttingHandler.StartCutting)
+		cuttingGroup.PATCH("/:id/result", cuttingHandler.UpdateCuttingResult)
+		cuttingGroup.POST("/:id/finalize", cuttingHandler.FinalizeCutting)
+	}
 
 		// Khazwal Monitoring routes (Supervisor only) - Sprint 5
 		khazwalMonitoring := api.Group("/khazwal")
@@ -258,21 +279,6 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 	{
 		cetak.GET("/queue", cetakHandler.GetQueue)
 		cetak.GET("/queue/:id", cetakHandler.GetDetail)
-	}
-
-	// Khazwal Counting routes (Epic 2)
-	countingHandler := counting.NewCountingHandler(db)
-
-	khazwalCounting := api.Group("/khazwal/counting")
-	khazwalCounting.Use(middleware.AuthMiddleware(db, cfg))
-	khazwalCounting.Use(middleware.RequireRole("STAFF_KHAZWAL", "ADMIN", "MANAGER"))
-	khazwalCounting.Use(middleware.ActivityLogger(db))
-	{
-		khazwalCounting.GET("/queue", countingHandler.GetCountingQueue)
-		khazwalCounting.GET("/:id", countingHandler.GetCountingDetail)
-		khazwalCounting.POST("/:po_id/start", countingHandler.StartCounting)
-		khazwalCounting.PATCH("/:id/result", countingHandler.UpdateCountingResult)
-		khazwalCounting.POST("/:id/finalize", countingHandler.FinalizeCounting)
 	}
 
 		// Example routes (protected) - Commented out for Sprint 1

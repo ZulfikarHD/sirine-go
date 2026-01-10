@@ -152,7 +152,8 @@ import {
   History,
   Activity,
   Printer,
-  Calculator
+  Calculator,
+  Scissors
 } from 'lucide-vue-next'
 
 defineProps({
@@ -226,6 +227,11 @@ const isActive = (path) => {
     return currentPath === '/khazwal/counting' || currentPath.startsWith('/khazwal/counting/')
   }
   
+  if (path === '/khazwal/cutting') {
+    // Active untuk cutting queue dan start pages
+    return currentPath === '/khazwal/cutting' || currentPath.startsWith('/khazwal/cutting/')
+  }
+  
   if (path === '/khazwal/material-prep/history') {
     // Exact match untuk history
     return currentPath === '/khazwal/material-prep/history'
@@ -271,6 +277,7 @@ const navigationGroups = computed(() => {
     const khazwalItems = [
       { name: 'Persiapan Material', href: '/khazwal/material-prep', icon: Package },
       { name: 'Penghitungan', href: '/khazwal/counting', icon: Calculator },
+      { name: 'Pemotongan', href: '/khazwal/cutting', icon: Scissors },
       { name: 'Riwayat', href: '/khazwal/material-prep/history', icon: History },
     ]
     

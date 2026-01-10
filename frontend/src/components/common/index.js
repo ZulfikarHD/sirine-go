@@ -12,6 +12,13 @@ export { default as ConfirmDialog } from './ConfirmDialog.vue'
 export { default as AlertDialog } from './AlertDialog.vue'
 export { default as PasswordConfirmDialog } from './PasswordConfirmDialog.vue'
 
-// Other Common Components
+// Navigation & Layout Components
 export { default as Breadcrumbs } from './Breadcrumbs.vue'
+
+// UI Components
+export { default as PriorityBadge } from './PriorityBadge.vue'
+export { default as LoadingSkeleton } from './LoadingSkeleton.vue'
+export { default as BarcodeScanner } from './BarcodeScanner.vue'
+export { default as PhotoUploader } from './PhotoUploader.vue'
+export { default as MaterialPhotoViewer } from './MaterialPhotoViewer.vue'
 

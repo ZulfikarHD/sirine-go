@@ -1,6 +1,8 @@
 package database
 
 import (
+	"sirine-go/backend/internal/counting"
+	"sirine-go/backend/internal/cutting"
 	"sirine-go/backend/models"
 )
 
@@ -33,8 +35,9 @@ func NewModelsRegistry() *ModelsRegistry {
 	registry.Register(&models.POStageTracking{}, "po_stage_trackings")
 	registry.Register(&models.KhazwalMaterialPreparation{}, "khazwal_material_preparations")
 
-	// TODO: Tambahkan models baru di sini untuk auto-migration
-	// registry.Register(&models.NewModel{}, "new_model_table")
+	// Khazwal Counting & Cutting models (Epic 2 & 3)
+	registry.Register(&counting.KhazwalCountingResult{}, "khazwal_counting_results")
+	registry.Register(&cutting.KhazwalCuttingResult{}, "khazwal_cutting_results")
 
 	return registry
 }

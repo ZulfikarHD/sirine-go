@@ -197,6 +197,26 @@ const routes = [
     }
   },
   {
+    path: '/khazwal/cutting',
+    name: 'cutting-queue',
+    component: () => import('../views/khazwal/cutting/CuttingQueuePage.vue'),
+    meta: { 
+      requiresAuth: true,
+      roles: ['STAFF_KHAZWAL', 'ADMIN', 'MANAGER'],
+      title: 'Pemotongan'
+    }
+  },
+  {
+    path: '/khazwal/cutting/start/:poId',
+    name: 'cutting-start',
+    component: () => import('../views/khazwal/cutting/CuttingStartPage.vue'),
+    meta: { 
+      requiresAuth: true,
+      roles: ['STAFF_KHAZWAL', 'ADMIN', 'MANAGER'],
+      title: 'Mulai Pemotongan'
+    }
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('../views/NotFound.vue'),
