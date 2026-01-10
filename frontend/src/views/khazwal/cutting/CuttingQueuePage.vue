@@ -186,7 +186,10 @@
             :counting-completed-at="item.counting_completed_at"
             :waiting-minutes="item.waiting_minutes"
             :is-overdue="item.is_overdue"
+            :cutting-id="item.cutting_id"
+            :cutting-status="item.cutting_status"
             @start-cutting="handleStartCutting(item)"
+            @input-result="handleInputResult(item)"
           />
         </Motion>
       </div>
